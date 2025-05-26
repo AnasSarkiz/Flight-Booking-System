@@ -5,6 +5,11 @@ VisualStudioVersion = 17.12.35707.178 d17.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flight Booking System", "Flight Booking System.csproj", "{3700BCA8-1842-48D8-8CAF-F8AAD9A6C551}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{17DD0654-1272-4E3A-B0FC-73E03222EAF1}"
+	ProjectSection(SolutionItems) = preProject
+		db_DDL.sql = db_DDL.sql
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

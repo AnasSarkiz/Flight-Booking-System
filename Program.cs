@@ -1,3 +1,5 @@
+using FlightBooker;
+
 namespace Flight_Booking_System
 {
     internal static class Program
@@ -8,10 +10,8 @@ namespace Flight_Booking_System
         [STAThread]
         static void Main()
         {
-            // To customize application configuration such as set high DPI settings or default font,
-            // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
-            Application.Run(new Form1());
+            Application.Run(new Registration()); 
         }
     }
 }
