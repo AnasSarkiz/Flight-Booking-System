@@ -158,7 +158,7 @@ namespace FlightBooker
             // 
             // searchPanel
             // 
-            searchPanel.BackColor = Color.Linen;
+            searchPanel.BackColor = Color.LightSteelBlue;
             searchPanel.Controls.Add(originTextBox);
             searchPanel.Controls.Add(destinationTextBox);
             searchPanel.Controls.Add(departureDatePicker);
@@ -199,8 +199,11 @@ namespace FlightBooker
             // 
             // searchButton
             // 
-            searchButton.BackColor = Color.DarkOrange;
+            searchButton.BackColor = SystemColors.ControlLightLight;
             searchButton.Dock = DockStyle.Right;
+            searchButton.FlatStyle = FlatStyle.Popup;
+            searchButton.Font = new Font("Arial", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            searchButton.ForeColor = Color.Black;
             searchButton.Location = new Point(690, 10);
             searchButton.Name = "searchButton";
             searchButton.Size = new Size(100, 30);
@@ -211,7 +214,7 @@ namespace FlightBooker
             // 
             // filterPanel
             // 
-            filterPanel.BackColor = Color.Linen;
+            filterPanel.BackColor = Color.LightSteelBlue;
             filterPanel.Controls.Add(sortbox);
             filterPanel.Controls.Add(filterBox);
             filterPanel.Controls.Add(filterLabel);

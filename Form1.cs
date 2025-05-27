@@ -115,7 +115,7 @@ namespace FlightBooker
                 Width = 200,
                 Height = 300,
                 Margin = new Padding(10),
-                BackColor = Color.Orange
+                BackColor = Color.SteelBlue
             };
 
             PictureBox image = new PictureBox
@@ -174,7 +174,6 @@ namespace FlightBooker
 
             selectBtn.Click += (s, e) =>
             { 
-                MessageBox.Show($"Flight selected: {airlineName} from {origin} to {destination}");
                 ShowBookingPage();
             };
 
