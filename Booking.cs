@@ -102,33 +102,35 @@ namespace Flight_Booking_System
                 string.IsNullOrWhiteSpace(txtExpiry.Text) ||
                 string.IsNullOrWhiteSpace(txtCVV.Text))
             {
-                MessageBox.Show(
-                    "Please complete all fields, select a seat, and enter payment details.",
-                    "Incomplete Information",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-                return;
-            }
+                {
+                    MessageBox.Show(
+                        "Please complete all fields, select a seat, and enter payment details.",
+                        "Incomplete Information",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    return;
+                }
 
-            // TODO: Insert booking into database (collect all info here).
-            MessageBox.Show(
-                $"Booking confirmed:\n\n" +
-                $"Name: {txtFirstName.Text} {txtLastName.Text}\n" +
-                $"Passport: {txtPassport.Text}\n" +
-                $"Email: {txtEmail.Text}\n" +
-                $"Nationality: {txtNationality.Text}\n" +
-                $"Flight Date: {dobPicker.Value.ToShortDateString()}\n" +
-                $"Seat: {SelectedSeat}\n" +
-                $"Class: {(businessRadio.Checked ? "Business" : "Economy")}\n" +
-                $"Price: {txtPrice.Text}\n\n" +
-                $"Payment:\n" +
-                $"Card Holder: {txtCardName.Text}\n" +
-                $"Card Number: {txtCardNumber.Text}\n" +
-                $"Expiry: {txtExpiry.Text}\n" +
-                $"CVV: {txtCVV.Text}",
-                "Booking Successful",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Information);
+           
+                MessageBox.Show(
+                    $"Booking confirmed:\n\n" +
+                    $"Name: {txtFirstName.Text} {txtLastName.Text}\n" +
+                    $"Passport: {txtPassport.Text}\n" +
+                    $"Email: {txtEmail.Text}\n" +
+                    $"Nationality: {txtNationality.Text}\n" +
+                    $"Flight Date: {dobPicker.Value.ToShortDateString()}\n" +
+                    $"Seat: {SelectedSeat}\n" +
+                    $"Class: {(businessRadio.Checked ? "Business" : "Economy")}\n" +
+                    $"Price: {txtPrice.Text}\n\n" +
+                    $"Payment:\n" +
+                    $"Card Holder: {txtCardName.Text}\n" +
+                    $"Card Number: {txtCardNumber.Text}\n" +
+                    $"Expiry: {txtExpiry.Text}\n" +
+                    $"CVV: {txtCVV.Text}",
+                    "Booking Successful",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }
         }
     }
 }

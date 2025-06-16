@@ -11,21 +11,25 @@ namespace FlightBooker
         private Panel mainContentPanel;
         private Panel filterPanel;
         private FlowLayoutPanel flightCardsPanel;
-
+        private Panel searchPanel;
 
         private Label navLogo;
-        private Button bookingsBtn;
+        private Button homeBtn;
+        private Button searchFlightsBtn;
+    private Button bookingsBtn;
         private Button logoutBtn;
+
+        private GroupBox filterBox;
+        private GroupBox sortBox;
+        private RadioButton priceL;
+        private RadioButton durationRb;
         private Label filterLabel;
-        private Panel searchPanel;
+
         private TextBox originTextBox;
         private TextBox destinationTextBox;
         private DateTimePicker departureDatePicker;
         private Button searchButton;
 
-        /// <summary>
-        /// Clean up resources
-        /// </summary>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -33,105 +37,125 @@ namespace FlightBooker
             base.Dispose(disposing);
         }
 
-        /// <summary>
-        /// Required method for Designer support
-        /// </summary>
         private void InitializeComponent()
         {
-            navbarPanel = new Panel();
-            homeBtn = new Button();
-            bookingsBtn = new Button();
-            navLogo = new Label();
+            Panel navbarPanel;
             logoutBtn = new Button();
+            bookingsBtn = new Button();
+            searchFlightsBtn = new Button();
+            homeBtn = new Button();
+            navLogo = new Label();
             mainContentPanel = new Panel();
             flightCardsPanel = new FlowLayoutPanel();
             searchPanel = new Panel();
+            numericUpDown1 = new NumericUpDown();
+            noPassenger = new Label();
+            label1 = new Label();
+            flightDateLbl = new Label();
+            originLbl = new Label();
             originTextBox = new TextBox();
             destinationTextBox = new TextBox();
             departureDatePicker = new DateTimePicker();
             searchButton = new Button();
             filterPanel = new Panel();
-            sortbox = new GroupBox();
-            priceH = new RadioButton();
+            sortBox = new GroupBox();
             priceL = new RadioButton();
+            durationRb = new RadioButton();
             filterBox = new GroupBox();
             filterLabel = new Label();
+            navbarPanel = new Panel();
             navbarPanel.SuspendLayout();
             mainContentPanel.SuspendLayout();
             searchPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
             filterPanel.SuspendLayout();
-            sortbox.SuspendLayout();
+            sortBox.SuspendLayout();
             SuspendLayout();
             // 
             // navbarPanel
             // 
-            navbarPanel.BackColor = Color.WhiteSmoke;
-            navbarPanel.Controls.Add(homeBtn);
-            navbarPanel.Controls.Add(bookingsBtn);
-            navbarPanel.Controls.Add(navLogo);
+            navbarPanel.BackColor = Color.White;
             navbarPanel.Controls.Add(logoutBtn);
+            navbarPanel.Controls.Add(bookingsBtn);
+            navbarPanel.Controls.Add(searchFlightsBtn);
+            navbarPanel.Controls.Add(homeBtn);
+            navbarPanel.Controls.Add(navLogo);
             navbarPanel.Dock = DockStyle.Top;
             navbarPanel.Location = new Point(0, 0);
             navbarPanel.Name = "navbarPanel";
-            navbarPanel.Padding = new Padding(1);
+            navbarPanel.Padding = new Padding(10, 0, 10, 0);
             navbarPanel.Size = new Size(1000, 60);
             navbarPanel.TabIndex = 1;
             // 
-            // homeBtn
+            // logoutBtn
             // 
-            homeBtn.BackColor = Color.White;
-            homeBtn.Dock = DockStyle.Right;
-            homeBtn.FlatAppearance.BorderColor = Color.Linen;
-            homeBtn.FlatAppearance.BorderSize = 0;
-            homeBtn.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
-            homeBtn.Location = new Point(699, 1);
-            homeBtn.Name = "homeBtn";
-            homeBtn.Size = new Size(100, 58);
-            homeBtn.TabIndex = 4;
-            homeBtn.Text = "Home";
-            homeBtn.UseVisualStyleBackColor = false;
-            homeBtn.Click += homeBtn_Click;
+            logoutBtn.AutoSize = true;
+            logoutBtn.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            logoutBtn.Dock = DockStyle.Right;
+            logoutBtn.FlatAppearance.BorderSize = 0;
+            logoutBtn.FlatStyle = FlatStyle.Flat;
+            logoutBtn.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold);
+            logoutBtn.Location = new Point(650, 0);
+            logoutBtn.Name = "logoutBtn";
+            logoutBtn.Size = new Size(73, 60);
+            logoutBtn.TabIndex = 0;
+            logoutBtn.Text = "Logout";
+            logoutBtn.Click += logoutBtn_Click;
             // 
             // bookingsBtn
             // 
-            bookingsBtn.BackColor = Color.White;
+            bookingsBtn.AutoSize = true;
+            bookingsBtn.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             bookingsBtn.Dock = DockStyle.Right;
-            bookingsBtn.FlatAppearance.BorderColor = Color.Linen;
             bookingsBtn.FlatAppearance.BorderSize = 0;
-            bookingsBtn.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
-            bookingsBtn.Location = new Point(799, 1);
+            bookingsBtn.FlatStyle = FlatStyle.Flat;
+            bookingsBtn.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold);
+            bookingsBtn.Location = new Point(723, 0);
             bookingsBtn.Name = "bookingsBtn";
-            bookingsBtn.Size = new Size(100, 58);
-            bookingsBtn.TabIndex = 0;
-            bookingsBtn.Text = "Bookings";
-            bookingsBtn.UseVisualStyleBackColor = false;
+            bookingsBtn.Size = new Size(81, 60);
+            bookingsBtn.TabIndex = 1;
+            bookingsBtn.Text = "Booking";
             bookingsBtn.Click += bookingsBtn_Click;
+            // 
+            // searchFlightsBtn
+            // 
+            searchFlightsBtn.AutoSize = true;
+            searchFlightsBtn.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            searchFlightsBtn.Dock = DockStyle.Right;
+            searchFlightsBtn.FlatAppearance.BorderSize = 0;
+            searchFlightsBtn.FlatStyle = FlatStyle.Flat;
+            searchFlightsBtn.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold);
+            searchFlightsBtn.Location = new Point(804, 0);
+            searchFlightsBtn.Name = "searchFlightsBtn";
+            searchFlightsBtn.Size = new Size(121, 60);
+            searchFlightsBtn.TabIndex = 2;
+            searchFlightsBtn.Text = "Search Flights";
+            searchFlightsBtn.Click += searchButton_Click;
+            // 
+            // homeBtn
+            // 
+            homeBtn.AutoSize = true;
+            homeBtn.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            homeBtn.Dock = DockStyle.Right;
+            homeBtn.FlatAppearance.BorderSize = 0;
+            homeBtn.FlatStyle = FlatStyle.Flat;
+            homeBtn.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold);
+            homeBtn.Location = new Point(925, 0);
+            homeBtn.Name = "homeBtn";
+            homeBtn.Size = new Size(65, 60);
+            homeBtn.TabIndex = 3;
+            homeBtn.Text = "Home";
+            homeBtn.Click += homeBtn_Click;
             // 
             // navLogo
             // 
-            navLogo.Dock = DockStyle.Left;
+            navLogo.AutoSize = true;
             navLogo.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
-            navLogo.Location = new Point(1, 1);
+            navLogo.Location = new Point(10, 17);
             navLogo.Name = "navLogo";
-            navLogo.Size = new Size(168, 58);
-            navLogo.TabIndex = 2;
+            navLogo.Size = new Size(154, 25);
+            navLogo.TabIndex = 4;
             navLogo.Text = "✈ FlightBooker";
-            navLogo.TextAlign = ContentAlignment.MiddleLeft;
-            // 
-            // logoutBtn
-            // 
-            logoutBtn.BackColor = Color.White;
-            logoutBtn.Dock = DockStyle.Right;
-            logoutBtn.FlatAppearance.BorderColor = Color.Linen;
-            logoutBtn.FlatAppearance.BorderSize = 0;
-            logoutBtn.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
-            logoutBtn.Location = new Point(899, 1);
-            logoutBtn.Name = "logoutBtn";
-            logoutBtn.Size = new Size(100, 58);
-            logoutBtn.TabIndex = 3;
-            logoutBtn.Text = "Logout";
-            logoutBtn.UseVisualStyleBackColor = false;
-            logoutBtn.Click += logoutBtn_Click;
             // 
             // mainContentPanel
             // 
@@ -148,17 +172,21 @@ namespace FlightBooker
             // flightCardsPanel
             // 
             flightCardsPanel.AutoScroll = true;
-            flightCardsPanel.BackColor = Color.WhiteSmoke;
             flightCardsPanel.Dock = DockStyle.Fill;
-            flightCardsPanel.Location = new Point(200, 50);
+            flightCardsPanel.Location = new Point(200, 150);
             flightCardsPanel.Name = "flightCardsPanel";
-            flightCardsPanel.Padding = new Padding(20, 70, 10, 10);
-            flightCardsPanel.Size = new Size(800, 490);
+            flightCardsPanel.Padding = new Padding(40, 150, 10, 10);
+            flightCardsPanel.Size = new Size(800, 390);
             flightCardsPanel.TabIndex = 0;
             // 
             // searchPanel
             // 
-            searchPanel.BackColor = Color.LightSteelBlue;
+            searchPanel.BackColor = SystemColors.MenuBar;
+            searchPanel.Controls.Add(numericUpDown1);
+            searchPanel.Controls.Add(noPassenger);
+            searchPanel.Controls.Add(label1);
+            searchPanel.Controls.Add(flightDateLbl);
+            searchPanel.Controls.Add(originLbl);
             searchPanel.Controls.Add(originTextBox);
             searchPanel.Controls.Add(destinationTextBox);
             searchPanel.Controls.Add(departureDatePicker);
@@ -166,48 +194,97 @@ namespace FlightBooker
             searchPanel.Dock = DockStyle.Top;
             searchPanel.Location = new Point(200, 0);
             searchPanel.Name = "searchPanel";
-            searchPanel.Padding = new Padding(10);
-            searchPanel.Size = new Size(800, 50);
-            searchPanel.TabIndex = 2;
+            searchPanel.Padding = new Padding(20);
+            searchPanel.Size = new Size(800, 150);
+            searchPanel.TabIndex = 1;
+            // 
+            // numericUpDown1
+            // 
+            numericUpDown1.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            numericUpDown1.Location = new Point(487, 62);
+            numericUpDown1.Name = "numericUpDown1";
+            numericUpDown1.Size = new Size(250, 23);
+            numericUpDown1.TabIndex = 9;
+            // 
+            // noPassenger
+            // 
+            noPassenger.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            noPassenger.AutoSize = true;
+            noPassenger.Location = new Point(399, 70);
+            noPassenger.Name = "noPassenger";
+            noPassenger.Size = new Size(82, 15);
+            noPassenger.TabIndex = 8;
+            noPassenger.Text = "No Passenger:";
+            // 
+            // label1
+            // 
+            label1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            label1.AutoSize = true;
+            label1.ImageAlign = ContentAlignment.MiddleLeft;
+            label1.Location = new Point(411, 30);
+            label1.Name = "label1";
+            label1.Size = new Size(70, 15);
+            label1.TabIndex = 7;
+            label1.Text = "Destination:";
+            // 
+            // flightDateLbl
+            // 
+            flightDateLbl.AutoSize = true;
+            flightDateLbl.Location = new Point(38, 70);
+            flightDateLbl.Name = "flightDateLbl";
+            flightDateLbl.Size = new Size(34, 15);
+            flightDateLbl.TabIndex = 6;
+            flightDateLbl.Text = "Date:";
+            // 
+            // originLbl
+            // 
+            originLbl.AutoSize = true;
+            originLbl.Location = new Point(38, 27);
+            originLbl.Name = "originLbl";
+            originLbl.Size = new Size(43, 15);
+            originLbl.TabIndex = 5;
+            originLbl.Text = "Origin:";
             // 
             // originTextBox
             // 
-            originTextBox.Location = new Point(15, 12);
-            originTextBox.Margin = new Padding(5);
+            originTextBox.Font = new Font("Segoe UI", 10F);
+            originTextBox.Location = new Point(119, 22);
             originTextBox.Name = "originTextBox";
-            originTextBox.PlaceholderText = "From";
-            originTextBox.Size = new Size(149, 23);
+            originTextBox.PlaceholderText = "Origin";
+            originTextBox.Size = new Size(250, 25);
             originTextBox.TabIndex = 0;
             // 
             // destinationTextBox
             // 
-            destinationTextBox.Location = new Point(183, 12);
-            destinationTextBox.Margin = new Padding(5);
+            destinationTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            destinationTextBox.Font = new Font("Segoe UI", 10F);
+            destinationTextBox.Location = new Point(487, 23);
             destinationTextBox.Name = "destinationTextBox";
-            destinationTextBox.PlaceholderText = "To";
-            destinationTextBox.Size = new Size(160, 23);
+            destinationTextBox.PlaceholderText = "Destination";
+            destinationTextBox.Size = new Size(250, 25);
             destinationTextBox.TabIndex = 1;
             // 
             // departureDatePicker
             // 
-            departureDatePicker.Format = DateTimePickerFormat.Short;
-            departureDatePicker.Location = new Point(366, 12);
-            departureDatePicker.Margin = new Padding(5);
+            departureDatePicker.CustomFormat = "yyyy-MM-dd";
+            departureDatePicker.Font = new Font("Segoe UI", 10F);
+            departureDatePicker.Format = DateTimePickerFormat.Custom;
+            departureDatePicker.Location = new Point(119, 62);
             departureDatePicker.Name = "departureDatePicker";
-            departureDatePicker.Size = new Size(150, 23);
+            departureDatePicker.Size = new Size(250, 25);
             departureDatePicker.TabIndex = 2;
             // 
             // searchButton
             // 
-            searchButton.BackColor = SystemColors.ControlLightLight;
-            searchButton.Dock = DockStyle.Right;
+            searchButton.Anchor = AnchorStyles.Bottom;
+            searchButton.BackColor = Color.LightSteelBlue;
             searchButton.FlatStyle = FlatStyle.Popup;
-            searchButton.Font = new Font("Arial", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            searchButton.ForeColor = Color.Black;
-            searchButton.Location = new Point(690, 10);
+            searchButton.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+            searchButton.Location = new Point(38, 103);
+            searchButton.Margin = new Padding(0);
             searchButton.Name = "searchButton";
-            searchButton.Size = new Size(100, 30);
-            searchButton.TabIndex = 3;
+            searchButton.Size = new Size(724, 42);
+            searchButton.TabIndex = 4;
             searchButton.Text = "Search";
             searchButton.UseVisualStyleBackColor = false;
             searchButton.Click += searchButton_Click;
@@ -215,75 +292,69 @@ namespace FlightBooker
             // filterPanel
             // 
             filterPanel.BackColor = Color.LightSteelBlue;
-            filterPanel.Controls.Add(sortbox);
+            filterPanel.Controls.Add(sortBox);
             filterPanel.Controls.Add(filterBox);
             filterPanel.Controls.Add(filterLabel);
             filterPanel.Dock = DockStyle.Left;
             filterPanel.Location = new Point(0, 0);
             filterPanel.Name = "filterPanel";
             filterPanel.Size = new Size(200, 540);
-            filterPanel.TabIndex = 1;
+            filterPanel.TabIndex = 2;
             // 
-            // sortbox
+            // sortBox
             // 
-            sortbox.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            sortbox.Controls.Add(priceH);
-            sortbox.Controls.Add(priceL);
-            sortbox.Font = new Font("Segoe UI", 14.25F, FontStyle.Bold);
-            sortbox.Location = new Point(19, 147);
-            sortbox.Name = "sortbox";
-            sortbox.Size = new Size(150, 200);
-            sortbox.TabIndex = 2;
-            sortbox.TabStop = false;
-            sortbox.Text = "Sort";
-            // 
-            // priceH
-            // 
-            priceH.AutoSize = true;
-            priceH.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            priceH.Location = new Point(6, 57);
-            priceH.Name = "priceH";
-            priceH.Size = new Size(126, 19);
-            priceH.TabIndex = 1;
-            priceH.TabStop = true;
-            priceH.Text = "Price Highest First";
-            priceH.UseVisualStyleBackColor = true;
+            sortBox.AutoSize = true;
+            sortBox.Controls.Add(priceL);
+            sortBox.Controls.Add(durationRb);
+            sortBox.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+            sortBox.Location = new Point(10, 170);
+            sortBox.Name = "sortBox";
+            sortBox.Size = new Size(180, 111);
+            sortBox.TabIndex = 0;
+            sortBox.TabStop = false;
+            sortBox.Text = "Sort by";
             // 
             // priceL
             // 
             priceL.AutoSize = true;
-            priceL.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            priceL.Location = new Point(6, 32);
+            priceL.Font = new Font("Segoe UI", 10F);
+            priceL.Location = new Point(10, 30);
             priceL.Name = "priceL";
-            priceL.Size = new Size(123, 19);
+            priceL.Size = new Size(56, 23);
             priceL.TabIndex = 0;
-            priceL.TabStop = true;
-            priceL.Text = "Price Lowest First";
-            priceL.UseVisualStyleBackColor = true;
+            priceL.Text = "Price";
+            // 
+            // durationRb
+            // 
+            durationRb.AutoSize = true;
+            durationRb.Font = new Font("Segoe UI", 10F);
+            durationRb.Location = new Point(10, 60);
+            durationRb.Name = "durationRb";
+            durationRb.Size = new Size(81, 23);
+            durationRb.TabIndex = 1;
+            durationRb.Text = "Duration";
             // 
             // filterBox
             // 
             filterBox.AutoSize = true;
-            filterBox.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            filterBox.Font = new Font("Segoe UI", 14.25F, FontStyle.Bold);
-            filterBox.Location = new Point(19, 24);
-            filterBox.MinimumSize = new Size(150, 70);
+            filterBox.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+            filterBox.Location = new Point(10, 50);
             filterBox.Name = "filterBox";
-            filterBox.Size = new Size(150, 70);
+            filterBox.Size = new Size(180, 100);
             filterBox.TabIndex = 1;
             filterBox.TabStop = false;
-            filterBox.Text = "Filter";
+            filterBox.Text = "Airlines";
             // 
             // filterLabel
             // 
             filterLabel.Dock = DockStyle.Top;
-            filterLabel.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            filterLabel.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
             filterLabel.Location = new Point(0, 0);
             filterLabel.Name = "filterLabel";
-            filterLabel.Padding = new Padding(10);
+            filterLabel.Padding = new Padding(10, 10, 0, 10);
             filterLabel.Size = new Size(200, 23);
-            filterLabel.TabIndex = 0;
-            filterLabel.Text = "Filters";
+            filterLabel.TabIndex = 2;
+            filterLabel.Text = "Filter & Sort";
             // 
             // Form1
             // 
@@ -294,20 +365,22 @@ namespace FlightBooker
             Name = "Form1";
             Text = "FlightBooker";
             navbarPanel.ResumeLayout(false);
+            navbarPanel.PerformLayout();
             mainContentPanel.ResumeLayout(false);
             searchPanel.ResumeLayout(false);
             searchPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)numericUpDown1).EndInit();
             filterPanel.ResumeLayout(false);
             filterPanel.PerformLayout();
-            sortbox.ResumeLayout(false);
-            sortbox.PerformLayout();
+            sortBox.ResumeLayout(false);
+            sortBox.PerformLayout();
             ResumeLayout(false);
         }
 
-        private Button homeBtn;
-        private GroupBox filterBox;
-        private GroupBox sortbox;
-        private RadioButton priceH;
-        private RadioButton priceL;
+        private Label flightDateLbl;
+        private Label originLbl;
+        private Label noPassenger;
+        private Label label1;
+        private NumericUpDown numericUpDown1;
     }
 }
