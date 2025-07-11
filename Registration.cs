@@ -1,3 +1,4 @@
+using FlightBookingSystem;
 using System;
 using System.Windows.Forms;
 
@@ -18,7 +19,7 @@ namespace FlightBooker
             if (true)
             {
                 this.Hide();
-                Form1 mainForm = new Form1();
+                MainForm mainForm = new MainForm();
                 mainForm.Show();
             }
             else

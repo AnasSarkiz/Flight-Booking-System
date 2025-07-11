@@ -8,15 +8,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Flight_Booking_System
+namespace Flight_Booking_System.Controls
 {
-    public partial class ManageBooking : UserControl
+    public partial class BookingCard : UserControl
     {
-        public ManageBooking()
+        public BookingCard()
         {
             InitializeComponent();
         }
-
-           
     }
 }
