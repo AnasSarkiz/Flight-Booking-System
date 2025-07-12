@@ -318,6 +318,7 @@ namespace FlightBookingSystem.Controls
         private async Task LoadImageAsync(Panel panel, string imageUrl)
         {
             try
+
             {
                 using (var httpClient = new HttpClient())
                 {

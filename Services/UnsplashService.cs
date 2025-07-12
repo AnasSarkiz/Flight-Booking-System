@@ -3,37 +3,34 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using DotNetEnv;
+using System.Collections.Concurrent;
+using System.IO;
 
 namespace FlightBookingSystem.Services
 {
-    public class UnsplashService
+    public class UnsplashService : IDisposable
     {
         private const string BaseUrl = "https://api.unsplash.com/";
         private readonly string _accessKey;
         private readonly HttpClient _httpClient;
 
+        // Cache for city image URLs
+        private static readonly ConcurrentDictionary<string, string> _cityImageCache = new ConcurrentDictionary<string, string>();
+        // Cache file path
+        private readonly string _cacheFilePath;
+
         public UnsplashService()
         {
+            // Load environment variables
             var envPath = Path.Combine(Directory.GetCurrentDirectory(), ".env");
-            Console.WriteLine($"Looking for .env at: {envPath}");
-            Console.WriteLine($"File exists: {File.Exists(envPath)}");
-
             DotNetEnv.Env.Load();
 
-            Console.WriteLine("Loaded environment variables:");
-            foreach (System.Collections.DictionaryEntry env in Environment.GetEnvironmentVariables())
+            _accessKey = Environment.GetEnvironmentVariable("UNSPLASH_Access_Key");
+            if (string.IsNullOrEmpty(_accessKey))
             {
-                Console.WriteLine($"{env.Key}={env.Value}");
+                throw new Exception("UNSPLASH_Access_Key not found in environment variables");
             }
 
-            var accessKey = Environment.GetEnvironmentVariable("UNSPLASH_Access_Key");
-            if (string.IsNullOrEmpty(accessKey))
-            {
-                throw new Exception(".env file found but UNSPLASH_Access_Key not loaded. Check:\n" +
-                                  "1. .env file formatting\n" +
-                                  "2. Variable name spelling\n" +
-                                  $"Current directory: {Directory.GetCurrentDirectory()}");
-            }
             // Initialize HttpClient
             _httpClient = new HttpClient
             {
@@ -43,10 +40,28 @@ namespace FlightBookingSystem.Services
 
             _httpClient.DefaultRequestHeaders.Add("Authorization", $"Client-ID {_accessKey}");
             _httpClient.DefaultRequestHeaders.Add("Accept-Version", "v1");
+
+            // Set up cache file path
+            _cacheFilePath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "FlightBookingSystem",
+                "unsplash_cache.json");
+
+            // Load cache from file if exists
+            LoadCacheFromFile();
         }
 
         public async Task<string> GetCityImageUrl(string cityName, string imageSize = "regular")
         {
+            // Create cache key with city name and size
+            var cacheKey = $"{cityName.ToLowerInvariant()}_{imageSize}";
+
+            // Check cache first
+            if (_cityImageCache.TryGetValue(cacheKey, out var cachedUrl))
+            {
+                return cachedUrl;
+            }
+
             try
             {
                 // Clean city name (remove airport code if present)
@@ -62,9 +77,15 @@ namespace FlightBookingSystem.Services
                 var content = await response.Content.ReadAsStringAsync();
                 dynamic result = JsonConvert.DeserializeObject(content);
 
-                // Return the requested image size (defaults to 'regular')
-                return result?.results[0]?.urls?[imageSize]?.ToString()
-                       ?? GetDefaultImageUrl();
+                // Get the requested image size (defaults to 'regular')
+                var imageUrl = result?.results[0]?.urls?[imageSize]?.ToString()
+                             ?? GetDefaultImageUrl();
+
+                // Add to cache
+                _cityImageCache.TryAdd(cacheKey, imageUrl);
+                SaveCacheToFile();
+
+                return imageUrl;
             }
             catch (HttpRequestException ex)
             {
@@ -97,11 +118,51 @@ namespace FlightBookingSystem.Services
 
         private string GetDefaultImageUrl()
         {
-            // Default travel image from Unsplash
             return "https://images.unsplash.com/photo-1500835556837-99ac94a94552?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80";
         }
 
-        // Dispose pattern for HttpClient
+        private void LoadCacheFromFile()
+        {
+            try
+            {
+                if (File.Exists(_cacheFilePath))
+                {
+                    var json = File.ReadAllText(_cacheFilePath);
+                    var cache = JsonConvert.DeserializeObject<ConcurrentDictionary<string, string>>(json);
+                    if (cache != null)
+                    {
+                        foreach (var item in cache)
+                        {
+                            _cityImageCache.TryAdd(item.Key, item.Value);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading cache file: {ex.Message}");
+            }
+        }
+
+        private void SaveCacheToFile()
+        {
+            try
+            {
+                var directory = Path.GetDirectoryName(_cacheFilePath);
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                var json = JsonConvert.SerializeObject(_cityImageCache);
+                File.WriteAllText(_cacheFilePath, json);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving cache file: {ex.Message}");
+            }
+        }
+
         public void Dispose()
         {
             _httpClient?.Dispose();

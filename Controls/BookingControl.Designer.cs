@@ -11,7 +11,6 @@
         private SeatMapControl seatMapControl;
         private System.Windows.Forms.Button btnConfirm;
         private System.Windows.Forms.Button btnBack;
-        private System.Windows.Forms.Label lblFlightInfo;
         private System.Windows.Forms.Label lblSeatInfo;
 
         protected override void Dispose(bool disposing)
@@ -25,148 +24,142 @@
 
         private void InitializeComponent()
         {
-            this.tabControl = new System.Windows.Forms.TabControl();
-            this.passengerTab = new System.Windows.Forms.TabPage();
-            this.paymentTab = new System.Windows.Forms.TabPage();
-            this.seatTab = new System.Windows.Forms.TabPage();
-            this.seatMapControl = new FlightBookingSystem.Controls.SeatMapControl();
-            this.btnConfirm = new System.Windows.Forms.Button();
-            this.btnBack = new System.Windows.Forms.Button();
-            this.lblFlightInfo = new System.Windows.Forms.Label();
-            this.lblSeatInfo = new System.Windows.Forms.Label();
-            this.tabControl.SuspendLayout();
-            this.seatTab.SuspendLayout();
-            this.SuspendLayout();
-
+            tabControl = new TabControl();
+            passengerTab = new TabPage();
+            paymentTab = new TabPage();
+            seatTab = new TabPage();
+            seatMapControl = new SeatMapControl();
+            btnConfirm = new Button();
+            btnBack = new Button();
+            lblSeatInfo = new Label();
+            lblFlightInfo = new Label();
+            tabControl.SuspendLayout();
+            seatTab.SuspendLayout();
+            SuspendLayout();
             // 
             // tabControl
             // 
-            this.tabControl.Controls.Add(this.passengerTab);
-            this.tabControl.Controls.Add(this.paymentTab);
-            this.tabControl.Controls.Add(this.seatTab);
-            this.tabControl.Dock = System.Windows.Forms.DockStyle.Top;
-            this.tabControl.Location = new System.Drawing.Point(0, 40);
-            this.tabControl.Name = "tabControl";
-            this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(1000, 500);
-            this.tabControl.TabIndex = 0;
-
+            tabControl.Controls.Add(passengerTab);
+            tabControl.Controls.Add(paymentTab);
+            tabControl.Controls.Add(seatTab);
+            tabControl.Dock = DockStyle.Top;
+            tabControl.Location = new Point(0, 0);
+            tabControl.Margin = new Padding(3, 30, 3, 3);
+            tabControl.Name = "tabControl";
+            tabControl.SelectedIndex = 0;
+            tabControl.Size = new Size(1000, 500);
+            tabControl.TabIndex = 0;
             // 
             // passengerTab
             // 
-            this.passengerTab.BackColor = System.Drawing.Color.FromArgb(245, 249, 255);
-            this.passengerTab.Location = new System.Drawing.Point(4, 24);
-            this.passengerTab.Name = "passengerTab";
-            this.passengerTab.Padding = new System.Windows.Forms.Padding(20);
-            this.passengerTab.Size = new System.Drawing.Size(992, 472);
-            this.passengerTab.TabIndex = 0;
-            this.passengerTab.Text = "Passenger Information";
-
+            passengerTab.BackColor = Color.FromArgb(245, 249, 255);
+            passengerTab.Location = new Point(4, 24);
+            passengerTab.Name = "passengerTab";
+            passengerTab.Padding = new Padding(20);
+            passengerTab.Size = new Size(992, 472);
+            passengerTab.TabIndex = 0;
+            passengerTab.Text = "Passenger Information";
             // 
             // paymentTab
             // 
-            this.paymentTab.BackColor = System.Drawing.Color.FromArgb(245, 249, 255);
-            this.paymentTab.Location = new System.Drawing.Point(4, 24);
-            this.paymentTab.Name = "paymentTab";
-            this.paymentTab.Padding = new System.Windows.Forms.Padding(20);
-            this.paymentTab.Size = new System.Drawing.Size(992, 472);
-            this.paymentTab.TabIndex = 1;
-            this.paymentTab.Text = "Payment Details";
-
+            paymentTab.BackColor = Color.FromArgb(245, 249, 255);
+            paymentTab.Location = new Point(4, 24);
+            paymentTab.Name = "paymentTab";
+            paymentTab.Padding = new Padding(20);
+            paymentTab.Size = new Size(992, 472);
+            paymentTab.TabIndex = 1;
+            paymentTab.Text = "Payment Details";
             // 
             // seatTab
             // 
-            this.seatTab.BackColor = System.Drawing.Color.FromArgb(245, 249, 255);
-            this.seatTab.Controls.Add(this.seatMapControl);
-            this.seatTab.Location = new System.Drawing.Point(4, 24);
-            this.seatTab.Name = "seatTab";
-            this.seatTab.Padding = new System.Windows.Forms.Padding(10);
-            this.seatTab.Size = new System.Drawing.Size(992, 472);
-            this.seatTab.TabIndex = 2;
-            this.seatTab.Text = "Seat Selection";
-
+            seatTab.BackColor = Color.FromArgb(245, 249, 255);
+            seatTab.Controls.Add(seatMapControl);
+            seatTab.Location = new Point(4, 24);
+            seatTab.Name = "seatTab";
+            seatTab.Padding = new Padding(10);
+            seatTab.Size = new Size(992, 472);
+            seatTab.TabIndex = 2;
+            seatTab.Text = "Seat Selection";
             // 
             // seatMapControl
             // 
-            this.seatMapControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.seatMapControl.Location = new System.Drawing.Point(10, 10);
-            this.seatMapControl.Name = "seatMapControl";
-            this.seatMapControl.Size = new System.Drawing.Size(972, 452);
-            this.seatMapControl.TabIndex = 0;
-
+            seatMapControl.BackColor = Color.FromArgb(245, 249, 255);
+            seatMapControl.Dock = DockStyle.Fill;
+            seatMapControl.Location = new Point(10, 10);
+            seatMapControl.Name = "seatMapControl";
+            seatMapControl.Size = new Size(972, 452);
+            seatMapControl.TabIndex = 0;
             // 
             // btnConfirm
             // 
-            this.btnConfirm.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnConfirm.BackColor = System.Drawing.Color.FromArgb(0, 115, 207);
-            this.btnConfirm.FlatAppearance.BorderSize = 0;
-            this.btnConfirm.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnConfirm.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.btnConfirm.ForeColor = System.Drawing.Color.White;
-            this.btnConfirm.Location = new System.Drawing.Point(800, 560);
-            this.btnConfirm.Name = "btnConfirm";
-            this.btnConfirm.Size = new System.Drawing.Size(180, 50);
-            this.btnConfirm.TabIndex = 1;
-            this.btnConfirm.Text = "CONFIRM BOOKING";
-            this.btnConfirm.UseVisualStyleBackColor = false;
-
+            btnConfirm.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnConfirm.BackColor = Color.FromArgb(0, 115, 207);
+            btnConfirm.FlatAppearance.BorderSize = 0;
+            btnConfirm.FlatStyle = FlatStyle.Flat;
+            btnConfirm.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+            btnConfirm.ForeColor = Color.White;
+            btnConfirm.Location = new Point(800, 560);
+            btnConfirm.Name = "btnConfirm";
+            btnConfirm.Size = new Size(180, 50);
+            btnConfirm.TabIndex = 1;
+            btnConfirm.Text = "CONFIRM BOOKING";
+            btnConfirm.UseVisualStyleBackColor = false;
             // 
             // btnBack
             // 
-            this.btnBack.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnBack.BackColor = System.Drawing.Color.FromArgb(220, 220, 230);
-            this.btnBack.FlatAppearance.BorderSize = 0;
-            this.btnBack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnBack.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.btnBack.Location = new System.Drawing.Point(20, 560);
-            this.btnBack.Name = "btnBack";
-            this.btnBack.Size = new System.Drawing.Size(120, 50);
-            this.btnBack.TabIndex = 2;
-            this.btnBack.Text = "BACK";
-            this.btnBack.UseVisualStyleBackColor = false;
-
-            // 
-            // lblFlightInfo
-            // 
-            this.lblFlightInfo.Dock = System.Windows.Forms.DockStyle.Top;
-            this.lblFlightInfo.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.lblFlightInfo.ForeColor = System.Drawing.Color.FromArgb(0, 60, 120);
-            this.lblFlightInfo.Location = new System.Drawing.Point(0, 0);
-            this.lblFlightInfo.Name = "lblFlightInfo";
-            this.lblFlightInfo.Padding = new System.Windows.Forms.Padding(20, 10, 20, 10);
-            this.lblFlightInfo.Size = new System.Drawing.Size(1000, 40);
-            this.lblFlightInfo.TabIndex = 3;
-            this.lblFlightInfo.Text = "Flight: AA123 from New York (JFK) to London (LHR)";
-            this.lblFlightInfo.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-
+            btnBack.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            btnBack.BackColor = Color.FromArgb(220, 220, 230);
+            btnBack.FlatAppearance.BorderSize = 0;
+            btnBack.FlatStyle = FlatStyle.Flat;
+            btnBack.Font = new Font("Segoe UI", 10F);
+            btnBack.Location = new Point(20, 560);
+            btnBack.Name = "btnBack";
+            btnBack.Size = new Size(120, 50);
+            btnBack.TabIndex = 2;
+            btnBack.Text = "BACK";
+            btnBack.UseVisualStyleBackColor = false;
             // 
             // lblSeatInfo
             // 
-            this.lblSeatInfo.AutoSize = true;
-            this.lblSeatInfo.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.lblSeatInfo.Location = new System.Drawing.Point(20, 520);
-            this.lblSeatInfo.Name = "lblSeatInfo";
-            this.lblSeatInfo.Size = new System.Drawing.Size(200, 15);
-            this.lblSeatInfo.TabIndex = 10;
-            this.lblSeatInfo.Text = "Selected Seat: None";
-
+            lblSeatInfo.AutoSize = true;
+            lblSeatInfo.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            lblSeatInfo.Location = new Point(511, 525);
+            lblSeatInfo.Name = "lblSeatInfo";
+            lblSeatInfo.Size = new Size(120, 15);
+            lblSeatInfo.TabIndex = 10;
+            lblSeatInfo.Text = "Selected Seat: None";
+            // 
+            // lblFlightInfo
+            // 
+            lblFlightInfo.Dock = DockStyle.Top;
+            lblFlightInfo.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+            lblFlightInfo.ForeColor = Color.FromArgb(0, 60, 120);
+            lblFlightInfo.Location = new Point(0, 500);
+            lblFlightInfo.Name = "lblFlightInfo";
+            lblFlightInfo.Padding = new Padding(20, 10, 20, 10);
+            lblFlightInfo.Size = new Size(1000, 66);
+            lblFlightInfo.TabIndex = 11;
+            lblFlightInfo.Text = "Flight: AA123 from New York (JFK) to London (LHR)";
+            lblFlightInfo.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // BookingControl
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.FromArgb(245, 249, 255);
-            this.Controls.Add(this.lblSeatInfo);
-            this.Controls.Add(this.lblFlightInfo);
-            this.Controls.Add(this.btnBack);
-            this.Controls.Add(this.btnConfirm);
-            this.Controls.Add(this.tabControl);
-            this.Name = "BookingControl";
-            this.Size = new System.Drawing.Size(1000, 630);
-            this.tabControl.ResumeLayout(false);
-            this.seatTab.ResumeLayout(false);
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            BackColor = Color.FromArgb(245, 249, 255);
+            Controls.Add(lblFlightInfo);
+            Controls.Add(lblSeatInfo);
+            Controls.Add(btnBack);
+            Controls.Add(btnConfirm);
+            Controls.Add(tabControl);
+            Name = "BookingControl";
+            Size = new Size(1000, 630);
+            tabControl.ResumeLayout(false);
+            seatTab.ResumeLayout(false);
+            ResumeLayout(false);
+            PerformLayout();
         }
+
+        private Label lblFlightInfo;
     }
 }
