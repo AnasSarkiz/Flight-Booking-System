@@ -8,7 +8,8 @@ namespace FlightBookingSystem.Models
         public string Airline { get; set; }
         public TimeSpan Duration { get; set; }
         public decimal Price { get; set; }
-        public string ImageUrl { get; set; }
+        public string DestinationImageUrl { get; set; }
+        public string AirlineLogoUrl { get; set; }
         public string Origin { get; set; }
         public string Destination { get; set; }
         public DateTime DepartureTime { get; set; }

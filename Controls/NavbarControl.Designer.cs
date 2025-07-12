@@ -22,122 +22,133 @@
 
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NavbarControl));
-            this.homeButton = new System.Windows.Forms.Button();
-            this.searchFlightsButton = new System.Windows.Forms.Button();
-            this.bookingsButton = new System.Windows.Forms.Button();
-            this.profileButton = new System.Windows.Forms.Button();
-            this.navLogo = new System.Windows.Forms.Label();
-            this.logoIcon = new System.Windows.Forms.PictureBox();
-            this.activeIndicator = new System.Windows.Forms.Panel();
-            ((System.ComponentModel.ISupportInitialize)(this.logoIcon)).BeginInit();
-            this.SuspendLayout();
-
+            homeButton = new Button();
+            searchFlightsButton = new Button();
+            bookingsButton = new Button();
+            profileButton = new Button();
+            navLogo = new Label();
+            logoIcon = new PictureBox();
+            activeIndicator = new Panel();
+            ((System.ComponentModel.ISupportInitialize)logoIcon).BeginInit();
+            SuspendLayout();
+            // 
             // homeButton
-            this.homeButton.FlatAppearance.BorderSize = 0;
-            this.homeButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.homeButton.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold);
-            this.homeButton.ForeColor = System.Drawing.Color.White;
-            this.homeButton.Image = ((System.Drawing.Image)(resources.GetObject("homeButton.Image")));
-            this.homeButton.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.homeButton.Location = new System.Drawing.Point(300, 20);
-            this.homeButton.Name = "homeButton";
-            this.homeButton.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
-            this.homeButton.Size = new System.Drawing.Size(120, 40);
-            this.homeButton.TabIndex = 0;
-            this.homeButton.Text = "Home";
-            this.homeButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.homeButton.UseVisualStyleBackColor = true;
-
+            // 
+            homeButton.FlatAppearance.BorderSize = 0;
+            homeButton.FlatStyle = FlatStyle.Flat;
+            homeButton.Font = new Font("Segoe UI Semibold", 10F, FontStyle.Bold);
+            homeButton.ForeColor = Color.White;
+            homeButton.ImageAlign = ContentAlignment.MiddleLeft;
+            homeButton.Location = new Point(300, 20);
+            homeButton.Name = "homeButton";
+            homeButton.Padding = new Padding(10, 0, 0, 0);
+            homeButton.Size = new Size(120, 40);
+            homeButton.TabIndex = 0;
+            homeButton.Text = "Home";
+            homeButton.TextImageRelation = TextImageRelation.ImageBeforeText;
+            homeButton.UseVisualStyleBackColor = true;
+            // 
             // searchFlightsButton
-            this.searchFlightsButton.FlatAppearance.BorderSize = 0;
-            this.searchFlightsButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.searchFlightsButton.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold);
-            this.searchFlightsButton.ForeColor = System.Drawing.Color.White;
-            this.searchFlightsButton.Image = ((System.Drawing.Image)(resources.GetObject("searchFlightsButton.Image")));
-            this.searchFlightsButton.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.searchFlightsButton.Location = new System.Drawing.Point(430, 20);
-            this.searchFlightsButton.Name = "searchFlightsButton";
-            this.searchFlightsButton.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
-            this.searchFlightsButton.Size = new System.Drawing.Size(150, 40);
-            this.searchFlightsButton.TabIndex = 1;
-            this.searchFlightsButton.Text = "Search Flights";
-            this.searchFlightsButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.searchFlightsButton.UseVisualStyleBackColor = true;
-
+            // 
+            searchFlightsButton.FlatAppearance.BorderSize = 0;
+            searchFlightsButton.FlatStyle = FlatStyle.Flat;
+            searchFlightsButton.Font = new Font("Segoe UI Semibold", 10F, FontStyle.Bold);
+            searchFlightsButton.ForeColor = Color.White;
+            searchFlightsButton.ImageAlign = ContentAlignment.MiddleLeft;
+            searchFlightsButton.Location = new Point(430, 20);
+            searchFlightsButton.Name = "searchFlightsButton";
+            searchFlightsButton.Padding = new Padding(10, 0, 0, 0);
+            searchFlightsButton.Size = new Size(150, 40);
+            searchFlightsButton.TabIndex = 1;
+            searchFlightsButton.Text = "Search Flights";
+            searchFlightsButton.TextImageRelation = TextImageRelation.ImageBeforeText;
+            searchFlightsButton.UseVisualStyleBackColor = true;
+            // 
             // bookingsButton
-            this.bookingsButton.FlatAppearance.BorderSize = 0;
-            this.bookingsButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.bookingsButton.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold);
-            this.bookingsButton.ForeColor = System.Drawing.Color.White;
-            this.bookingsButton.Image = ((System.Drawing.Image)(resources.GetObject("bookingsButton.Image")));
-            this.bookingsButton.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.bookingsButton.Location = new System.Drawing.Point(590, 20);
-            this.bookingsButton.Name = "bookingsButton";
-            this.bookingsButton.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
-            this.bookingsButton.Size = new System.Drawing.Size(130, 40);
-            this.bookingsButton.TabIndex = 2;
-            this.bookingsButton.Text = "My Trips";
-            this.bookingsButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.bookingsButton.UseVisualStyleBackColor = true;
-
+            // 
+            bookingsButton.FlatAppearance.BorderSize = 0;
+            bookingsButton.FlatStyle = FlatStyle.Flat;
+            bookingsButton.Font = new Font("Segoe UI Semibold", 10F, FontStyle.Bold);
+            bookingsButton.ForeColor = Color.White;
+            bookingsButton.ImageAlign = ContentAlignment.MiddleLeft;
+            bookingsButton.Location = new Point(590, 20);
+            bookingsButton.Name = "bookingsButton";
+            bookingsButton.Padding = new Padding(10, 0, 0, 0);
+            bookingsButton.Size = new Size(130, 40);
+            bookingsButton.TabIndex = 2;
+            bookingsButton.Text = "My Trips";
+            bookingsButton.TextImageRelation = TextImageRelation.ImageBeforeText;
+            bookingsButton.UseVisualStyleBackColor = true;
+            // 
             // profileButton
-            this.profileButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.profileButton.FlatAppearance.BorderSize = 0;
-            this.profileButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.profileButton.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold);
-            this.profileButton.ForeColor = System.Drawing.Color.White;
-            this.profileButton.Image = ((System.Drawing.Image)(resources.GetObject("profileButton.Image")));
-            this.profileButton.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.profileButton.Location = new System.Drawing.Point(1000, 20);
-            this.profileButton.Name = "profileButton";
-            this.profileButton.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
-            this.profileButton.Size = new System.Drawing.Size(120, 40);
-            this.profileButton.TabIndex = 3;
-            this.profileButton.Text = "Profile";
-            this.profileButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.profileButton.UseVisualStyleBackColor = true;
-
+            // 
+            profileButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            profileButton.FlatAppearance.BorderSize = 0;
+            profileButton.FlatStyle = FlatStyle.Flat;
+            profileButton.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            profileButton.ForeColor = Color.White;
+            profileButton.ImageAlign = ContentAlignment.MiddleLeft;
+            profileButton.Location = new Point(1000, 20);
+            profileButton.Name = "profileButton";
+            profileButton.Padding = new Padding(10, 0, 0, 0);
+            profileButton.Size = new Size(120, 40);
+            profileButton.TabIndex = 3;
+            profileButton.Text = "Logout";
+            profileButton.TextImageRelation = TextImageRelation.ImageBeforeText;
+            profileButton.UseVisualStyleBackColor = true;
+            // 
             // navLogo
-            this.navLogo.AutoSize = true;
-            this.navLogo.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.navLogo.ForeColor = System.Drawing.Color.White;
-            this.navLogo.Location = new System.Drawing.Point(70, 20);
-            this.navLogo.Name = "navLogo";
-            this.navLogo.Size = new System.Drawing.Size(194, 32);
-            this.navLogo.TabIndex = 4;
-            this.navLogo.Text = "NEBULA TRAVEL";
-
+            // 
+            navLogo.AutoSize = true;
+            navLogo.Font = new Font("Segoe UI", 20F, FontStyle.Bold);
+            navLogo.ForeColor = Color.FromArgb(0, 168, 255);
+            navLogo.Location = new Point(70, 20);
+            navLogo.Name = "navLogo";
+            navLogo.Size = new Size(87, 32);
+            navLogo.TabIndex = 4;
+            navLogo.Text = "RE7LA";
+            // 
             // logoIcon
-            this.logoIcon.Image = ((System.Drawing.Image)(resources.GetObject("logoIcon.Image")));
-            this.logoIcon.Location = new System.Drawing.Point(20, 15);
-            this.logoIcon.Name = "logoIcon";
-            this.logoIcon.Size = new System.Drawing.Size(40, 40);
-            this.logoIcon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.logoIcon.TabIndex = 5;
-            this.logoIcon.TabStop = false;
-
+            // 
+            logoIcon.Location = new Point(20, 15);
+            logoIcon.Name = "logoIcon";
+            logoIcon.Size = new Size(40, 40);
+            logoIcon.SizeMode = PictureBoxSizeMode.Zoom;
+            logoIcon.TabIndex = 5;
+            logoIcon.TabStop = false;
+            // 
             // activeIndicator
-            this.activeIndicator.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(168)))), ((int)(((byte)(255)))));
-            this.activeIndicator.Location = new System.Drawing.Point(300, 60);
-            this.activeIndicator.Name = "activeIndicator";
-            this.activeIndicator.Size = new System.Drawing.Size(120, 4);
-            this.activeIndicator.TabIndex = 6;
-
+            // 
+            activeIndicator.BackColor = Color.FromArgb(0, 200, 255);
+            activeIndicator.Height = 3;
+            activeIndicator.Location = new Point(300, 60);
+            activeIndicator.Name = "activeIndicator";
+            activeIndicator.Size = new Size(120, 4);
+            activeIndicator.TabIndex = 6;
+            // Button styling
+            var buttons = new[] { homeButton, searchFlightsButton, bookingsButton, profileButton };
+            foreach (var btn in buttons)
+            {
+                btn.FlatAppearance.MouseOverBackColor = Color.FromArgb(20, 40, 80);
+                btn.FlatAppearance.MouseDownBackColor = Color.FromArgb(0, 80, 160);
+                btn.Cursor = Cursors.Hand;
+            }
+            // 
             // NavbarControl
-            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(8)))), ((int)(((byte)(18)))), ((int)(((byte)(44)))));
-            this.Controls.Add(this.activeIndicator);
-            this.Controls.Add(this.logoIcon);
-            this.Controls.Add(this.navLogo);
-            this.Controls.Add(this.profileButton);
-            this.Controls.Add(this.bookingsButton);
-            this.Controls.Add(this.searchFlightsButton);
-            this.Controls.Add(this.homeButton);
-            this.Name = "NavbarControl";
-            this.Size = new System.Drawing.Size(1200, 80);
-            ((System.ComponentModel.ISupportInitialize)(this.logoIcon)).EndInit();
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            // 
+            BackColor = Color.FromArgb(5, 15, 40);
+            Controls.Add(activeIndicator);
+            Controls.Add(logoIcon);
+            Controls.Add(navLogo);
+            Controls.Add(profileButton);
+            Controls.Add(bookingsButton);
+            Controls.Add(searchFlightsButton);
+            Controls.Add(homeButton);
+            Name = "NavbarControl";
+            Size = new Size(1200, 80);
+            ((System.ComponentModel.ISupportInitialize)logoIcon).EndInit();
+            ResumeLayout(false);
+            PerformLayout();
         }
     }
 }

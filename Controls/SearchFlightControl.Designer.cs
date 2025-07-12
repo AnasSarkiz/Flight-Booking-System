@@ -18,53 +18,53 @@
 
         private void InitializeComponent()
         {
-            searchBoxControl = new SearchBoxControl();
-            filterPanelControl = new FilterPanelControl();
-            flightCardsPanel = new FlowLayoutPanel();
-            SuspendLayout();
-            // 
+            this.searchBoxControl = new FlightBookingSystem.Controls.SearchBoxControl();
+            this.filterPanelControl = new FlightBookingSystem.Controls.FilterPanelControl();
+            this.flightCardsPanel = new System.Windows.Forms.FlowLayoutPanel();
+            this.SuspendLayout();
+
             // searchBoxControl
-            // 
-            searchBoxControl.BackColor = Color.White;
-            searchBoxControl.Dock = DockStyle.Top;
-            searchBoxControl.Font = new Font("Segoe UI", 9F);
-            searchBoxControl.Location = new Point(0, 0);
-            searchBoxControl.Name = "searchBoxControl";
-            searchBoxControl.Size = new Size(1200, 150);
-            searchBoxControl.TabIndex = 0;
-            // 
+            this.searchBoxControl.BackColor = Color.FromArgb(250, 252, 255);
+            this.searchBoxControl.Dock = System.Windows.Forms.DockStyle.Top;
+            this.searchBoxControl.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.searchBoxControl.Location = new System.Drawing.Point(0, 0);
+            this.searchBoxControl.Name = "searchBoxControl";
+            this.searchBoxControl.Size = new System.Drawing.Size(1200, 150);
+            this.searchBoxControl.TabIndex = 0;
+            searchBoxControl.BorderStyle = BorderStyle.FixedSingle;
+
             // filterPanelControl
-            // 
             filterPanelControl.BackColor = Color.White;
-            filterPanelControl.Dock = DockStyle.Left;
-            filterPanelControl.Location = new Point(0, 150);
-            filterPanelControl.Name = "filterPanelControl";
-            filterPanelControl.SelectedSortOption = FilterPanelControl.SortOption.Price;
-            filterPanelControl.Size = new Size(250, 570);
-            filterPanelControl.TabIndex = 1;
-            // 
+            this.filterPanelControl.Dock = System.Windows.Forms.DockStyle.Left;
+            this.filterPanelControl.Location = new System.Drawing.Point(0, 150);
+            this.filterPanelControl.Name = "filterPanelControl";
+            this.filterPanelControl.SelectedSortOption = FlightBookingSystem.Controls.FilterPanelControl.SortOption.Price;
+            this.filterPanelControl.Size = new System.Drawing.Size(250, 570);
+            this.filterPanelControl.TabIndex = 1;
+            //filterPanelControl.BorderStyle = BorderStyle.FixedSingle;
+
             // flightCardsPanel
-            // 
-            flightCardsPanel.AutoScroll = true;
-            flightCardsPanel.BackColor = Color.FromArgb(240, 245, 255);
-            flightCardsPanel.Dock = DockStyle.Fill;
-            flightCardsPanel.Location = new Point(250, 150);
-            flightCardsPanel.Name = "flightCardsPanel";
-            flightCardsPanel.Padding = new Padding(20);
-            flightCardsPanel.Size = new Size(950, 570);
-            flightCardsPanel.TabIndex = 2;
-            // 
+            this.flightCardsPanel.AutoScroll = true;
+            this.flightCardsPanel.BackColor = Color.FromArgb(245, 249, 255);
+            this.flightCardsPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.flightCardsPanel.Location = new System.Drawing.Point(250, 150);
+            this.flightCardsPanel.Name = "flightCardsPanel";
+            this.flightCardsPanel.Padding = new System.Windows.Forms.Padding(20);
+            this.flightCardsPanel.Size = new System.Drawing.Size(950, 570);
+            this.flightCardsPanel.TabIndex = 2;
+            this.BackColor = Color.FromArgb(245, 249, 255);
+
             // SearchFlightsControl
-            // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
-            BackColor = Color.FromArgb(240, 245, 255);
-            Controls.Add(flightCardsPanel);
-            Controls.Add(filterPanelControl);
-            Controls.Add(searchBoxControl);
-            Name = "SearchFlightsControl";
-            Size = new Size(1200, 720);
-            ResumeLayout(false);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(245)))), ((int)(((byte)(255)))));
+            this.Controls.Add(this.flightCardsPanel);
+            this.Controls.Add(this.filterPanelControl);
+            this.Controls.Add(this.searchBoxControl);
+            this.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.Name = "SearchFlightsControl";
+            this.Size = new System.Drawing.Size(1200, 720);
+            this.ResumeLayout(false);
         }
     }
 }

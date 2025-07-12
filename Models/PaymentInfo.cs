@@ -8,9 +8,10 @@ namespace FlightBookingSystem.Models
 {
     public class PaymentInfo
     {
-        public string CardHolderName { get; set; }
-        public string CardNumber { get; set; }
-        public string ExpiryDate { get; set; }
-        public string CVV { get; set; }
+            public string CardHolderName { get; set; } = string.Empty;
+            public string CardNumber { get; set; } = string.Empty;
+            public string ExpiryDate { get; set; } = string.Empty;
+            public string CVV { get; set; } = string.Empty;
+        }
     }
-}
+

@@ -14,8 +14,7 @@
         private System.Windows.Forms.Button searchButton;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.Panel panel3;
-        private System.Windows.Forms.Panel panel4;
+        private System.Windows.Forms.CheckBox returnCheckBox;
 
         protected override void Dispose(bool disposing)
         {
@@ -39,8 +38,7 @@
             searchButton = new Button();
             panel1 = new Panel();
             panel2 = new Panel();
-            panel3 = new Panel();
-            panel4 = new Panel();
+            returnCheckBox = new CheckBox();
             SuspendLayout();
             // 
             // originLabel
@@ -57,18 +55,18 @@
             // 
             originTextBox.BackColor = Color.White;
             originTextBox.BorderStyle = BorderStyle.None;
-            originTextBox.Font = new Font("Segoe UI", 12F);
+            originTextBox.Font = new Font("Segoe UI", 11F);
             originTextBox.Location = new Point(20, 40);
             originTextBox.Name = "originTextBox";
             originTextBox.PlaceholderText = "City or Airport";
-            originTextBox.Size = new Size(250, 22);
+            originTextBox.Size = new Size(396, 22);
             originTextBox.TabIndex = 1;
             // 
             // destinationLabel
             // 
             destinationLabel.AutoSize = true;
             destinationLabel.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold);
-            destinationLabel.Location = new Point(290, 20);
+            destinationLabel.Location = new Point(484, 20);
             destinationLabel.Name = "destinationLabel";
             destinationLabel.Size = new Size(85, 15);
             destinationLabel.TabIndex = 2;
@@ -78,11 +76,11 @@
             // 
             destinationTextBox.BackColor = Color.White;
             destinationTextBox.BorderStyle = BorderStyle.None;
-            destinationTextBox.Font = new Font("Segoe UI", 12F);
-            destinationTextBox.Location = new Point(290, 40);
+            destinationTextBox.Font = new Font("Segoe UI", 11F);
+            destinationTextBox.Location = new Point(484, 40);
             destinationTextBox.Name = "destinationTextBox";
             destinationTextBox.PlaceholderText = "City or Airport";
-            destinationTextBox.Size = new Size(250, 22);
+            destinationTextBox.Size = new Size(369, 22);
             destinationTextBox.TabIndex = 3;
             // 
             // departureLabel
@@ -99,19 +97,19 @@
             // 
             departureDatePicker.CalendarFont = new Font("Segoe UI", 12F);
             departureDatePicker.CustomFormat = "ddd, MMM dd, yyyy";
-            departureDatePicker.Font = new Font("Segoe UI", 12F);
+            departureDatePicker.Font = new Font("Segoe UI", 11F);
             departureDatePicker.Format = DateTimePickerFormat.Custom;
             departureDatePicker.Location = new Point(20, 100);
             departureDatePicker.MinDate = new DateTime(2023, 1, 1, 0, 0, 0, 0);
             departureDatePicker.Name = "departureDatePicker";
-            departureDatePicker.Size = new Size(250, 29);
+            departureDatePicker.Size = new Size(396, 29);
             departureDatePicker.TabIndex = 5;
             // 
             // returnLabel
             // 
             returnLabel.AutoSize = true;
             returnLabel.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold);
-            returnLabel.Location = new Point(290, 80);
+            returnLabel.Location = new Point(484, 80);
             returnLabel.Name = "returnLabel";
             returnLabel.Size = new Size(83, 15);
             returnLabel.TabIndex = 6;
@@ -121,12 +119,12 @@
             // 
             returnDatePicker.CalendarFont = new Font("Segoe UI", 12F);
             returnDatePicker.CustomFormat = "ddd, MMM dd, yyyy";
-            returnDatePicker.Font = new Font("Segoe UI", 12F);
+            returnDatePicker.Font = new Font("Segoe UI", 11F);
             returnDatePicker.Format = DateTimePickerFormat.Custom;
-            returnDatePicker.Location = new Point(290, 100);
+            returnDatePicker.Location = new Point(484, 100);
             returnDatePicker.MinDate = new DateTime(2023, 1, 1, 0, 0, 0, 0);
             returnDatePicker.Name = "returnDatePicker";
-            returnDatePicker.Size = new Size(250, 29);
+            returnDatePicker.Size = new Size(369, 29);
             returnDatePicker.TabIndex = 7;
             // 
             // searchButton
@@ -134,50 +132,56 @@
             searchButton.BackColor = Color.FromArgb(0, 168, 255);
             searchButton.FlatAppearance.BorderSize = 0;
             searchButton.FlatStyle = FlatStyle.Flat;
-            searchButton.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
             searchButton.ForeColor = Color.White;
-            searchButton.Location = new Point(578, 65);
+            searchButton.Location = new Point(963, 64);
             searchButton.Name = "searchButton";
             searchButton.Size = new Size(200, 40);
             searchButton.TabIndex = 10;
             searchButton.Text = "SEARCH FLIGHTS";
             searchButton.UseVisualStyleBackColor = false;
+            searchButton.FlatAppearance.MouseOverBackColor = Color.FromArgb(0, 140, 220);
+            searchButton.Cursor = Cursors.Hand;
+            searchButton.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+
             // 
             // panel1
             // 
-            panel1.BackColor = Color.FromArgb(200, 200, 200);
+            panel1.Height = 2;
+            panel1.BackColor = Color.FromArgb(0, 168, 255);
             panel1.Location = new Point(20, 65);
             panel1.Name = "panel1";
-            panel1.Size = new Size(250, 1);
+            panel1.Size = new Size(396, 1);
             panel1.TabIndex = 9;
             // 
             // panel2
             // 
-            panel2.BackColor = Color.FromArgb(200, 200, 200);
-            panel2.Location = new Point(290, 65);
+            panel2.Height = 2;
+            panel2.BackColor = Color.FromArgb(0, 168, 255);
+            panel2.Location = new Point(484, 65);
             panel2.Name = "panel2";
-            panel2.Size = new Size(250, 1);
+            panel2.Size = new Size(369, 1);
             panel2.TabIndex = 10;
             // 
-            // panel3
+            // returnCheckBox
             // 
-            panel3.Location = new Point(0, 0);
-            panel3.Name = "panel3";
-            panel3.Size = new Size(200, 100);
-            panel3.TabIndex = 0;
-            // 
-            // panel4
-            // 
-            panel4.Location = new Point(0, 0);
-            panel4.Name = "panel4";
-            panel4.Size = new Size(200, 100);
-            panel4.TabIndex = 0;
+            returnCheckBox.AutoSize = true;
+            returnCheckBox.Checked = true;
+            returnCheckBox.CheckState = CheckState.Checked;
+            returnCheckBox.ForeColor = Color.FromArgb(80, 80, 80);
+            returnCheckBox.Font = new Font("Segoe UI", 9F);
+            returnCheckBox.Location = new Point(574, 80);
+            returnCheckBox.Name = "returnCheckBox";
+            returnCheckBox.Size = new Size(82, 19);
+            returnCheckBox.TabIndex = 11;
+            returnCheckBox.Text = "Round trip";
+            returnCheckBox.UseVisualStyleBackColor = true;
             // 
             // SearchBoxControl
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
+            Controls.Add(returnCheckBox);
             Controls.Add(searchButton);
             Controls.Add(returnDatePicker);
             Controls.Add(returnLabel);
@@ -191,7 +195,7 @@
             Controls.Add(originLabel);
             Font = new Font("Segoe UI", 9F);
             Name = "SearchBoxControl";
-            Size = new Size(800, 150);
+            Size = new Size(1214, 150);
             ResumeLayout(false);
             PerformLayout();
         }

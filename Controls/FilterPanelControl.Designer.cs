@@ -53,8 +53,8 @@
             // 
             filterLabel.AutoSize = true;
             filterLabel.Dock = DockStyle.Top;
-            filterLabel.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
-            filterLabel.ForeColor = Color.FromArgb(8, 18, 44);
+            filterLabel.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+            filterLabel.ForeColor = Color.FromArgb(0, 100, 200);
             filterLabel.Location = new Point(0, 0);
             filterLabel.Name = "filterLabel";
             filterLabel.Padding = new Padding(20, 20, 0, 10);
@@ -157,6 +157,8 @@
             priceTrackBar.TabIndex = 0;
             priceTrackBar.TickFrequency = 100;
             priceTrackBar.Value = 500;
+            priceTrackBar.TickStyle = TickStyle.None;
+            priceTrackBar.BackColor = Color.FromArgb(230, 240, 255);
             // 
             // stopsGroupBox
             // 
@@ -223,6 +225,15 @@
             applyFiltersButton.TabIndex = 4;
             applyFiltersButton.Text = "APPLY FILTERS";
             applyFiltersButton.UseVisualStyleBackColor = false;
+            applyFiltersButton.FlatAppearance.MouseOverBackColor = Color.FromArgb(0, 140, 220);
+            applyFiltersButton.Cursor = Cursors.Hand;
+            // GroupBox styling
+            var groupBoxes = new[] { airlinesGroupBox, priceGroupBox, stopsGroupBox };
+            foreach (var gb in groupBoxes)
+            {
+                gb.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+                gb.ForeColor = Color.FromArgb(0, 100, 200);
+            }
             // 
             // FilterPanelControl
             // 

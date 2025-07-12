@@ -16,7 +16,8 @@ namespace FlightBooker
             string username = usernameTextBox.Text;
             string password = passwordTextBox.Text;
 
-            if (true)
+            // Add your actual authentication logic here
+            if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
             {
                 this.Hide();
                 MainForm mainForm = new MainForm();
@@ -24,8 +25,13 @@ namespace FlightBooker
             }
             else
             {
-                MessageBox.Show("Invalid credentials.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Please enter both username and password.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void showPasswordCheck_CheckedChanged(object sender, EventArgs e)
+        {
+            passwordTextBox.UseSystemPasswordChar = !showPasswordCheck.Checked;
         }
     }
 }

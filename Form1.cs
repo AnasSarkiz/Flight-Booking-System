@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using FlightBookingSystem.Controls;
+using FlightBookingSystem.Models;
 
 namespace FlightBookingSystem
 {
@@ -32,7 +33,21 @@ namespace FlightBookingSystem
         {
             var searchControl = new SearchFlightsControl();
             searchControl.BackToHomeClicked += (s, e) => ShowHomeView();
+            searchControl.FlightSelected += (s, flight) => ShowBookingView(flight);
             SwitchView(searchControl);
+        }
+
+        private void ShowBookingView(Flight flight)
+        {
+            var bookingControl = new BookingControl(flight);
+            bookingControl.BackRequested += (s, e) => ShowSearchFlightsView();
+            bookingControl.BookingConfirmed += (s, booking) =>
+            {
+                MessageBox.Show($"Booking confirmed! Your PNR is: {booking.PNR}", "Success",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ShowHomeView();
+            };
+            SwitchView(bookingControl);
         }
 
         private void ShowBookingsView()
