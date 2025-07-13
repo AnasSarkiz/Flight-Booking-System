@@ -13,18 +13,35 @@ namespace FlightBookingSystem
 
         public MainForm()
         {
-            // Initialize Unsplash service
+            InitializeComponent();
             _unsplashService = new UnsplashService();
 
-            InitializeComponent();
-
-            // Wire up events for the designer-created navbar
+            // Wire up navbar events
             navbarControl.HomeClicked += (s, e) => ShowHomeView();
             navbarControl.SearchFlightsClicked += (s, e) => ShowSearchFlightsView();
             navbarControl.BookingsClicked += (s, e) => ShowBookingsView();
+            navbarControl.ContactUsClicked += (s, e) => ShowContactUs();
+            navbarControl.AboutUsClicked += (s, e) => ShowAboutUs();
             navbarControl.LogoutClicked += (s, e) => Logout();
-
+            navbarControl.UserManagementClicked += (s, e) => ShowUserManagement();
+            navbarControl.UserProfileClicked += (s, e) => ShowUserProfile();
+            navbarControl.ActivityLogClicked += (s, e) => ShowActivityLog();
             ShowHomeView();
+        }
+        private void ShowUserProfile()
+        {
+            var userProfileControl = new UserProfileControl();
+            SwitchView(userProfileControl);
+        }
+        private void ShowUserManagement()
+        {
+            var userManagementControl = new UserManagementControl();
+            SwitchView(userManagementControl);
+        }
+        private void ShowActivityLog()
+        {
+            var activityLogControl = new ActivityLogControl();
+            SwitchView(activityLogControl);
         }
 
         private void ShowHomeView()
@@ -56,7 +73,7 @@ namespace FlightBookingSystem
             {
                 MessageBox.Show($"Booking confirmed! Your PNR is: {booking.PNR}", "Success",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
-                ShowHomeView();
+                ShowBookingsView();
             };
             SwitchView(bookingControl);
         }
@@ -67,20 +84,16 @@ namespace FlightBookingSystem
             SwitchView(bookingsControl);
         }
 
-        private void SwitchView(UserControl newView)
+        private void ShowContactUs()
         {
-            // Remove current view if exists
-            if (currentView != null)
-            {
-                mainContentPanel.Controls.Remove(currentView);
-                currentView.Dispose();
-            }
+            var contactUsControl = new ContactUsControl();
+            SwitchView(contactUsControl);
+        }
 
-            // Add new view to the content panel
-            currentView = newView;
-            currentView.Dock = DockStyle.Fill;
-            mainContentPanel.Controls.Add(currentView);
-            currentView.BringToFront();
+        private void ShowAboutUs()
+        {
+            var aboutUsControl = new AboutUsControl();
+            SwitchView(aboutUsControl);
         }
 
         private void Logout()
@@ -92,12 +105,24 @@ namespace FlightBookingSystem
 
             if (result == DialogResult.Yes)
             {
-                Application.Restart();
+                Application.Exit();
             }
         }
 
-        // Remove the Dispose method from here - it's already in MainForm.Designer.cs
-        // Add this partial method to handle UnsplashService disposal
+        private void SwitchView(UserControl newView)
+        {
+            if (currentView != null)
+            {
+                mainContentPanel.Controls.Remove(currentView);
+                currentView.Dispose();
+            }
+
+            currentView = newView;
+            currentView.Dock = DockStyle.Fill;
+            mainContentPanel.Controls.Add(currentView);
+            currentView.BringToFront();
+        }
+
         partial void AdditionalDispose(bool disposing)
         {
             if (disposing)
