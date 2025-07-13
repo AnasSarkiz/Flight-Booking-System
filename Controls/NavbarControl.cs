@@ -14,14 +14,41 @@ namespace FlightBookingSystem.Controls
         {
             InitializeComponent();
             WireUpEvents();
+            SetActiveButton(homeButton); // Default to home button active
         }
 
         private void WireUpEvents()
         {
-            homeButton.Click += (s, e) => HomeClicked?.Invoke(this, e);
-            searchFlightsButton.Click += (s, e) => SearchFlightsClicked?.Invoke(this, e);
-            bookingsButton.Click += (s, e) => BookingsClicked?.Invoke(this, e);
+            homeButton.Click += (s, e) =>
+            {
+                HomeClicked?.Invoke(this, e);
+                SetActiveButton(homeButton);
+            };
+
+            searchFlightsButton.Click += (s, e) =>
+            {
+                SearchFlightsClicked?.Invoke(this, e);
+                SetActiveButton(searchFlightsButton);
+            };
+
+            bookingsButton.Click += (s, e) =>
+            {
+                BookingsClicked?.Invoke(this, e);
+                SetActiveButton(bookingsButton);
+            };
+
             profileButton.Click += (s, e) => LogoutClicked?.Invoke(this, e);
+        }
+
+        private void SetActiveButton(Button activeButton)
+        {
+            // Position the indicator under the active button
+            activeIndicator.Location = new Point(
+                activeButton.Location.X,
+                activeButton.Location.Y + activeButton.Height - 3);
+            activeIndicator.Width = activeButton.Width;
+
+           
         }
     }
 }

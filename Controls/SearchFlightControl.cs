@@ -314,7 +314,10 @@ namespace FlightBookingSystem.Controls
 
             return card;
         }
-
+        public void SetSearchDestination(string destination)
+        {
+            searchBoxControl.SetDestination(destination); // You'll need to implement this in SearchBoxControl
+        }
         private async Task LoadImageAsync(Panel panel, string imageUrl)
         {
             try

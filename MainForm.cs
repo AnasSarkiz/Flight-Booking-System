@@ -2,15 +2,20 @@
 using System.Windows.Forms;
 using FlightBookingSystem.Controls;
 using FlightBookingSystem.Models;
+using FlightBookingSystem.Services;
 
 namespace FlightBookingSystem
 {
     public partial class MainForm : Form
     {
         private UserControl currentView;
+        private readonly UnsplashService _unsplashService;
 
         public MainForm()
         {
+            // Initialize Unsplash service
+            _unsplashService = new UnsplashService();
+
             InitializeComponent();
 
             // Wire up events for the designer-created navbar
@@ -24,14 +29,20 @@ namespace FlightBookingSystem
 
         private void ShowHomeView()
         {
-            var homeControl = new HomeControl();
+            var homeControl = new HomeControl(_unsplashService);
             homeControl.ExploreFlightsClicked += (s, e) => ShowSearchFlightsView();
+            homeControl.PromotionClicked += (s, city) =>
+            {
+                var searchControl = new SearchFlightsControl();
+                searchControl.SetSearchDestination(city);
+                ShowSearchFlightsView(searchControl);
+            };
             SwitchView(homeControl);
         }
 
-        private void ShowSearchFlightsView()
+        private void ShowSearchFlightsView(SearchFlightsControl existingControl = null)
         {
-            var searchControl = new SearchFlightsControl();
+            var searchControl = existingControl ?? new SearchFlightsControl();
             searchControl.BackToHomeClicked += (s, e) => ShowHomeView();
             searchControl.FlightSelected += (s, flight) => ShowBookingView(flight);
             SwitchView(searchControl);
@@ -82,6 +93,16 @@ namespace FlightBookingSystem
             if (result == DialogResult.Yes)
             {
                 Application.Restart();
+            }
+        }
+
+        // Remove the Dispose method from here - it's already in MainForm.Designer.cs
+        // Add this partial method to handle UnsplashService disposal
+        partial void AdditionalDispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _unsplashService?.Dispose();
             }
         }
     }

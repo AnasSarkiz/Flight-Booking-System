@@ -3,10 +3,18 @@
     partial class HomeControl
     {
         private System.ComponentModel.IContainer components = null;
-        private System.Windows.Forms.PictureBox heroImage;
-        private System.Windows.Forms.Button exploreButton;
+        private System.Windows.Forms.Panel headerPanel;
         private System.Windows.Forms.Label titleLabel;
         private System.Windows.Forms.Label subtitleLabel;
+        private System.Windows.Forms.Button exploreButton;
+        private System.Windows.Forms.TableLayoutPanel destinationsPanel;
+        private System.Windows.Forms.Label destinationsTitle;
+
+        private System.Windows.Forms.Panel[] cityCards = new System.Windows.Forms.Panel[8];
+        private System.Windows.Forms.PictureBox[] cityImages = new System.Windows.Forms.PictureBox[8];
+        private System.Windows.Forms.Label[] cityLabels = new System.Windows.Forms.Label[8];
+        private System.Windows.Forms.Button[] cityButtons = new System.Windows.Forms.Button[8];
+
 
         protected override void Dispose(bool disposing)
         {
@@ -19,84 +27,125 @@
 
         private void InitializeComponent()
         {
-            heroImage = new PictureBox();
-            exploreButton = new Button();
-            titleLabel = new Label();
-            subtitleLabel = new Label();
-            ((System.ComponentModel.ISupportInitialize)heroImage).BeginInit();
-            SuspendLayout();
-            // 
-            // heroImage
-            // 
-            heroImage.Dock = DockStyle.Top;
-            heroImage.Location = new Point(0, 0);
-            heroImage.Margin = new Padding(2);
-            heroImage.Name = "heroImage";
-            heroImage.Size = new Size(933, 300);
-            heroImage.SizeMode = PictureBoxSizeMode.StretchImage;
-            heroImage.TabIndex = 0;
-            heroImage.TabStop = false;
-            // 
-            // exploreButton
-            // 
-            exploreButton.Anchor = AnchorStyles.None;
-            exploreButton.BackColor = Color.FromArgb(0, 168, 255);
-            exploreButton.FlatAppearance.BorderSize = 0;
-            exploreButton.FlatStyle = FlatStyle.Flat;
-            exploreButton.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
-            exploreButton.ForeColor = Color.White;
-            exploreButton.Location = new Point(389, 315);
-            exploreButton.Margin = new Padding(2);
-            exploreButton.Name = "exploreButton";
-            exploreButton.Size = new Size(156, 38);
-            exploreButton.TabIndex = 1;
-            exploreButton.Text = "Explore Flights";
-            exploreButton.UseVisualStyleBackColor = false;
-            // 
-            // titleLabel
-            // 
-            titleLabel.Anchor = AnchorStyles.None;
-            titleLabel.AutoSize = true;
-            titleLabel.Font = new Font("Segoe UI", 28F, FontStyle.Bold);
-            titleLabel.ForeColor = Color.FromArgb(8, 18, 44);
-            titleLabel.Location = new Point(311, 240);
-            titleLabel.Margin = new Padding(2, 0, 2, 0);
-            titleLabel.Name = "titleLabel";
-            titleLabel.Size = new Size(341, 51);
-            titleLabel.TabIndex = 2;
-            titleLabel.Text = "Ready to Explore?";
-            titleLabel.TextAlign = ContentAlignment.MiddleCenter;
-            // 
-            // subtitleLabel
-            // 
-            subtitleLabel.Anchor = AnchorStyles.None;
-            subtitleLabel.AutoSize = true;
-            subtitleLabel.Font = new Font("Segoe UI", 14F);
-            subtitleLabel.ForeColor = Color.FromArgb(8, 18, 44);
-            subtitleLabel.Location = new Point(233, 285);
-            subtitleLabel.Margin = new Padding(2, 0, 2, 0);
-            subtitleLabel.Name = "subtitleLabel";
-            subtitleLabel.Size = new Size(501, 25);
-            subtitleLabel.TabIndex = 3;
-            subtitleLabel.Text = "Discover amazing destinations at unbeatable prices today!";
-            subtitleLabel.TextAlign = ContentAlignment.MiddleCenter;
-            // 
-            // HomeControl
-            // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
-            BackColor = Color.FromArgb(240, 245, 255);
-            Controls.Add(subtitleLabel);
-            Controls.Add(titleLabel);
-            Controls.Add(exploreButton);
-            Controls.Add(heroImage);
-            Font = new Font("Segoe UI", 9F);
-            Margin = new Padding(2);
-            Name = "HomeControl";
-            Size = new Size(933, 540);
-            ((System.ComponentModel.ISupportInitialize)heroImage).EndInit();
-            ResumeLayout(false);
-            PerformLayout();
+            this.headerPanel = new System.Windows.Forms.Panel();
+            this.destinationsTitle = new System.Windows.Forms.Label();
+            this.destinationsPanel = new System.Windows.Forms.TableLayoutPanel();
+            this.titleLabel = new System.Windows.Forms.Label();
+            this.subtitleLabel = new System.Windows.Forms.Label();
+            this.exploreButton = new System.Windows.Forms.Button();
+
+            this.SuspendLayout();
+
+            // Header Panel
+            this.headerPanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.headerPanel.Size = new System.Drawing.Size(1200, 100);
+            this.headerPanel.BackColor = System.Drawing.Color.FromArgb(8, 18, 44);
+
+            // Destinations Title
+            this.destinationsTitle.Dock = System.Windows.Forms.DockStyle.Top;
+            this.destinationsTitle.AutoSize = true;
+            this.destinationsTitle.Font = new System.Drawing.Font("Segoe UI", 24F, System.Drawing.FontStyle.Bold);
+            this.destinationsTitle.ForeColor = System.Drawing.Color.FromArgb(8, 18, 44);
+            this.destinationsTitle.Padding = new System.Windows.Forms.Padding(20, 20, 0, 10);
+            this.destinationsTitle.Text = "Popular Destinations";
+
+            // Destinations Panel (TableLayout)
+            this.destinationsPanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.destinationsPanel.ColumnCount = 4;
+            this.destinationsPanel.RowCount = 2;
+            this.destinationsPanel.Height = 520;
+            this.destinationsPanel.Padding = new System.Windows.Forms.Padding(20, 0, 20, 20);
+            this.destinationsPanel.GrowStyle = System.Windows.Forms.TableLayoutPanelGrowStyle.FixedSize;
+
+            for (int i = 0; i < 4; i++)
+            {
+                this.destinationsPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            }
+            for (int i = 0; i < 2; i++)
+            {
+                this.destinationsPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.AutoSize));
+            }
+
+            for (int i = 0; i < cities.Length; i++)
+            {
+                cityCards[i] = new System.Windows.Forms.Panel();
+                cityImages[i] = new System.Windows.Forms.PictureBox();
+                cityLabels[i] = new System.Windows.Forms.Label();
+                cityButtons[i] = new System.Windows.Forms.Button();
+
+                cityCards[i].BackColor = System.Drawing.Color.White;
+                cityCards[i].BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+                cityCards[i].Margin = new System.Windows.Forms.Padding(10);
+                cityCards[i].Size = new Size(250, 250); // Set explicit size instead of MaximumSize
+                cityCards[i].MaximumSize = new Size(400, 400);
+
+                cityImages[i].Dock = System.Windows.Forms.DockStyle.Top;
+                cityImages[i].Height = 150;
+                cityImages[i].SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+
+                cityLabels[i].Dock = System.Windows.Forms.DockStyle.Top;
+                cityLabels[i].Height = 40;
+                cityLabels[i].Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
+                cityLabels[i].ForeColor = System.Drawing.Color.FromArgb(8, 18, 44);
+                cityLabels[i].Text = cities[i];
+                cityLabels[i].TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+
+                cityButtons[i].Dock = System.Windows.Forms.DockStyle.Fill;
+                cityButtons[i].Text = "Book Now";
+                cityButtons[i].Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+                cityButtons[i].BackColor = System.Drawing.Color.FromArgb(0, 168, 255);
+                cityButtons[i].ForeColor = System.Drawing.Color.White;
+                cityButtons[i].FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+                cityButtons[i].FlatAppearance.BorderSize = 0;
+
+                cityCards[i].Controls.Add(cityButtons[i]);
+                cityCards[i].Controls.Add(cityLabels[i]);
+                cityCards[i].Controls.Add(cityImages[i]);
+
+                int row = i / 4;
+                int col = i % 4;
+                destinationsPanel.Controls.Add(cityCards[i], col, row);
+            }
+
+            // Title Label
+            this.titleLabel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.titleLabel.AutoSize = true;
+            this.titleLabel.Font = new System.Drawing.Font("Segoe UI", 28F, System.Drawing.FontStyle.Bold);
+            this.titleLabel.ForeColor = System.Drawing.Color.FromArgb(8, 18, 44);
+            this.titleLabel.Padding = new System.Windows.Forms.Padding(20, 40, 20, 0);
+            this.titleLabel.Text = "Your Journey Begins Here";
+
+            // Subtitle Label
+            this.subtitleLabel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.subtitleLabel.AutoSize = true;
+            this.subtitleLabel.Font = new System.Drawing.Font("Segoe UI", 16F);
+            this.subtitleLabel.ForeColor = System.Drawing.Color.FromArgb(8, 18, 44);
+            this.subtitleLabel.Padding = new System.Windows.Forms.Padding(20, 10, 20, 40);
+            this.subtitleLabel.Text = "Discover amazing destinations at unbeatable prices today!";
+
+            // Explore Button
+            this.exploreButton.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.exploreButton.BackColor = System.Drawing.Color.FromArgb(0, 168, 255);
+            this.exploreButton.FlatAppearance.BorderSize = 0;
+            this.exploreButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.exploreButton.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
+            this.exploreButton.ForeColor = System.Drawing.Color.White;
+            this.exploreButton.Size = new System.Drawing.Size(250, 60);
+            this.exploreButton.Text = "Explore All Destinations";
+            this.exploreButton.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.exploreButton.Margin = new System.Windows.Forms.Padding(0, 0, 0, 40);
+
+            // Add Controls
+            this.Controls.Add(this.exploreButton);
+            this.Controls.Add(this.subtitleLabel);
+            this.Controls.Add(this.titleLabel);
+            this.Controls.Add(this.destinationsPanel);
+            this.Controls.Add(this.destinationsTitle);
+            this.Controls.Add(this.headerPanel);
+
+            this.Size = new System.Drawing.Size(1200, 1000);
+            this.ResumeLayout(false);
+            this.PerformLayout();
         }
     }
 }

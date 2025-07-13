@@ -87,7 +87,11 @@ namespace FlightBookingSystem.Controls
 
             returnCheckBox.CheckedChanged += ReturnCheckBox_CheckedChanged;
         }
-
+        public void SetDestination(string destination)
+        {
+            // Implementation to set the destination in your search box
+            destinationTextBox.Text = destination;
+        }
         private async void TextBox_LostFocus(object sender, EventArgs e)
         {
             await Task.Delay(200);
