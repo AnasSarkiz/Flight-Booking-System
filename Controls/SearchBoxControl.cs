@@ -1,13 +1,16 @@
-﻿using System;
+﻿using Flight_Booking_System.Properties;
+using FlightBookingSystem.Models;
+using Microsoft.VisualBasic.ApplicationServices;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
+using System.Resources;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using FlightBookingSystem.Models;
 
 namespace FlightBookingSystem.Controls
 {
@@ -25,7 +28,8 @@ namespace FlightBookingSystem.Controls
         public DateTime? ReturnDate => returnCheckBox.Checked ? returnDatePicker.Value.Date : (DateTime?)null;
         public Airport OriginAirport { get; private set; }
         public Airport DestinationAirport { get; private set; }
-
+        public string GetOriginIata() => OriginAirport?.iata;
+        public string GetDestinationIata() => DestinationAirport?.iata;
         public SearchBoxControl()
         {
             InitializeComponent();
@@ -38,7 +42,7 @@ namespace FlightBookingSystem.Controls
         {
             try
             {
-                string jsonPath = @"C:\Users\aness\Desktop\flightBooker\resources\airports.json";
+                string jsonPath =@"C:\Users\HP\Desktop\flightBookinSys\resources\airports.json";
                 string json = File.ReadAllText(jsonPath);
                 var airportDict = JsonSerializer.Deserialize<Dictionary<string, Airport>>(json);
 

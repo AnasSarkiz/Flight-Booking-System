@@ -20,12 +20,15 @@ namespace FlightBookingSystem.Controls
 
         private List<Flight> _flights = new List<Flight>();
         private readonly UnsplashService _unsplashService;
+        private readonly AmadeusService _amadeusService;
 
         public SearchBoxControl SearchBox => searchBoxControl;
         public FilterPanelControl FilterPanel => filterPanelControl;
 
         public SearchFlightsControl()
         {
+            _amadeusService = new AmadeusService();
+            _unsplashService = new UnsplashService();
             _unsplashService = new UnsplashService();
             InitializeComponent();
             WireUpEvents();
@@ -86,14 +89,42 @@ namespace FlightBookingSystem.Controls
             DisplayFlights(flights);
         }
 
-        private void OnSearchTriggered(object sender, EventArgs e)
+        private async void OnSearchTriggered(object sender, EventArgs e)
         {
-            var filteredFlights = FilterFlights(
-                searchBoxControl.Origin,
-                searchBoxControl.Destination,
-                searchBoxControl.DepartureDate
-            );
-            DisplayFlights(filteredFlights);
+            try
+            {
+                var origin = searchBoxControl.OriginAirport?.iata;
+                var destination = searchBoxControl.DestinationAirport?.iata;
+
+                if (string.IsNullOrEmpty(origin) || string.IsNullOrEmpty(destination))
+                {
+                    MessageBox.Show("Please select valid airports");
+                    return;
+                }
+
+                var flights = await _amadeusService.SearchFlightsAsync(
+                    origin,
+                    destination,
+                    searchBoxControl.DepartureDate,
+                    searchBoxControl.ReturnDate
+                );
+
+                // Enhance flight data with images
+                foreach (var flight in flights)
+                {
+                    var cityName = flight.Destination.Split('(')[0].Trim();
+                    flight.DestinationImageUrl = await _unsplashService.GetCityImageUrl(cityName);
+                    flight.AirlineLogoUrl = await _unsplashService.GetAirlineLogoUrl(flight.Airline);
+                }
+
+                LoadFlights(flights);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error searching flights: {ex.Message}");
+                // Fallback to test flights
+                await InitializeTestFlightsAsync();
+            }
         }
 
         private void OnSortChanged(object sender, EventArgs e)

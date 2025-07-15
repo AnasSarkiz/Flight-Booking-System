@@ -1,4 +1,6 @@
 ﻿
+using System;
+
 namespace FlightBookingSystem.Models
 {
     public class Flight
@@ -16,5 +18,7 @@ namespace FlightBookingSystem.Models
         public DateTime ArrivalTime { get; set; }
         public string FormattedDuration => $"{Duration.Hours}h {Duration.Minutes}m";
         public string FormattedPrice => $"${Price:N0}";
+
     }
+   
 }
