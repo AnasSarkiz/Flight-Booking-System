@@ -42,8 +42,11 @@ namespace FlightBookingSystem.Controls
         {
             try
             {
-                string jsonPath =@"C:\Users\HP\Desktop\flightBookinSys\resources\airports.json";
-                string json = File.ReadAllText(jsonPath);
+                string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+                string resourcesPath = Path.GetFullPath(Path.Combine(baseDirectory, @"..\..\..\resources\airports.json"));
+
+                string json = File.ReadAllText(resourcesPath);
                 var airportDict = JsonSerializer.Deserialize<Dictionary<string, Airport>>(json);
 
                 _airports = airportDict.Values

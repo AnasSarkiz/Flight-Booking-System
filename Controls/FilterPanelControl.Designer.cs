@@ -18,6 +18,7 @@
         private System.Windows.Forms.RadioButton anyStopsRadio;
         private System.Windows.Forms.Button applyFiltersButton;
 
+
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))

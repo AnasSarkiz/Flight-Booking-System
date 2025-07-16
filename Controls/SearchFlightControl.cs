@@ -1,5 +1,4 @@
-﻿// SearchFlightsControl.cs
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -40,17 +39,17 @@ namespace FlightBookingSystem.Controls
         {
             var testFlights = new List<Flight>
             {
-                await CreateTestFlight(1, "AA123", "American Airlines", "New York (JFK)", "London (LHR)", 2, 8, 499.99m),
-                await CreateTestFlight(2, "DL456", "Delta Airlines", "Atlanta (ATL)", "Paris (CDG)", 4, 11, 599.99m),
-                await CreateTestFlight(3, "UA789", "United Airlines", "Chicago (ORD)", "Tokyo (NRT)", 6, 18, 1299.99m),
-                await CreateTestFlight(4, "BA321", "British Airways", "London (LHR)", "New York (JFK)", 8, 14, 549.99m)
+                await CreateTestFlight(1, "AA123", "AA", "New York (JFK)", "London (LHR)", 2, 8, 499.99m),
+                await CreateTestFlight(2, "DL456", "DL", "Atlanta (ATL)", "Paris (CDG)", 4, 11, 599.99m),
+                await CreateTestFlight(3, "UA789", "UA", "Chicago (ORD)", "Tokyo (NRT)", 6, 18, 1299.99m),
+                await CreateTestFlight(4, "BA321", "BA", "London (LHR)", "New York (JFK)", 8, 14, 549.99m)
             };
 
             LoadFlights(testFlights);
         }
 
         private async Task<Flight> CreateTestFlight(int id, string number, string airline,
-            string origin, string destination, int depHours, int arrHours, decimal price)
+     string origin, string destination, int depHours, int arrHours, decimal price)
         {
             var cityName = destination.Split('(')[0].Trim();
             return new Flight
@@ -65,7 +64,8 @@ namespace FlightBookingSystem.Controls
                 Duration = TimeSpan.FromHours(arrHours - depHours),
                 Price = price,
                 DestinationImageUrl = await _unsplashService.GetCityImageUrl(cityName),
-                AirlineLogoUrl = $"https://logo.clearbit.com/{airline.Replace(" ", "").ToLower()}.com"
+                AirlineLogoUrl = $"https://content.airhex.com/content/logos/airlines_{airline}_80_80_s.png",
+                Stops = id % 3
             };
         }
 
@@ -73,6 +73,26 @@ namespace FlightBookingSystem.Controls
         {
             searchBoxControl.SearchTriggered += OnSearchTriggered;
             filterPanelControl.SortChanged += OnSortChanged;
+            filterPanelControl.FiltersApplied += OnFiltersApplied;
+        }
+        private void OnFiltersApplied(object sender, EventArgs e)
+        {
+            ApplyFilters();
+        }
+
+        private void ApplyFilters()
+        {
+            var filteredFlights = _flights.Where(f =>
+                (filterPanelControl.SelectedAirlines.Count == 0 ||
+                 filterPanelControl.SelectedAirlines.Contains(f.Airline)) &&
+                f.Price <= filterPanelControl.MaxPrice &&
+                (filterPanelControl.SelectedStopOption == FilterPanelControl.StopOption.AnyStops ||
+                 (filterPanelControl.SelectedStopOption == FilterPanelControl.StopOption.NonStop && f.Stops == 0) ||
+                 (filterPanelControl.SelectedStopOption == FilterPanelControl.StopOption.OneStop && f.Stops == 1))
+            ).ToList();
+
+            var sortedFlights = SortFlights(filteredFlights, filterPanelControl.SelectedSortOption);
+            DisplayFlights(sortedFlights);
         }
 
         private void ConfigureFlightCardsPanel()
@@ -86,6 +106,7 @@ namespace FlightBookingSystem.Controls
         public void LoadFlights(List<Flight> flights)
         {
             _flights = flights ?? throw new ArgumentNullException(nameof(flights));
+            filterPanelControl.UpdateFilters(flights);
             DisplayFlights(flights);
         }
 
@@ -93,6 +114,10 @@ namespace FlightBookingSystem.Controls
         {
             try
             {
+                // Show loading label
+                loadingLabel.Visible = true;
+                flightCardsPanel.Visible = false;
+
                 var origin = searchBoxControl.OriginAirport?.iata;
                 var destination = searchBoxControl.DestinationAirport?.iata;
 
@@ -109,7 +134,13 @@ namespace FlightBookingSystem.Controls
                     searchBoxControl.ReturnDate
                 );
 
-                // Enhance flight data with images
+                if (flights.Count == 0)
+                {
+                    MessageBox.Show("No flights found for your search criteria");
+                    filterPanelControl.UpdateFilters(new List<Flight>());
+                    return;
+                }
+
                 foreach (var flight in flights)
                 {
                     var cityName = flight.Destination.Split('(')[0].Trim();
@@ -122,10 +153,16 @@ namespace FlightBookingSystem.Controls
             catch (Exception ex)
             {
                 MessageBox.Show($"Error searching flights: {ex.Message}");
-                // Fallback to test flights
                 await InitializeTestFlightsAsync();
             }
+            finally
+            {
+                // Hide loading label and show results
+                loadingLabel.Visible = false;
+                flightCardsPanel.Visible = true;
+            }
         }
+
 
         private void OnSortChanged(object sender, EventArgs e)
         {
@@ -136,14 +173,7 @@ namespace FlightBookingSystem.Controls
             DisplayFlights(sortedFlights);
         }
 
-        private List<Flight> FilterFlights(string origin, string destination, DateTime departureDate)
-        {
-            return _flights.FindAll(f =>
-                (string.IsNullOrEmpty(origin) || f.Origin.Contains(origin, StringComparison.OrdinalIgnoreCase)) &&
-                (string.IsNullOrEmpty(destination) || f.Destination.Contains(destination, StringComparison.OrdinalIgnoreCase)) &&
-                f.DepartureTime.Date == departureDate.Date
-            );
-        }
+    
 
         private List<Flight> SortFlights(List<Flight> flights, FilterPanelControl.SortOption sortOption)
         {
@@ -315,7 +345,7 @@ namespace FlightBookingSystem.Controls
             };
             pricePanel.Controls.Add(perPersonLabel);
 
-            var selectButton = new RoundedButton
+            var selectButton = new Button
             {
                 Text = "SELECT FLIGHT",
                 Size = new Size(130, 36),
@@ -325,6 +355,7 @@ namespace FlightBookingSystem.Controls
                 FlatStyle = FlatStyle.Flat,
                 Font = new Font("Arial", 9, FontStyle.Bold),
             };
+     
             selectButton.FlatAppearance.BorderSize = 0;
             selectButton.MouseEnter += (s, e) => selectButton.BackColor = Color.FromArgb(0, 95, 180);
             selectButton.MouseLeave += (s, e) => selectButton.BackColor = Color.FromArgb(0, 115, 207);
@@ -365,10 +396,27 @@ namespace FlightBookingSystem.Controls
             }
             catch
             {
-                // Use a placeholder if image fails to load
-                panel.BackColor = Color.FromArgb(240, 245, 255);
-                panel.BackgroundImage = null;
+
+                try
+                {
+                    using (var httpClient = new HttpClient())
+                    {
+                        var fallbackUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Airplane_silhouette.svg/512px-Airplane_silhouette.svg.png";
+                        var fallbackBytes = await httpClient.GetByteArrayAsync(fallbackUrl);
+                        await using (var ms = new MemoryStream(fallbackBytes))
+                        {
+                            panel.BackgroundImage = Image.FromStream(ms);
+                        }
+                    }
+                }
+                catch
+                {
+                    // Final fallback if even that fails
+                    panel.BackColor = Color.FromArgb(240, 245, 255);
+                    panel.BackgroundImage = null;
+                }
             }
+
         }
     }
 
@@ -405,41 +453,5 @@ namespace FlightBookingSystem.Controls
             }
         }
     }
-
-    // Custom rounded button class
-    public class RoundedButton : Button
-    {
-        public int CornerRadius { get; set; } = 8;
-
-        public RoundedButton()
-        {
-            DoubleBuffered = true;
-            FlatStyle = FlatStyle.Flat;
-            FlatAppearance.BorderSize = 0;
-        }
-
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            base.OnPaint(e);
-
-            // Draw rounded background
-            using (var path = new GraphicsPath())
-            {
-                var rect = new Rectangle(0, 0, Width, Height);
-                path.AddArc(rect.X, rect.Y, CornerRadius, CornerRadius, 180, 90);
-                path.AddArc(rect.X + rect.Width - CornerRadius, rect.Y, CornerRadius, CornerRadius, 270, 90);
-                path.AddArc(rect.X + rect.Width - CornerRadius, rect.Y + rect.Height - CornerRadius, CornerRadius, CornerRadius, 0, 90);
-                path.AddArc(rect.X, rect.Y + rect.Height - CornerRadius, CornerRadius, CornerRadius, 90, 90);
-                path.CloseFigure();
-
-                Region = new Region(path);
-                e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-                e.Graphics.FillPath(new SolidBrush(BackColor), path);
-            }
-
-            // Draw the text
-            TextFormatFlags flags = TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter;
-            TextRenderer.DrawText(e.Graphics, Text, Font, ClientRectangle, ForeColor, flags);
-        }
-    }
+   
 }

@@ -6,7 +6,7 @@
         private FlightBookingSystem.Controls.SearchBoxControl searchBoxControl;
         private FlightBookingSystem.Controls.FilterPanelControl filterPanelControl;
         private System.Windows.Forms.FlowLayoutPanel flightCardsPanel;
-
+        private System.Windows.Forms.Label loadingLabel;
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -53,6 +53,17 @@
             this.flightCardsPanel.Size = new System.Drawing.Size(950, 570);
             this.flightCardsPanel.TabIndex = 2;
             this.BackColor = Color.FromArgb(245, 249, 255);
+
+            // loadingLabel
+            this.loadingLabel = new System.Windows.Forms.Label();
+            this.loadingLabel.Text = "✈️ Searching for flights...";
+            this.loadingLabel.Font = new Font("Segoe UI", 11, FontStyle.Bold);
+            this.loadingLabel.ForeColor = Color.FromArgb(80, 80, 100);
+            this.loadingLabel.TextAlign = ContentAlignment.MiddleCenter;
+            this.loadingLabel.Dock = DockStyle.Fill;
+            this.loadingLabel.Visible = false;
+            this.Controls.Add(this.loadingLabel);
+            this.Controls.SetChildIndex(this.loadingLabel, 0); // Show above all
 
             // SearchFlightsControl
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);

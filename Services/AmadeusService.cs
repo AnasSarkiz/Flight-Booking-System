@@ -124,7 +124,9 @@ namespace FlightBookingSystem.Services
             foreach (var offer in root.GetProperty("data").EnumerateArray())
             {
                 var firstItinerary = offer.GetProperty("itineraries")[0];
-                var firstSegment = firstItinerary.GetProperty("segments")[0];
+                var segments = firstItinerary.GetProperty("segments");
+                var firstSegment = segments[0];
+                var lastSegment = segments[segments.GetArrayLength() - 1];
                 var price = offer.GetProperty("price").GetProperty("total").GetString();
 
                 // Parse duration correctly
@@ -136,11 +138,12 @@ namespace FlightBookingSystem.Services
                     FlightNumber = firstSegment.GetProperty("number").GetString(),
                     Airline = firstSegment.GetProperty("carrierCode").GetString(),
                     Origin = firstSegment.GetProperty("departure").GetProperty("iataCode").GetString(),
-                    Destination = firstSegment.GetProperty("arrival").GetProperty("iataCode").GetString(),
+                    Destination = lastSegment.GetProperty("arrival").GetProperty("iataCode").GetString(),
                     DepartureTime = DateTime.Parse(firstSegment.GetProperty("departure").GetProperty("at").GetString()),
-                    ArrivalTime = DateTime.Parse(firstSegment.GetProperty("arrival").GetProperty("at").GetString()),
+                    ArrivalTime = DateTime.Parse(lastSegment.GetProperty("arrival").GetProperty("at").GetString()),
                     Price = decimal.Parse(price),
-                    Duration = duration
+                    Duration = duration,
+                    Stops = segments.GetArrayLength() - 1 
                 };
 
                 flights.Add(flight);

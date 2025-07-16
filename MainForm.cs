@@ -16,7 +16,6 @@ namespace FlightBookingSystem
             InitializeComponent();
             _unsplashService = new UnsplashService();
 
-            // Wire up navbar events
             navbarControl.HomeClicked += (s, e) => ShowHomeView();
             navbarControl.SearchFlightsClicked += (s, e) => ShowSearchFlightsView();
             navbarControl.BookingsClicked += (s, e) => ShowBookingsView();

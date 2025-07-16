@@ -99,22 +99,35 @@ namespace FlightBookingSystem.Services
             }
         }
 
-        public async Task<string> GetAirlineLogoUrl(string airlineName)
+        public async Task<string> GetAirlineLogoUrl(string iataCode)
         {
+            iataCode = iataCode?.ToUpper().Trim();
+
+            if (string.IsNullOrWhiteSpace(iataCode) || iataCode.Length != 2)
+            {
+                return "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Airplane_silhouette.svg/512px-Airplane_silhouette.svg.png";
+            }
+
+            // AirHex image URL (assuming you're using the free CDN version)
+            var logoUrl = $"https://content.airhex.com/content/logos/airlines_{iataCode}_80_80_s.png";
+
+            // Optional: Validate the logo exists
             try
             {
-                // Clean airline name
-                var cleanName = Uri.EscapeDataString(airlineName
-                    .Replace(" ", "")
-                    .ToLower());
-
-                return $"https://logo.clearbit.com/{cleanName}.com";
+                var response = await _httpClient.GetAsync(logoUrl);
+                if (response.IsSuccessStatusCode)
+                    return logoUrl;
+                else
+                    return "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Airplane_silhouette.svg/512px-Airplane_silhouette.svg.png";
             }
             catch
             {
-                return "https://logo.clearbit.com/example.com"; // Fallback logo
+                 return "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Airplane_silhouette.svg/512px-Airplane_silhouette.svg.png";
             }
         }
+
+     
+
 
         private string GetDefaultImageUrl()
         {
