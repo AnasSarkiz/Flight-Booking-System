@@ -1,7 +1,4 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
-name: .NET
+name: Secure WinForms Build
 
 on:
   push:
@@ -9,20 +6,34 @@ on:
   pull_request:
     branches: [ "master" ]
 
+env:
+  DOTNET_NOLOGO: true
+
 jobs:
   build:
-
     runs-on: windows-latest
-
+    
     steps:
     - uses: actions/checkout@v4
+
+    - name: Create .env file
+      run: |
+        echo "UNSPLASH_Access_Key=${{ secrets.UNSPLASH_ACCESS_KEY }}" > .env
+        echo "UNSPLASH_Secret_Key=${{ secrets.UNSPLASH_SECRET_KEY }}" >> .env
+        echo "AMADEUS_CLIENT_ID=${{ secrets.AMADEUS_CLIENT_ID }}" >> .env
+        echo "AMADEUS_CLIENT_SECRET=${{ secrets.AMADEUS_CLIENT_SECRET }}" >> .env
+      shell: bash
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
+
     - name: Restore dependencies
       run: dotnet restore
+
     - name: Build
       run: dotnet build --no-restore
+
     - name: Test
       run: dotnet test --no-build --verbosity normal
