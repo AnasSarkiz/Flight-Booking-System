@@ -3,13 +3,6 @@
     partial class UserManagementControl
     {
         private System.ComponentModel.IContainer components = null;
-        private System.Windows.Forms.Label titleLabel;
-        private System.Windows.Forms.Panel contentPanel;
-        private System.Windows.Forms.DataGridView usersGrid;
-        private System.Windows.Forms.Panel toolbar;
-        private System.Windows.Forms.Button addButton;
-        private System.Windows.Forms.Button editButton;
-        private System.Windows.Forms.Button deleteButton;
 
         protected override void Dispose(bool disposing)
         {
@@ -22,129 +15,90 @@
 
         private void InitializeComponent()
         {
-            titleLabel = new Label();
-            contentPanel = new Panel();
-            usersGrid = new DataGridView();
-            toolbar = new Panel();
-            deleteButton = new Button();
-            editButton = new Button();
-            addButton = new Button();
-            contentPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)usersGrid).BeginInit();
-            toolbar.SuspendLayout();
-            SuspendLayout();
-            // 
-            // titleLabel
-            // 
-            titleLabel.BackColor = SystemColors.Control;
-            titleLabel.Dock = DockStyle.Top;
-            titleLabel.Font = new Font("Segoe UI", 24F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            titleLabel.ForeColor = Color.FromArgb(8, 18, 44);
-            titleLabel.Location = new Point(0, 0);
-            titleLabel.Name = "titleLabel";
-            titleLabel.Size = new Size(800, 60);
-            titleLabel.TabIndex = 0;
-            titleLabel.Text = "User Management";
-            titleLabel.TextAlign = ContentAlignment.MiddleCenter;
-            // 
-            // contentPanel
-            // 
-            contentPanel.BackColor = Color.White;
-            contentPanel.Controls.Add(usersGrid);
-            contentPanel.Controls.Add(toolbar);
-            contentPanel.Dock = DockStyle.Fill;
-            contentPanel.Location = new Point(0, 60);
-            contentPanel.Name = "contentPanel";
-            contentPanel.Padding = new Padding(20);
-            contentPanel.Size = new Size(800, 540);
-            contentPanel.TabIndex = 1;
+            this.usersGrid = new System.Windows.Forms.DataGridView();
+            this.addButton = new System.Windows.Forms.Button();
+            this.editButton = new System.Windows.Forms.Button();
+            this.deleteButton = new System.Windows.Forms.Button();
+            this.topUpButton = new System.Windows.Forms.Button();
+            ((System.ComponentModel.ISupportInitialize)(this.usersGrid)).BeginInit();
+            this.SuspendLayout();
             // 
             // usersGrid
             // 
-            usersGrid.AllowUserToAddRows = false;
-            usersGrid.AllowUserToDeleteRows = false;
-            usersGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            usersGrid.BackgroundColor = Color.White;
-            usersGrid.BorderStyle = BorderStyle.None;
-            usersGrid.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            usersGrid.Dock = DockStyle.Fill;
-            usersGrid.Location = new Point(20, 70);
-            usersGrid.Name = "usersGrid";
-            usersGrid.ReadOnly = true;
-            usersGrid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            usersGrid.Size = new Size(760, 450);
-            usersGrid.TabIndex = 1;
-            // 
-            // toolbar
-            // 
-            toolbar.BackColor = Color.FromArgb(240, 245, 255);
-            toolbar.Controls.Add(deleteButton);
-            toolbar.Controls.Add(editButton);
-            toolbar.Controls.Add(addButton);
-            toolbar.Dock = DockStyle.Top;
-            toolbar.Location = new Point(20, 20);
-            toolbar.Name = "toolbar";
-            toolbar.Size = new Size(760, 50);
-            toolbar.TabIndex = 0;
-            // 
-            // deleteButton
-            // 
-            deleteButton.BackColor = Color.FromArgb(255, 80, 80);
-            deleteButton.FlatAppearance.BorderSize = 0;
-            deleteButton.FlatStyle = FlatStyle.Flat;
-            deleteButton.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            deleteButton.ForeColor = Color.White;
-            deleteButton.Location = new Point(550, 14);
-            deleteButton.Name = "deleteButton";
-            deleteButton.Size = new Size(100, 30);
-            deleteButton.TabIndex = 2;
-            deleteButton.Text = "Delete";
-            deleteButton.UseVisualStyleBackColor = false;
-            deleteButton.Click += deleteButton_Click;
-            // 
-            // editButton
-            // 
-            editButton.BackColor = Color.FromArgb(0, 168, 255);
-            editButton.FlatAppearance.BorderSize = 0;
-            editButton.FlatStyle = FlatStyle.Flat;
-            editButton.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            editButton.ForeColor = Color.White;
-            editButton.Location = new Point(343, 14);
-            editButton.Name = "editButton";
-            editButton.Size = new Size(100, 30);
-            editButton.TabIndex = 1;
-            editButton.Text = "Edit";
-            editButton.UseVisualStyleBackColor = false;
-            editButton.Click += editButton_Click;
+            this.usersGrid.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.usersGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.usersGrid.Location = new System.Drawing.Point(20, 20);
+            this.usersGrid.Name = "usersGrid";
+            this.usersGrid.RowHeadersWidth = 51;
+            this.usersGrid.RowTemplate.Height = 24;
+            this.usersGrid.Size = new System.Drawing.Size(760, 400);
+            this.usersGrid.TabIndex = 0;
             // 
             // addButton
             // 
-            addButton.BackColor = Color.FromArgb(0, 168, 255);
-            addButton.FlatAppearance.BorderSize = 0;
-            addButton.FlatStyle = FlatStyle.Flat;
-            addButton.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            addButton.ForeColor = Color.White;
-            addButton.Location = new Point(138, 14);
-            addButton.Name = "addButton";
-            addButton.Size = new Size(100, 30);
-            addButton.TabIndex = 0;
-            addButton.Text = "Add User";
-            addButton.UseVisualStyleBackColor = false;
-            addButton.Click += addButton_Click;
+            this.addButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.addButton.Location = new System.Drawing.Point(20, 440);
+            this.addButton.Name = "addButton";
+            this.addButton.Size = new System.Drawing.Size(100, 40);
+            this.addButton.TabIndex = 1;
+            this.addButton.Text = "Add";
+            this.addButton.UseVisualStyleBackColor = true;
+            this.addButton.Click += new System.EventHandler(this.addButton_Click);
+            // 
+            // editButton
+            // 
+            this.editButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.editButton.Location = new System.Drawing.Point(140, 440);
+            this.editButton.Name = "editButton";
+            this.editButton.Size = new System.Drawing.Size(100, 40);
+            this.editButton.TabIndex = 2;
+            this.editButton.Text = "Edit";
+            this.editButton.UseVisualStyleBackColor = true;
+            this.editButton.Click += new System.EventHandler(this.editButton_Click);
+            // 
+            // deleteButton
+            // 
+            this.deleteButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.deleteButton.Location = new System.Drawing.Point(260, 440);
+            this.deleteButton.Name = "deleteButton";
+            this.deleteButton.Size = new System.Drawing.Size(100, 40);
+            this.deleteButton.TabIndex = 3;
+            this.deleteButton.Text = "Delete";
+            this.deleteButton.UseVisualStyleBackColor = true;
+            this.deleteButton.Click += new System.EventHandler(this.deleteButton_Click);
+            // 
+            // topUpButton
+            // 
+            this.topUpButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.topUpButton.Location = new System.Drawing.Point(380, 440);
+            this.topUpButton.Name = "topUpButton";
+            this.topUpButton.Size = new System.Drawing.Size(120, 40);
+            this.topUpButton.TabIndex = 4;
+            this.topUpButton.Text = "Top Up Balance";
+            this.topUpButton.UseVisualStyleBackColor = true;
+            this.topUpButton.Click += new System.EventHandler(this.topUpButton_Click);
             // 
             // UserManagementControl
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
-            Controls.Add(contentPanel);
-            Controls.Add(titleLabel);
-            Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            Name = "UserManagementControl";
-            Size = new Size(800, 600);
-            contentPanel.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)usersGrid).EndInit();
-            toolbar.ResumeLayout(false);
-            ResumeLayout(false);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.topUpButton);
+            this.Controls.Add(this.deleteButton);
+            this.Controls.Add(this.editButton);
+            this.Controls.Add(this.addButton);
+            this.Controls.Add(this.usersGrid);
+            this.Name = "UserManagementControl";
+            this.Size = new System.Drawing.Size(800, 500);
+            ((System.ComponentModel.ISupportInitialize)(this.usersGrid)).EndInit();
+            this.ResumeLayout(false);
         }
+
+        private System.Windows.Forms.DataGridView usersGrid;
+        private System.Windows.Forms.Button addButton;
+        private System.Windows.Forms.Button editButton;
+        private System.Windows.Forms.Button deleteButton;
+        private System.Windows.Forms.Button topUpButton;
     }
 }

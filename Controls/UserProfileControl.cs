@@ -21,6 +21,7 @@ namespace FlightBookingSystem.Controls
             lblEmail.Text = "john.doe@example.com";
             lblMemberSince.Text = "Member since: January 2023";
             lblTotalBookings.Text = "Total bookings: 12";
+            lblBalance.Text = "Current balance: $150.00";
         }
 
         private void btnBack_Click(object sender, EventArgs e)
