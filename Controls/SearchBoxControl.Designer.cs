@@ -33,9 +33,6 @@
             searchButton = new Button();
             panel1 = new Panel();
             panel2 = new Panel();
-            returnCheckBox = new CheckBox();
-            returnLabel = new Label();
-            returnDatePicker = new DateTimePicker();
             SuspendLayout();
             // 
             // originLabel
@@ -134,51 +131,12 @@
             panel2.Size = new Size(369, 1);
             panel2.TabIndex = 10;
             // 
-            // returnCheckBox
-            // 
-            returnCheckBox.AutoSize = true;
-            returnCheckBox.Checked = true;
-            returnCheckBox.CheckState = CheckState.Checked;
-            returnCheckBox.Font = new Font("Segoe UI", 9F);
-            returnCheckBox.ForeColor = Color.FromArgb(80, 80, 80);
-            returnCheckBox.Location = new Point(574, 80);
-            returnCheckBox.Name = "returnCheckBox";
-            returnCheckBox.Size = new Size(82, 19);
-            returnCheckBox.TabIndex = 11;
-            returnCheckBox.Text = "Round trip";
-            returnCheckBox.UseVisualStyleBackColor = true;
-            // 
-            // returnLabel
-            // 
-            returnLabel.AutoSize = true;
-            returnLabel.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold);
-            returnLabel.Location = new Point(484, 80);
-            returnLabel.Name = "returnLabel";
-            returnLabel.Size = new Size(83, 15);
-            returnLabel.TabIndex = 6;
-            returnLabel.Text = "RETURN DATE";
-            // 
-            // returnDatePicker
-            // 
-            returnDatePicker.CalendarFont = new Font("Segoe UI", 12F);
-            returnDatePicker.CustomFormat = "ddd, MMM dd, yyyy";
-            returnDatePicker.Font = new Font("Segoe UI", 11F);
-            returnDatePicker.Format = DateTimePickerFormat.Custom;
-            returnDatePicker.Location = new Point(484, 100);
-            returnDatePicker.MinDate = new DateTime(2023, 1, 1, 0, 0, 0, 0);
-            returnDatePicker.Name = "returnDatePicker";
-            returnDatePicker.Size = new Size(369, 27);
-            returnDatePicker.TabIndex = 7;
-            // 
             // SearchBoxControl
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
-            Controls.Add(returnCheckBox);
             Controls.Add(searchButton);
-            Controls.Add(returnDatePicker);
-            Controls.Add(returnLabel);
             Controls.Add(departureDatePicker);
             Controls.Add(departureLabel);
             Controls.Add(panel2);
@@ -193,9 +151,5 @@
             ResumeLayout(false);
             PerformLayout();
         }
-
-        private CheckBox returnCheckBox;
-        private Label returnLabel;
-        private DateTimePicker returnDatePicker;
     }
 }

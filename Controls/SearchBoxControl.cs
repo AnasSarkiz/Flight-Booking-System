@@ -25,7 +25,6 @@ namespace FlightBookingSystem.Controls
         public string Origin => originTextBox.Text.Trim();
         public string Destination => destinationTextBox.Text.Trim();
         public DateTime DepartureDate => departureDatePicker.Value.Date;
-        public DateTime? ReturnDate => returnCheckBox.Checked ? returnDatePicker.Value.Date : (DateTime?)null;
         public Airport OriginAirport { get; private set; }
         public Airport DestinationAirport { get; private set; }
         public string GetOriginIata() => OriginAirport?.iata;
@@ -92,7 +91,6 @@ namespace FlightBookingSystem.Controls
             destinationTextBox.KeyDown += TextBox_KeyDown;
             destinationTextBox.LostFocus += TextBox_LostFocus;
 
-            returnCheckBox.CheckedChanged += ReturnCheckBox_CheckedChanged;
         }
         public void SetDestination(string destination)
         {
@@ -111,12 +109,6 @@ namespace FlightBookingSystem.Controls
             {
                 _suggestionListBox.Visible = false;
             }
-        }
-
-        private void ReturnCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            returnDatePicker.Enabled = returnCheckBox.Checked;
-            returnLabel.Enabled = returnCheckBox.Checked;
         }
 
         private void TextBox_TextChanged(object sender, EventArgs e)

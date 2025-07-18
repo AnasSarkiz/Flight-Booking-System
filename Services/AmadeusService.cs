@@ -54,7 +54,7 @@ namespace FlightBookingSystem.Services
             return _accessToken;
         }
 
-        public async Task<List<Flight>> SearchFlightsAsync(string origin, string destination, DateTime departureDate, DateTime? returnDate)
+        public async Task<List<Flight>> SearchFlightsAsync(string origin, string destination, DateTime departureDate)
         {
             var token = await GetAccessTokenAsync();
 
@@ -73,20 +73,6 @@ namespace FlightBookingSystem.Services
         }
     };
 
-            // Add return flight if needed
-            if (returnDate.HasValue)
-            {
-                originDestinations.Add(new
-                {
-                    id = "2",
-                    originLocationCode = destination,
-                    destinationLocationCode = origin,
-                    departureDateTimeRange = new
-                    {
-                        date = returnDate.Value.ToString("yyyy-MM-dd")
-                    }
-                });
-            }
 
             var request = new
             {
@@ -97,7 +83,7 @@ namespace FlightBookingSystem.Services
             new { id = "1", travelerType = "ADULT" }
         },
                 sources = new[] { "GDS" },
-                searchCriteria = new { maxFlightOffers = 10 }
+                searchCriteria = new { maxFlightOffers = 20 }
             };
 
             var json = JsonSerializer.Serialize(request);

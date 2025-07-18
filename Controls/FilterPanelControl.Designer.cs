@@ -146,13 +146,13 @@
             minPriceLabel.Name = "minPriceLabel";
             minPriceLabel.Size = new Size(31, 13);
             minPriceLabel.TabIndex = 1;
-            minPriceLabel.Text = "$100";
+            minPriceLabel.Text = "$0";
             // 
             // priceTrackBar
             // 
             priceTrackBar.Location = new Point(20, 40);
             priceTrackBar.Maximum = 1000;
-            priceTrackBar.Minimum = 100;
+            priceTrackBar.Minimum = 0;
             priceTrackBar.Name = "priceTrackBar";
             priceTrackBar.Size = new Size(210, 45);
             priceTrackBar.TabIndex = 0;

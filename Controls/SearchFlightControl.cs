@@ -130,11 +130,10 @@ namespace FlightBookingSystem.Controls
                 var flights = await _amadeusService.SearchFlightsAsync(
                     origin,
                     destination,
-                    searchBoxControl.DepartureDate,
-                    searchBoxControl.ReturnDate
+                    searchBoxControl.DepartureDate
                 );
 
-                if (flights.Count == 0)
+                if (GetCount(flights) == 0)
                 {
                     MessageBox.Show("No flights found for your search criteria");
                     filterPanelControl.UpdateFilters(new List<Flight>());
@@ -163,6 +162,10 @@ namespace FlightBookingSystem.Controls
             }
         }
 
+        private static int GetCount(List<Flight> flights)
+        {
+            return flights.Count;
+        }
 
         private void OnSortChanged(object sender, EventArgs e)
         {
@@ -193,7 +196,7 @@ namespace FlightBookingSystem.Controls
 
             if (flights.Count == 0)
             {
-                var noResultsPanel = new RoundedPanel
+                var noResultsPanel = new Panel
                 {
                     Width = flightCardsPanel.Width - 40,
                     Height = 100,
@@ -226,26 +229,13 @@ namespace FlightBookingSystem.Controls
 
         private Panel CreateFlightCard(Flight flight)
         {
-            var card = new RoundedPanel
+            var card = new Panel
             {
                 Width = flightCardsPanel.Width - 60,
                 Height = 160,
                 Margin = new Padding(10, 15, 10, 15),
                 BackColor = Color.White,
-                BorderColor = Color.FromArgb(220, 230, 240),
-                BorderWidth = 1,
-                CornerRadius = 12,
                 Cursor = Cursors.Hand
-            };
-
-            // Add hover effect
-            card.MouseEnter += (s, e) => {
-                card.BackColor = Color.FromArgb(248, 250, 255);
-                card.BorderColor = Color.FromArgb(0, 120, 215);
-            };
-            card.MouseLeave += (s, e) => {
-                card.BackColor = Color.White;
-                card.BorderColor = Color.FromArgb(220, 230, 240);
             };
 
             // Main content panel
@@ -417,40 +407,6 @@ namespace FlightBookingSystem.Controls
                 }
             }
 
-        }
-    }
-
-    // Custom rounded panel class for modern UI
-    public class RoundedPanel : Panel
-    {
-        public int CornerRadius { get; set; } = 8;
-        public Color BorderColor { get; set; } = Color.LightGray;
-        public int BorderWidth { get; set; } = 1;
-
-        public RoundedPanel()
-        {
-            DoubleBuffered = true;
-        }
-
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            base.OnPaint(e);
-
-            using (var path = new GraphicsPath())
-            using (var borderPen = new Pen(BorderColor, BorderWidth))
-            {
-                var rect = new Rectangle(0, 0, Width, Height);
-                path.AddArc(rect.X, rect.Y, CornerRadius, CornerRadius, 180, 90);
-                path.AddArc(rect.X + rect.Width - CornerRadius, rect.Y, CornerRadius, CornerRadius, 270, 90);
-                path.AddArc(rect.X + rect.Width - CornerRadius, rect.Y + rect.Height - CornerRadius, CornerRadius, CornerRadius, 0, 90);
-                path.AddArc(rect.X, rect.Y + rect.Height - CornerRadius, CornerRadius, CornerRadius, 90, 90);
-                path.CloseFigure();
-
-                Region = new Region(path);
-                e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-                e.Graphics.FillPath(new SolidBrush(BackColor), path);
-                e.Graphics.DrawPath(borderPen, path);
-            }
         }
     }
    

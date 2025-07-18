@@ -86,9 +86,9 @@
             // datePicker
             // 
             datePicker.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            datePicker.Location = new Point(120, 12);
+            datePicker.Location = new Point(170, 9);
             datePicker.Name = "datePicker";
-            datePicker.Size = new Size(200, 25);
+            datePicker.Size = new Size(418, 25);
             datePicker.TabIndex = 1;
             datePicker.ValueChanged += datePicker_ValueChanged;
             // 
