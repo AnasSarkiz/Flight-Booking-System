@@ -12,7 +12,8 @@
         private System.Windows.Forms.Button searchButton;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel2;
-
+        private System.Windows.Forms.ComboBox cabinClassComboBox;
+        private System.Windows.Forms.Label cabinClassLabel;
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -33,6 +34,8 @@
             searchButton = new Button();
             panel1 = new Panel();
             panel2 = new Panel();
+            cabinClassLabel = new Label();
+            cabinClassComboBox = new ComboBox();
             SuspendLayout();
             // 
             // originLabel
@@ -131,11 +134,29 @@
             panel2.Size = new Size(369, 1);
             panel2.TabIndex = 10;
             // 
+            // cabinClassLabel
+            // 
+            cabinClassLabel.Location = new Point(484, 100);
+            cabinClassLabel.Name = "cabinClassLabel";
+            cabinClassLabel.Size = new Size(134, 23);
+            cabinClassLabel.TabIndex = 0;
+            cabinClassLabel.Text = "Cabin Class";
+            // 
+            // cabinClassComboBox
+            // 
+            cabinClassComboBox.Items.AddRange(new object[] { "Economy", "Business", "First" });
+            cabinClassComboBox.Location = new Point(639, 100);
+            cabinClassComboBox.Name = "cabinClassComboBox";
+            cabinClassComboBox.Size = new Size(194, 23);
+            cabinClassComboBox.TabIndex = 1;
+            // 
             // SearchBoxControl
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
+            Controls.Add(cabinClassLabel);
+            Controls.Add(cabinClassComboBox);
             Controls.Add(searchButton);
             Controls.Add(departureDatePicker);
             Controls.Add(departureLabel);

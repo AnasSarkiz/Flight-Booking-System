@@ -120,7 +120,7 @@ namespace FlightBookingSystem.Controls
 
                 var origin = searchBoxControl.OriginAirport?.iata;
                 var destination = searchBoxControl.DestinationAirport?.iata;
-
+                var cabinClass = searchBoxControl.CabinClass;
                 if (string.IsNullOrEmpty(origin) || string.IsNullOrEmpty(destination))
                 {
                     MessageBox.Show("Please select valid airports");
@@ -130,7 +130,8 @@ namespace FlightBookingSystem.Controls
                 var flights = await _amadeusService.SearchFlightsAsync(
                     origin,
                     destination,
-                    searchBoxControl.DepartureDate
+                    searchBoxControl.DepartureDate,
+                    cabinClass
                 );
 
                 if (GetCount(flights) == 0)

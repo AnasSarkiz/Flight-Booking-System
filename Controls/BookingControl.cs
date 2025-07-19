@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using FlightBookingSystem.Models;
 using Newtonsoft.Json;
@@ -9,25 +12,37 @@ namespace FlightBookingSystem.Controls
     {
         public event EventHandler<BookingDetails> BookingConfirmed;
         public event EventHandler BackRequested;
+
         private List<string> _nationalities;
         private readonly Flight _selectedFlight;
+        private readonly User _currentUser;
         private BookingDetails _bookingDetails;
 
-        public BookingControl(Flight flight)
+        public BookingControl(Flight flight, User user)
         {
             if (flight == null) throw new ArgumentNullException(nameof(flight));
+            if (user == null) throw new ArgumentNullException(nameof(user));
+
             _selectedFlight = flight;
+            _currentUser = user;
 
             InitializeComponent();
             InitializeBooking();
             WireUpEvents();
             LoadNationalities();
+            UpdateBalanceDisplay();
         }
+
+        private void UpdateBalanceDisplay()
+        {
+            lblBalance.Text = $"Available Balance: {_currentUser.Balance:C}";
+            lblBalance.ForeColor = _currentUser.Balance >= _selectedFlight.Price ? Color.Green : Color.Red;
+        }
+
         private void LoadNationalities()
         {
             try
             {
-                // Direct path to your JSON file
                 string jsonPath = @"C:\Users\aness\Desktop\flightBooker\resources\countries.json";
 
                 if (!File.Exists(jsonPath))
@@ -44,27 +59,24 @@ namespace FlightBookingSystem.Controls
                     .OrderBy(n => n)
                     .ToList();
 
-                // Configure ComboBox properties BEFORE setting DataSource
-                cmbNationality.DropDownStyle = ComboBoxStyle.DropDown; // Changed from DropDownList
+                cmbNationality.DropDownStyle = ComboBoxStyle.DropDown;
                 cmbNationality.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
                 cmbNationality.AutoCompleteSource = AutoCompleteSource.ListItems;
-
                 cmbNationality.DataSource = _nationalities;
             }
             catch (Exception ex)
             {
                 _nationalities = new List<string>
-        {
-            "American", "British", "Canadian", "French", "German", "Japanese"
-        };
+                {
+                    "American", "British", "Canadian", "French", "German", "Japanese"
+                };
 
                 cmbNationality.DataSource = _nationalities;
-
                 MessageBox.Show($"Failed to load nationalities: {ex.Message}\nUsing default values instead.",
                               "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
-        // Simple class to match your JSON structure
+
         private class CountryData
         {
             public string num_code { get; set; }
@@ -80,17 +92,17 @@ namespace FlightBookingSystem.Controls
             {
                 Flight = _selectedFlight,
                 Passenger = new Passenger(),
-                Payment = new PaymentInfo(),
                 SeatNumber = GenerateRandomSeat(),
                 PNR = GeneratePNR(),
                 TotalPrice = _selectedFlight.Price,
+                BookedBuy = _currentUser
             };
 
             lblSeatInfo.Text = $"Assigned Seat: {_bookingDetails.SeatNumber}";
             lblFlightInfo.Text = $"{_selectedFlight.Airline} • {_selectedFlight.FlightNumber}\n" +
                                $"{_selectedFlight.Origin} → {_selectedFlight.Destination}\n" +
                                $"{_selectedFlight.DepartureTime:ddd, MMM dd yyyy hh:mm tt}";
-            lblTotalPrice.Text = $"Total: {_selectedFlight.FormattedPrice}";
+            lblTotalPrice.Text = $"Total Price: {_selectedFlight.FormattedPrice}";
         }
 
         private string GeneratePNR()
@@ -113,7 +125,6 @@ namespace FlightBookingSystem.Controls
             btnBack.Click += (s, e) => BackRequested?.Invoke(this, EventArgs.Empty);
             btnConfirm.Click += (s, e) => ProcessBooking();
 
-            // Passenger info events
             txtFirstName.TextChanged += (s, e) => _bookingDetails.Passenger.FirstName = txtFirstName.Text;
             txtLastName.TextChanged += (s, e) => _bookingDetails.Passenger.LastName = txtLastName.Text;
             txtPassport.TextChanged += (s, e) => _bookingDetails.Passenger.PassportNumber = txtPassport.Text;
@@ -121,18 +132,28 @@ namespace FlightBookingSystem.Controls
             txtEmail.TextChanged += (s, e) => _bookingDetails.Passenger.Email = txtEmail.Text;
             txtPhone.TextChanged += (s, e) => _bookingDetails.Passenger.Phone = txtPhone.Text;
             dtpDob.ValueChanged += (s, e) => _bookingDetails.Passenger.DateOfBirth = dtpDob.Value;
-
-            // Payment info events
-            txtCardName.TextChanged += (s, e) => _bookingDetails.Payment.CardHolderName = txtCardName.Text;
-            txtCardNumber.TextChanged += (s, e) => _bookingDetails.Payment.CardNumber = txtCardNumber.Text;
-            txtExpiry.TextChanged += (s, e) => _bookingDetails.Payment.ExpiryDate = txtExpiry.Text;
-            txtCVV.TextChanged += (s, e) => _bookingDetails.Payment.CVV = txtCVV.Text;
         }
 
         private void ProcessBooking()
         {
             if (!ValidateBooking()) return;
-            BookingConfirmed?.Invoke(this, _bookingDetails);
+
+            if (_currentUser.Balance < _selectedFlight.Price)
+            {
+                MessageBox.Show($"Insufficient balance. Your balance is {_currentUser.Balance:C} but the flight costs {_selectedFlight.Price:C}.",
+                              "Payment Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            var confirmResult = MessageBox.Show($"Confirm booking for {_selectedFlight.Price:C}? This amount will be deducted from your balance.",
+                                             "Confirm Booking",
+                                             MessageBoxButtons.YesNo,
+                                             MessageBoxIcon.Question);
+
+            if (confirmResult == DialogResult.Yes)
+            {
+                BookingConfirmed?.Invoke(this, _bookingDetails);
+            }
         }
 
         private bool ValidateBooking()
@@ -146,13 +167,6 @@ namespace FlightBookingSystem.Controls
             if (string.IsNullOrWhiteSpace(_bookingDetails.Passenger.LastName))
             {
                 MessageBox.Show("Last name is required", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
-            }
-
-            if (string.IsNullOrWhiteSpace(_bookingDetails.Payment.CardNumber) ||
-                _bookingDetails.Payment.CardNumber.Replace("-", "").Length != 16)
-            {
-                MessageBox.Show("Please enter a valid 16-digit card number", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
 

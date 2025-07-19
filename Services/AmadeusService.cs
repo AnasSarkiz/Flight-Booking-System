@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using static FlightBookingSystem.Models.Flight;
 
 namespace FlightBookingSystem.Services
 {
@@ -49,12 +50,12 @@ namespace FlightBookingSystem.Services
             using var doc = JsonDocument.Parse(json);
             _accessToken = doc.RootElement.GetProperty("access_token").GetString();
             var expiresIn = doc.RootElement.GetProperty("expires_in").GetInt32();
-            _tokenExpiration = DateTime.UtcNow.AddSeconds(expiresIn - 60); // Add buffer
+            _tokenExpiration = DateTime.UtcNow.AddSeconds(expiresIn - 60);
 
             return _accessToken;
         }
 
-        public async Task<List<Flight>> SearchFlightsAsync(string origin, string destination, DateTime departureDate)
+        public async Task<List<Flight>> SearchFlightsAsync(string origin, string destination, DateTime departureDate,string SeatClass )
         {
             var token = await GetAccessTokenAsync();
 
@@ -77,13 +78,31 @@ namespace FlightBookingSystem.Services
             var request = new
             {
                 currencyCode = "USD",
-                originDestinations = originDestinations.ToArray(), // Convert to array
+                originDestinations = new[]
+      {
+        new
+        {
+            id = "1",
+            originLocationCode = origin,
+            destinationLocationCode = destination,
+            departureDateTimeRange = new
+            {
+                date = departureDate.ToString("yyyy-MM-dd")
+            }
+        }
+    },
                 travelers = new[]
-                {
-            new { id = "1", travelerType = "ADULT" }
-        },
+      {
+        new
+        {
+            id = "1",
+            travelerType = "ADULT",
+            fareOptions = new[] { "STANDARD" },
+            cabin = SeatClass  
+        }
+    },
                 sources = new[] { "GDS" },
-                searchCriteria = new { maxFlightOffers = 20 }
+                searchCriteria = new { maxFlightOffers = 50 }
             };
 
             var json = JsonSerializer.Serialize(request);
@@ -110,33 +129,32 @@ namespace FlightBookingSystem.Services
             foreach (var offer in root.GetProperty("data").EnumerateArray())
             {
                 var firstItinerary = offer.GetProperty("itineraries")[0];
-                var segments = firstItinerary.GetProperty("segments");
-                var firstSegment = segments[0];
-                var lastSegment = segments[segments.GetArrayLength() - 1];
+                var firstSegment = firstItinerary.GetProperty("segments")[0];
                 var price = offer.GetProperty("price").GetProperty("total").GetString();
 
-                // Parse duration correctly
-                var durationString = firstItinerary.GetProperty("duration").GetString();
-                var duration = ParseDuration(durationString);
+                var travelerPricing = offer.GetProperty("travelerPricings")[0];
+                var cabinClass = travelerPricing.GetProperty("fareOption").GetString();
 
                 var flight = new Flight
                 {
                     FlightNumber = firstSegment.GetProperty("number").GetString(),
                     Airline = firstSegment.GetProperty("carrierCode").GetString(),
                     Origin = firstSegment.GetProperty("departure").GetProperty("iataCode").GetString(),
-                    Destination = lastSegment.GetProperty("arrival").GetProperty("iataCode").GetString(),
+                    Destination = firstSegment.GetProperty("arrival").GetProperty("iataCode").GetString(),
                     DepartureTime = DateTime.Parse(firstSegment.GetProperty("departure").GetProperty("at").GetString()),
-                    ArrivalTime = DateTime.Parse(lastSegment.GetProperty("arrival").GetProperty("at").GetString()),
+                    ArrivalTime = DateTime.Parse(firstSegment.GetProperty("arrival").GetProperty("at").GetString()),
                     Price = decimal.Parse(price),
-                    Duration = duration,
-                    Stops = segments.GetArrayLength() - 1 
+                    Duration = ParseDuration(firstItinerary.GetProperty("duration").GetString()),
+                    SeatClass = cabinClass ?? "ECONOMY",
+                    Stops = firstItinerary.GetProperty("segments").GetArrayLength() - 1
                 };
 
                 flights.Add(flight);
             }
 
             return flights;
-        }
+                }
+        
 
         private TimeSpan ParseDuration(string durationString)
         {

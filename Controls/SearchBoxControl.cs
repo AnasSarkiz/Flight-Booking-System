@@ -92,6 +92,13 @@ namespace FlightBookingSystem.Controls
             destinationTextBox.LostFocus += TextBox_LostFocus;
 
         }
+        public string CabinClass
+        {
+            get
+            {
+                return cabinClassComboBox.SelectedItem.ToString().ToUpper();
+            }
+        }
         public void SetDestination(string destination)
         {
             // Implementation to set the destination in your search box

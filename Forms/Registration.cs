@@ -1,0 +1,45 @@
+using FlightBookingSystem;
+using FlightBookingSystem.DAL;
+using FlightBookingSystem.Services;
+using System;
+using System.Windows.Forms;
+using FlightBookingSystem.Models;
+using FlightBookingSystem.Helpers;
+namespace FlightBooker
+{
+    public partial class Registration : Form
+    {
+        private readonly UserService _userService;
+        public Registration()
+        {
+            InitializeComponent();
+            _userService = new UserService(new UserRepository());
+        }
+
+        private void LoginButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                User user = _userService.Login(
+                    usernameTextBox.Text.Trim(),
+                    passwordTextBox.Text.Trim()
+                );
+                //User user = _userService.GetUserById(4);
+                // Success! Open main form
+                this.Hide();
+                var userRepo = new UserRepository();
+                new MainForm(user,userRepo).Show();
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Login Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void showPasswordCheck_CheckedChanged(object sender, EventArgs e)
+        {
+            passwordTextBox.UseSystemPasswordChar = !showPasswordCheck.Checked;
+        }
+    }
+}

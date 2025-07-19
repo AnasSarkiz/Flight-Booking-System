@@ -21,7 +21,8 @@
             btnBack = new Button();
             lblSeatInfo = new Label();
             lblFlightInfo = new Label();
-            tabControl = new TabControl();
+            lblBalance = new Label();
+            lblTotalPrice = new Label();
             passengerTab = new TabPage();
             dtpDob = new DateTimePicker();
             txtPhone = new TextBox();
@@ -37,19 +38,9 @@
             label3 = new Label();
             label2 = new Label();
             label1 = new Label();
-            paymentTab = new TabPage();
-            lblTotalPrice = new Label();
-            txtCVV = new MaskedTextBox();
-            txtExpiry = new MaskedTextBox();
-            txtCardNumber = new MaskedTextBox();
-            txtCardName = new TextBox();
-            label11 = new Label();
-            label10 = new Label();
-            label9 = new Label();
-            label8 = new Label();
-            tabControl.SuspendLayout();
+            tabControl = new TabControl();
             passengerTab.SuspendLayout();
-            paymentTab.SuspendLayout();
+            tabControl.SuspendLayout();
             SuspendLayout();
             // 
             // btnConfirm
@@ -106,18 +97,27 @@
             lblFlightInfo.TabIndex = 11;
             lblFlightInfo.Text = "Flight Info";
             // 
-            // tabControl
+            // lblBalance
             // 
-            tabControl.Controls.Add(passengerTab);
-            tabControl.Controls.Add(paymentTab);
-            tabControl.Dock = DockStyle.Top;
-            tabControl.Font = new Font("Segoe UI", 10F);
-            tabControl.ItemSize = new Size(180, 25);
-            tabControl.Location = new Point(0, 0);
-            tabControl.Name = "tabControl";
-            tabControl.SelectedIndex = 0;
-            tabControl.Size = new Size(1000, 500);
-            tabControl.TabIndex = 0;
+            lblBalance.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            lblBalance.AutoSize = true;
+            lblBalance.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            lblBalance.Location = new Point(650, 525);
+            lblBalance.Name = "lblBalance";
+            lblBalance.Size = new Size(130, 19);
+            lblBalance.TabIndex = 12;
+            lblBalance.Text = "Available Balance:";
+            // 
+            // lblTotalPrice
+            // 
+            lblTotalPrice.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            lblTotalPrice.AutoSize = true;
+            lblTotalPrice.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            lblTotalPrice.Location = new Point(800, 525);
+            lblTotalPrice.Name = "lblTotalPrice";
+            lblTotalPrice.Size = new Size(83, 19);
+            lblTotalPrice.TabIndex = 13;
+            lblTotalPrice.Text = "Total Price:";
             // 
             // passengerTab
             // 
@@ -173,7 +173,6 @@
             cmbNationality.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbNationality.Font = new Font("Segoe UI", 10F);
             cmbNationality.FormattingEnabled = true;
-            cmbNationality.Items.AddRange(new object[] { "US", "UK", "CA", "AU", "JP", "DE", "FR" });
             cmbNationality.Location = new Point(180, 193);
             cmbNationality.Name = "cmbNationality";
             cmbNationality.Size = new Size(631, 25);
@@ -273,116 +272,25 @@
             label1.TabIndex = 0;
             label1.Text = "First Name:";
             // 
-            // paymentTab
+            // tabControl
             // 
-            paymentTab.BackColor = Color.White;
-            paymentTab.Controls.Add(lblTotalPrice);
-            paymentTab.Controls.Add(txtCVV);
-            paymentTab.Controls.Add(txtExpiry);
-            paymentTab.Controls.Add(txtCardNumber);
-            paymentTab.Controls.Add(txtCardName);
-            paymentTab.Controls.Add(label11);
-            paymentTab.Controls.Add(label10);
-            paymentTab.Controls.Add(label9);
-            paymentTab.Controls.Add(label8);
-            paymentTab.Location = new Point(4, 29);
-            paymentTab.Name = "paymentTab";
-            paymentTab.Padding = new Padding(20);
-            paymentTab.Size = new Size(992, 467);
-            paymentTab.TabIndex = 1;
-            paymentTab.Text = "Payment Details";
-            // 
-            // lblTotalPrice
-            // 
-            lblTotalPrice.AutoSize = true;
-            lblTotalPrice.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
-            lblTotalPrice.ForeColor = Color.FromArgb(0, 115, 207);
-            lblTotalPrice.Location = new Point(25, 251);
-            lblTotalPrice.Name = "lblTotalPrice";
-            lblTotalPrice.Size = new Size(56, 21);
-            lblTotalPrice.TabIndex = 8;
-            lblTotalPrice.Text = "Total: ";
-            // 
-            // txtCVV
-            // 
-            txtCVV.Font = new Font("Segoe UI", 10F);
-            txtCVV.Location = new Point(155, 201);
-            txtCVV.Mask = "###";
-            txtCVV.Name = "txtCVV";
-            txtCVV.Size = new Size(106, 25);
-            txtCVV.TabIndex = 7;
-            // 
-            // txtExpiry
-            // 
-            txtExpiry.Font = new Font("Segoe UI", 10F);
-            txtExpiry.Location = new Point(155, 151);
-            txtExpiry.Mask = "##/##";
-            txtExpiry.Name = "txtExpiry";
-            txtExpiry.Size = new Size(106, 25);
-            txtExpiry.TabIndex = 6;
-            // 
-            // txtCardNumber
-            // 
-            txtCardNumber.Font = new Font("Segoe UI", 10F);
-            txtCardNumber.Location = new Point(155, 101);
-            txtCardNumber.Mask = "####-####-####-####";
-            txtCardNumber.Name = "txtCardNumber";
-            txtCardNumber.Size = new Size(441, 25);
-            txtCardNumber.TabIndex = 5;
-            // 
-            // txtCardName
-            // 
-            txtCardName.Font = new Font("Segoe UI", 10F);
-            txtCardName.Location = new Point(155, 51);
-            txtCardName.Name = "txtCardName";
-            txtCardName.Size = new Size(441, 25);
-            txtCardName.TabIndex = 4;
-            // 
-            // label11
-            // 
-            label11.AutoSize = true;
-            label11.Font = new Font("Segoe UI", 10F);
-            label11.Location = new Point(25, 201);
-            label11.Name = "label11";
-            label11.Size = new Size(39, 19);
-            label11.TabIndex = 3;
-            label11.Text = "CVV:";
-            // 
-            // label10
-            // 
-            label10.AutoSize = true;
-            label10.Font = new Font("Segoe UI", 10F);
-            label10.Location = new Point(25, 151);
-            label10.Name = "label10";
-            label10.Size = new Size(81, 19);
-            label10.TabIndex = 2;
-            label10.Text = "Expiry Date:";
-            // 
-            // label9
-            // 
-            label9.AutoSize = true;
-            label9.Font = new Font("Segoe UI", 10F);
-            label9.Location = new Point(25, 101);
-            label9.Name = "label9";
-            label9.Size = new Size(95, 19);
-            label9.TabIndex = 1;
-            label9.Text = "Card Number:";
-            // 
-            // label8
-            // 
-            label8.AutoSize = true;
-            label8.Font = new Font("Segoe UI", 10F);
-            label8.Location = new Point(25, 51);
-            label8.Name = "label8";
-            label8.Size = new Size(120, 19);
-            label8.TabIndex = 0;
-            label8.Text = "Cardholder Name:";
+            tabControl.Controls.Add(passengerTab);
+            tabControl.Dock = DockStyle.Top;
+            tabControl.Font = new Font("Segoe UI", 10F);
+            tabControl.ItemSize = new Size(180, 25);
+            tabControl.Location = new Point(0, 0);
+            tabControl.Name = "tabControl";
+            tabControl.SelectedIndex = 0;
+            tabControl.Size = new Size(1000, 500);
+            tabControl.TabIndex = 0;
             // 
             // BookingControl
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
+            Controls.Add(lblTotalPrice);
+            Controls.Add(lblBalance);
             Controls.Add(lblFlightInfo);
             Controls.Add(lblSeatInfo);
             Controls.Add(btnBack);
@@ -390,46 +298,36 @@
             Controls.Add(tabControl);
             Name = "BookingControl";
             Size = new Size(1000, 630);
-            tabControl.ResumeLayout(false);
             passengerTab.ResumeLayout(false);
             passengerTab.PerformLayout();
-            paymentTab.ResumeLayout(false);
-            paymentTab.PerformLayout();
+            tabControl.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
 
         #endregion
 
-        private System.Windows.Forms.Button btnConfirm;
-        private System.Windows.Forms.Button btnBack;
-        private System.Windows.Forms.Label lblSeatInfo;
-        private System.Windows.Forms.Label lblFlightInfo;
-        private System.Windows.Forms.TabControl tabControl;
-        private System.Windows.Forms.TabPage passengerTab;
-        private System.Windows.Forms.TabPage paymentTab;
-        private System.Windows.Forms.DateTimePicker dtpDob;
-        private System.Windows.Forms.TextBox txtPhone;
-        private System.Windows.Forms.TextBox txtEmail;
-        private System.Windows.Forms.ComboBox cmbNationality;
-        private System.Windows.Forms.TextBox txtPassport;
-        private System.Windows.Forms.TextBox txtLastName;
-        private System.Windows.Forms.TextBox txtFirstName;
-        private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label lblTotalPrice;
-        private System.Windows.Forms.MaskedTextBox txtCVV;
-        private System.Windows.Forms.MaskedTextBox txtExpiry;
-        private System.Windows.Forms.MaskedTextBox txtCardNumber;
-        private System.Windows.Forms.TextBox txtCardName;
-        private System.Windows.Forms.Label label11;
-        private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.Label label8;
+        private Button btnConfirm;
+        private Button btnBack;
+        private Label lblSeatInfo;
+        private Label lblFlightInfo;
+        private Label lblBalance;
+        private Label lblTotalPrice;
+        private TabControl tabControl;
+        private TabPage passengerTab;
+        private DateTimePicker dtpDob;
+        private TextBox txtPhone;
+        private TextBox txtEmail;
+        private ComboBox cmbNationality;
+        private TextBox txtPassport;
+        private TextBox txtLastName;
+        private TextBox txtFirstName;
+        private Label label7;
+        private Label label6;
+        private Label label5;
+        private Label label4;
+        private Label label3;
+        private Label label2;
+        private Label label1;
     }
 }
