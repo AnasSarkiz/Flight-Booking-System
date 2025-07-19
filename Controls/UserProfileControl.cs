@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
-
+using FlightBookingSystem.Models;
+using FlightBookingSystem.Services;
 namespace FlightBookingSystem.Controls
 {
     public partial class UserProfileControl : UserControl
@@ -16,6 +17,7 @@ namespace FlightBookingSystem.Controls
 
         private void SetupProfileData()
         {
+
             // Sample data - replace with actual user data
             lblName.Text = "John Doe";
             lblEmail.Text = "john.doe@example.com";

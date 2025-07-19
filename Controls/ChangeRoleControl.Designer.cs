@@ -1,6 +1,6 @@
-﻿namespace FlightBookingSystem.Forms
+﻿namespace FlightBookingSystem.Controls
 {
-    partial class ChangeRoleForm
+    partial class ChangeRoleControl
     {
         private System.ComponentModel.IContainer components = null;
 
@@ -70,11 +70,6 @@
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.roleComboBox);
             this.Controls.Add(this.lblCurrentRole);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.Name = "ChangeRoleForm";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Change User Role";
             this.ResumeLayout(false);
             this.PerformLayout();

@@ -1,16 +1,17 @@
-﻿using FlightBookingSystem.Helpers;
-using FlightBookingSystem.Models;
-using System;
+﻿using System;
 using System.Windows.Forms;
 
-namespace FlightBookingSystem.UserMgmtForms
+namespace FlightBookingSystem.Controls
 {
-    public partial class TopUpForm : Form
+    public partial class TopUpControl : UserControl
     {
+        public event EventHandler<decimal> TopUpConfirmed;
+        public event EventHandler Cancelled;
+
         public decimal TopUpAmount { get; private set; }
         private readonly decimal currentBalance;
 
-        public TopUpForm(decimal currentBalance)
+        public TopUpControl(decimal currentBalance)
         {
             InitializeComponent();
             this.currentBalance = currentBalance;
@@ -23,8 +24,7 @@ namespace FlightBookingSystem.UserMgmtForms
             if (decimal.TryParse(txtAmount.Text, out decimal amount) && amount > 0)
             {
                 TopUpAmount = amount;
-                DialogResult = DialogResult.OK;
-                Close();
+                TopUpConfirmed?.Invoke(this, amount);
             }
             else
             {
@@ -35,8 +35,7 @@ namespace FlightBookingSystem.UserMgmtForms
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            DialogResult = DialogResult.Cancel;
-            Close();
+            Cancelled?.Invoke(this, EventArgs.Empty);
         }
 
         private void txtAmount_TextChanged(object sender, EventArgs e)

@@ -1,17 +1,9 @@
-﻿namespace FlightBookingSystem.UserMgmtForms
+﻿namespace FlightBookingSystem.Controls
 {
-    partial class EditUserForm
+    partial class EditUserControl : UserControl
     {
         private System.ComponentModel.IContainer components = null;
 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null))
-            {
-                components.Dispose();
-            }
-            base.Dispose(disposing);
-        }
 
         private void InitializeComponent()
         {
@@ -147,11 +139,6 @@
             this.Controls.Add(this.lblFirstName);
             this.Controls.Add(this.txtUsername);
             this.Controls.Add(this.lblUsername);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.Name = "EditUserForm";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Edit User";
             this.ResumeLayout(false);
             this.PerformLayout();

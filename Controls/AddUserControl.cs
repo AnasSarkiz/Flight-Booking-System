@@ -1,15 +1,15 @@
-﻿using FlightBookingSystem.Helpers;
-using FlightBookingSystem.Models;
+﻿using FlightBookingSystem.Models;
 using System;
 using System.Windows.Forms;
 
-namespace FlightBookingSystem.UserMgmtForms
+namespace FlightBookingSystem.Controls
 {
-    public partial class AddUserForm : Form
+    public partial class AddUserControl : UserControl
     {
-        public User NewUser { get; private set; }
+        public event EventHandler<User> UserAdded;
+        public event EventHandler Cancelled;
 
-        public AddUserForm(User currentUser)
+        public AddUserControl()
         {
             InitializeComponent();
             roleComboBox.DataSource = Enum.GetValues(typeof(User.Role));
@@ -20,49 +20,50 @@ namespace FlightBookingSystem.UserMgmtForms
         {
             if (ValidateInput())
             {
-                NewUser = new User
+                var newUser = new User
                 {
                     Username = txtUsername.Text,
-                    PasswordHash = txtPassword.Text, 
-
+                    PasswordHash = txtPassword.Text,
                     FirstName = txtFirstName.Text,
                     LastName = txtLastName.Text,
                     UserRole = (User.Role)roleComboBox.SelectedItem,
                     Balance = 0
                 };
-                DialogResult = DialogResult.OK;
-                Close();
+                UserAdded?.Invoke(this, newUser);
             }
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            DialogResult = DialogResult.Cancel;
-            Close();
+            Cancelled?.Invoke(this, EventArgs.Empty);
         }
 
         private bool ValidateInput()
         {
-            string debugPlainPassword = txtPassword.Text;
             if (string.IsNullOrWhiteSpace(txtUsername.Text))
             {
-                MessageBox.Show("Username is required", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowError("Username is required");
                 return false;
             }
 
             if (string.IsNullOrWhiteSpace(txtPassword.Text))
             {
-                MessageBox.Show("Password is required", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowError("Password is required");
                 return false;
             }
+
             if (txtPassword.Text.Length < 8)
             {
-                MessageBox.Show("Password must be at least 8 characters", "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowError("Password must be at least 8 characters");
                 return false;
             }
 
             return true;
+        }
+
+        private void ShowError(string message)
+        {
+            MessageBox.Show(message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 }

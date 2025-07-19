@@ -24,8 +24,6 @@ namespace FlightBooker
                     usernameTextBox.Text.Trim(),
                     passwordTextBox.Text.Trim()
                 );
-                //User user = _userService.GetUserById(4);
-                // Success! Open main form
                 this.Hide();
                 var userRepo = new UserRepository();
                 new MainForm(user,userRepo).Show();

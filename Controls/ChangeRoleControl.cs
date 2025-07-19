@@ -2,13 +2,16 @@
 using System;
 using System.Windows.Forms;
 
-namespace FlightBookingSystem.Forms
+namespace FlightBookingSystem.Controls
 {
-    public partial class ChangeRoleForm : Form
+    public partial class ChangeRoleControl : UserControl
     {
+        public event EventHandler<User.Role> RoleChanged;
+        public event EventHandler Cancelled;
+
         public User.Role NewRole { get; private set; }
 
-        public ChangeRoleForm(User.Role currentRole)
+        public ChangeRoleControl(User.Role currentRole)
         {
             InitializeComponent();
             roleComboBox.DataSource = Enum.GetValues(typeof(User.Role));
@@ -18,14 +21,12 @@ namespace FlightBookingSystem.Forms
         private void btnSave_Click(object sender, EventArgs e)
         {
             NewRole = (User.Role)roleComboBox.SelectedItem;
-            DialogResult = DialogResult.OK;
-            Close();
+            RoleChanged?.Invoke(this, NewRole);
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            DialogResult = DialogResult.Cancel;
-            Close();
+            Cancelled?.Invoke(this, EventArgs.Empty);
         }
     }
 }

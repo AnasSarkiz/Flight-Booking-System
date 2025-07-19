@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Data;
+using System.Linq;
 using System.Windows.Forms;
 using FlightBookingSystem.DAL;
 using FlightBookingSystem.Models;
 using FlightBookingSystem.Services;
-using FlightBookingSystem.Forms;
-using FlightBookingSystem.UserMgmtForms;
 
 namespace FlightBookingSystem.Controls
 {
@@ -15,104 +14,37 @@ namespace FlightBookingSystem.Controls
         private readonly UserService _userService;
         private DataTable _usersTable;
 
-        // Add the missing label declarations
-        private Label lblName;
-        private Label lblUsername;
-        private Label lblMemberSince;
-        private Label lblBalance;
-
         public UserManagementControl(User currentUser, IUserRepository userRepo)
         {
             InitializeComponent();
             _currentUser = currentUser;
-            _userService = new UserService(userRepo); // Initialize the user service with repository
-            _usersTable = new DataTable(); // Initialize the data table
+            _userService = new UserService(userRepo);
 
-            // Initialize the labels
-            lblName = new Label();
-            lblUsername = new Label();
-            lblMemberSince = new Label();
-            lblBalance = new Label();
-
-            SetupProfileData();
             InitializeGrid();
             LoadUsers();
             SetupPermissions();
+            SetupProfileData();
         }
 
         private void InitializeGrid()
         {
             usersGrid.Columns.Clear();
+            _usersTable = new DataTable();
 
-            usersGrid.Columns.Add(new DataGridViewTextBoxColumn()
-            {
-                DataPropertyName = "ID",
-                HeaderText = "ID",
-                Name = "ID",
-                ReadOnly = true
-            });
+            _usersTable.Columns.Add("ID", typeof(int));
+            _usersTable.Columns.Add("Username", typeof(string));
+            _usersTable.Columns.Add("FirstName", typeof(string));
+            _usersTable.Columns.Add("LastName", typeof(string));
+            _usersTable.Columns.Add("Role", typeof(string));
+            _usersTable.Columns.Add("Balance", typeof(decimal));
+            _usersTable.Columns.Add("LastLogin", typeof(DateTime));
+            _usersTable.Columns.Add("IsLocked", typeof(bool));
 
-            usersGrid.Columns.Add(new DataGridViewTextBoxColumn()
-            {
-                DataPropertyName = "Username",
-                HeaderText = "Username",
-                Name = "Username",
-                ReadOnly = true
-            });
-
-            // Add similar columns for FirstName, LastName, Role, Balance
-            usersGrid.Columns.Add(new DataGridViewTextBoxColumn()
-            {
-                DataPropertyName = "FirstName",
-                HeaderText = "First Name",
-                Name = "FirstName",
-                ReadOnly = true
-            });
-
-            usersGrid.Columns.Add(new DataGridViewTextBoxColumn()
-            {
-                DataPropertyName = "LastName",
-                HeaderText = "Last Name",
-                Name = "LastName",
-                ReadOnly = true
-            });
-
-            usersGrid.Columns.Add(new DataGridViewTextBoxColumn()
-            {
-                DataPropertyName = "Role",
-                HeaderText = "Role",
-                Name = "Role",
-                ReadOnly = true
-            });
-
-            usersGrid.Columns.Add(new DataGridViewTextBoxColumn()
-            {
-                DataPropertyName = "Balance",
-                HeaderText = "Balance",
-                Name = "Balance",
-                ReadOnly = true
-            });
-
-            usersGrid.Columns.Add(new DataGridViewTextBoxColumn()
-            {
-                DataPropertyName = "LastLogin",
-                HeaderText = "Last Login",
-                Name = "LastLogin",
-                ReadOnly = true,
-                DefaultCellStyle = new DataGridViewCellStyle()
-                {
-                    Format = "g"
-                }
-            });
-
-            usersGrid.Columns.Add(new DataGridViewCheckBoxColumn()
-            {
-                DataPropertyName = "IsLocked",
-                HeaderText = "Locked",
-                Name = "IsLocked",
-                ReadOnly = true
-            });
-
+            usersGrid.DataSource = _usersTable;
+            usersGrid.AutoGenerateColumns = false;
+            usersGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            usersGrid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            usersGrid.RowHeadersVisible = false;
         }
 
         private void LoadUsers()
@@ -143,7 +75,6 @@ namespace FlightBookingSystem.Controls
                         user.IsLocked
                     );
                 }
-                usersGrid.DataSource = _usersTable;
             }
             catch (Exception ex)
             {
@@ -159,31 +90,9 @@ namespace FlightBookingSystem.Controls
         private void SetupProfileData()
         {
             lblName.Text = $"{_currentUser.FirstName} {_currentUser.LastName}";
-            lblUsername.Text = $"Username: {_currentUser.Username}";
+            lblUsername.Text = $"{_currentUser.Username}";
             lblMemberSince.Text = $"Member since: {_currentUser.DateCreated:MMMM yyyy}";
-            lblBalance.Text = $"Balance: {_currentUser.Balance:C}";
-
-            // Add the labels to the control if they're not already added
-            if (!this.Controls.Contains(lblName))
-            {
-                lblName.Location = new System.Drawing.Point(20, 20);
-                this.Controls.Add(lblName);
-            }
-            if (!this.Controls.Contains(lblUsername))
-            {
-                lblUsername.Location = new System.Drawing.Point(20, 50);
-                this.Controls.Add(lblUsername);
-            }
-            if (!this.Controls.Contains(lblMemberSince))
-            {
-                lblMemberSince.Location = new System.Drawing.Point(20, 80);
-                this.Controls.Add(lblMemberSince);
-            }
-            if (!this.Controls.Contains(lblBalance))
-            {
-                lblBalance.Location = new System.Drawing.Point(20, 110);
-                this.Controls.Add(lblBalance);
-            }
+            lblBalance.Text = $"{_currentUser.Balance:C}";
         }
 
         private void SetupPermissions()
@@ -205,23 +114,47 @@ namespace FlightBookingSystem.Controls
 
         private void addButton_Click(object sender, EventArgs e)
         {
-            using (var addForm = new AddUserForm(_currentUser))
+            var addUserControl = new AddUserControl();
+            var form = new Form
             {
-                if (addForm.ShowDialog() == DialogResult.OK)
+                Text = "Add New User",
+                Size = new System.Drawing.Size(450, 450),
+                StartPosition = FormStartPosition.CenterParent,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                MaximizeBox = false,
+                MinimizeBox = false
+            };
+
+            addUserControl.Dock = DockStyle.Fill;
+            form.Controls.Add(addUserControl);
+
+            addUserControl.UserAdded += (s, newUser) =>
+            {
+                try
                 {
-                    try
-                    {
-                        _userService.AddUser(addForm.NewUser, _currentUser.Id);
-                        LoadUsers();
-                        MessageBox.Show("User added successfully!", "Success",
-                            MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Error adding user: {ex.Message}", "Error",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
+                    _userService.AddUser(newUser, _currentUser.Id);
+                    form.DialogResult = DialogResult.OK;
+                    form.Close();
+                    LoadUsers();
+                    MessageBox.Show("User added successfully!", "Success",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error adding user: {ex.Message}", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            };
+
+            addUserControl.Cancelled += (s, args) =>
+            {
+                form.DialogResult = DialogResult.Cancel;
+                form.Close();
+            };
+
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                LoadUsers();
             }
         }
 
@@ -238,26 +171,49 @@ namespace FlightBookingSystem.Controls
             }
 
             var userToEdit = _userService.GetUserById(selectedId);
-
             if (userToEdit == null) return;
 
-            using (var editForm = new EditUserForm(userToEdit))
+            var editControl = new EditUserControl(userToEdit);
+            var form = new Form
             {
-                if (editForm.ShowDialog() == DialogResult.OK)
+                Text = "Edit User",
+                Size = new System.Drawing.Size(450, 450),
+                StartPosition = FormStartPosition.CenterParent,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                MaximizeBox = false,
+                MinimizeBox = false
+            };
+
+            editControl.Dock = DockStyle.Fill;
+            form.Controls.Add(editControl);
+
+            editControl.UserUpdated += (s, updatedUser) =>
+            {
+                try
                 {
-                    try
-                    {
-                        _userService.UpdateUser(editForm.UpdatedUser);
-                        LoadUsers();
-                        MessageBox.Show("User updated successfully!", "Success",
-                            MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Error updating user: {ex.Message}", "Error",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
+                    _userService.UpdateUser(updatedUser);
+                    form.DialogResult = DialogResult.OK;
+                    form.Close();
+                    LoadUsers();
+                    MessageBox.Show("User updated successfully!", "Success",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error updating user: {ex.Message}", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            };
+
+            editControl.Cancelled += (s, args) =>
+            {
+                form.DialogResult = DialogResult.Cancel;
+                form.Close();
+            };
+
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                LoadUsers();
             }
         }
 
@@ -314,26 +270,49 @@ namespace FlightBookingSystem.Controls
             if (usersGrid.SelectedRows.Count == 0) return;
 
             var selectedId = (int)usersGrid.SelectedRows[0].Cells["ID"].Value;
-            var username = usersGrid.SelectedRows[0].Cells["Username"].Value.ToString();
             var currentBalance = (decimal)usersGrid.SelectedRows[0].Cells["Balance"].Value;
 
-            using (var topUpForm = new TopUpForm(currentBalance))
+            var topUpControl = new TopUpControl(currentBalance);
+            var form = new Form
             {
-                if (topUpForm.ShowDialog() == DialogResult.OK)
+                Text = "Top Up Balance",
+                Size = new System.Drawing.Size(350, 250),
+                StartPosition = FormStartPosition.CenterParent,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                MaximizeBox = false,
+                MinimizeBox = false
+            };
+
+            topUpControl.Dock = DockStyle.Fill;
+            form.Controls.Add(topUpControl);
+
+            topUpControl.TopUpConfirmed += (s, amount) =>
+            {
+                try
                 {
-                    try
-                    {
-                        _userService.UpdateUserBalance(selectedId, topUpForm.TopUpAmount);
-                        LoadUsers();
-                        MessageBox.Show("Balance updated successfully!", "Success",
-                            MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Error: {ex.Message}", "Error",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
+                    _userService.UpdateUserBalance(selectedId, amount);
+                    form.DialogResult = DialogResult.OK;
+                    form.Close();
+                    LoadUsers();
+                    MessageBox.Show("Balance updated successfully!", "Success",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error: {ex.Message}", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            };
+
+            topUpControl.Cancelled += (s, args) =>
+            {
+                form.DialogResult = DialogResult.Cancel;
+                form.Close();
+            };
+
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                LoadUsers();
             }
         }
 
@@ -345,23 +324,47 @@ namespace FlightBookingSystem.Controls
             var currentRole = (User.Role)Enum.Parse(typeof(User.Role),
                 usersGrid.SelectedRows[0].Cells["Role"].Value.ToString());
 
-            using (var roleForm = new ChangeRoleForm(currentRole))
+            var roleControl = new ChangeRoleControl(currentRole);
+            var form = new Form
             {
-                if (roleForm.ShowDialog() == DialogResult.OK)
+                Text = "Change User Role",
+                Size = new System.Drawing.Size(350, 200),
+                StartPosition = FormStartPosition.CenterParent,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                MaximizeBox = false,
+                MinimizeBox = false
+            };
+
+            roleControl.Dock = DockStyle.Fill;
+            form.Controls.Add(roleControl);
+
+            roleControl.RoleChanged += (s, newRole) =>
+            {
+                try
                 {
-                    try
-                    {
-                        _userService.ChangeUserRole(selectedId, roleForm.NewRole);
-                        LoadUsers();
-                        MessageBox.Show("Role changed successfully!", "Success",
-                            MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Error: {ex.Message}", "Error",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
+                    _userService.ChangeUserRole(selectedId, newRole);
+                    form.DialogResult = DialogResult.OK;
+                    form.Close();
+                    LoadUsers();
+                    MessageBox.Show("Role changed successfully!", "Success",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error: {ex.Message}", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            };
+
+            roleControl.Cancelled += (s, args) =>
+            {
+                form.DialogResult = DialogResult.Cancel;
+                form.Close();
+            };
+
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                LoadUsers();
             }
         }
 
