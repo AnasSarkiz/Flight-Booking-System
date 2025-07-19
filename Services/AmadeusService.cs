@@ -30,8 +30,8 @@ namespace FlightBookingSystem.Services
             if (!string.IsNullOrEmpty(_accessToken) && DateTime.UtcNow < _tokenExpiration)
                 return _accessToken;
 
-            var clientId = Environment.GetEnvironmentVariable("AMADEUS_CLIENT_ID");
-            var clientSecret = Environment.GetEnvironmentVariable("AMADEUS_CLIENT_SECRET");
+            String clientId = Environment.GetEnvironmentVariable("AMADEUS_CLIENT_ID");
+            String clientSecret = Environment.GetEnvironmentVariable("AMADEUS_CLIENT_SECRET");
 
             if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret))
                 throw new Exception("Amadeus credentials not configured");
@@ -46,10 +46,10 @@ namespace FlightBookingSystem.Services
             var response = await _httpClient.PostAsync(AuthUrl, content);
             response.EnsureSuccessStatusCode();
 
-            var json = await response.Content.ReadAsStringAsync();
+            String json = await response.Content.ReadAsStringAsync();
             using var doc = JsonDocument.Parse(json);
             _accessToken = doc.RootElement.GetProperty("access_token").GetString();
-            var expiresIn = doc.RootElement.GetProperty("expires_in").GetInt32();
+            int expiresIn = doc.RootElement.GetProperty("expires_in").GetInt32();
             _tokenExpiration = DateTime.UtcNow.AddSeconds(expiresIn - 60);
 
             return _accessToken;
@@ -57,7 +57,7 @@ namespace FlightBookingSystem.Services
 
         public async Task<List<Flight>> SearchFlightsAsync(string origin, string destination, DateTime departureDate,string SeatClass )
         {
-            var token = await GetAccessTokenAsync();
+            String token = await GetAccessTokenAsync();
 
             // Create initial originDestinations list
             var originDestinations = new List<object>
@@ -105,16 +105,16 @@ namespace FlightBookingSystem.Services
                 searchCriteria = new { maxFlightOffers = 50 }
             };
 
-            var json = JsonSerializer.Serialize(request);
-            var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+            String json = JsonSerializer.Serialize(request);
+            StringContent httpContent = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, FlightOffersUrl)
+            HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Post, FlightOffersUrl)
             {
                 Content = httpContent,
                 Headers = { { "Authorization", $"Bearer {token}" } }
             };
 
-            var response = await _httpClient.SendAsync(requestMessage);
+            HttpResponseMessage response = await _httpClient.SendAsync(requestMessage);
             response.EnsureSuccessStatusCode();
 
             return await ParseFlightOffers(await response.Content.ReadAsStringAsync());
@@ -122,20 +122,20 @@ namespace FlightBookingSystem.Services
 
         private async Task<List<Flight>> ParseFlightOffers(string json)
         {
-            using var doc = JsonDocument.Parse(json);
-            var root = doc.RootElement;
-            var flights = new List<Flight>();
+            using JsonDocument doc = JsonDocument.Parse(json);
+            JsonElement root = doc.RootElement;
+            List<Flight> flights = new List<Flight>();
 
-            foreach (var offer in root.GetProperty("data").EnumerateArray())
+            foreach (JsonElement offer in root.GetProperty("data").EnumerateArray())
             {
-                var firstItinerary = offer.GetProperty("itineraries")[0];
-                var firstSegment = firstItinerary.GetProperty("segments")[0];
-                var price = offer.GetProperty("price").GetProperty("total").GetString();
+                JsonElement firstItinerary = offer.GetProperty("itineraries")[0];
+                JsonElement firstSegment = firstItinerary.GetProperty("segments")[0];
+                String price = offer.GetProperty("price").GetProperty("total").GetString();
 
-                var travelerPricing = offer.GetProperty("travelerPricings")[0];
-                var cabinClass = travelerPricing.GetProperty("fareOption").GetString();
+                JsonElement travelerPricing = offer.GetProperty("travelerPricings")[0];
+                String cabinClass = travelerPricing.GetProperty("fareOption").GetString();
 
-                var flight = new Flight
+                Flight flight = new Flight
                 {
                     FlightNumber = firstSegment.GetProperty("number").GetString(),
                     Airline = firstSegment.GetProperty("carrierCode").GetString(),
@@ -165,7 +165,7 @@ namespace FlightBookingSystem.Services
             int minutes = 0;
 
             // Check for hours
-            var hourIndex = durationString.IndexOf('H');
+            int hourIndex = durationString.IndexOf('H');
             if (hourIndex > 0)
             {
                 hours = int.Parse(durationString.Substring(0, hourIndex));
@@ -173,7 +173,7 @@ namespace FlightBookingSystem.Services
             }
 
             // Check for minutes
-            var minuteIndex = durationString.IndexOf('M');
+            int minuteIndex = durationString.IndexOf('M');
             if (minuteIndex > 0)
             {
                 minutes = int.Parse(durationString.Substring(0, minuteIndex));

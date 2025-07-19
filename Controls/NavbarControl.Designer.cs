@@ -114,7 +114,7 @@
             profileButton.Padding = new Padding(10, 0, 0, 0);
             profileButton.Size = new Size(120, 40);
             profileButton.TabIndex = 3;
-            profileButton.Text = "Profile";
+            profileButton.Text = "Menu";
             profileButton.TextImageRelation = TextImageRelation.ImageBeforeText;
             profileButton.UseVisualStyleBackColor = true;
             // 
@@ -131,9 +131,11 @@
             // 
             // logoIcon
             // 
+            logoIcon.BackgroundImage = (Image)resources.GetObject("logoIcon.BackgroundImage");
+            logoIcon.BackgroundImageLayout = ImageLayout.Stretch;
             logoIcon.ErrorImage = (Image)resources.GetObject("logoIcon.ErrorImage");
             logoIcon.InitialImage = (Image)resources.GetObject("logoIcon.InitialImage");
-            logoIcon.Location = new Point(20, 15);
+            logoIcon.Location = new Point(24, 20);
             logoIcon.Name = "logoIcon";
             logoIcon.Size = new Size(40, 40);
             logoIcon.SizeMode = PictureBoxSizeMode.CenterImage;
@@ -160,7 +162,7 @@
             // userProfileMenuItem
             // 
             userProfileMenuItem.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            userProfileMenuItem.ImageScaling = ToolStripItemImageScaling.None;
+            userProfileMenuItem.ImageScaling = ToolStripItemImageScaling.SizeToFit;
             userProfileMenuItem.Name = "userProfileMenuItem";
             userProfileMenuItem.Size = new Size(167, 24);
             userProfileMenuItem.Text = "User Profile";
@@ -198,7 +200,7 @@
             // activityLogMenuItem
             // 
             activityLogMenuItem.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            activityLogMenuItem.ImageScaling = ToolStripItemImageScaling.None;
+            activityLogMenuItem.ImageScaling = ToolStripItemImageScaling.SizeToFit;
             activityLogMenuItem.Name = "activityLogMenuItem";
             activityLogMenuItem.Size = new Size(167, 24);
             activityLogMenuItem.Text = "Activity Log";

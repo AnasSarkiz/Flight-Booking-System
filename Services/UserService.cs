@@ -21,7 +21,7 @@ namespace FlightBookingSystem.Services
 
             try
             {
-                var user = _userRepo.Authenticate(username, password);
+                User user = _userRepo.Authenticate(username, password);
 
                 if (user == null)
                     throw new Exception("Invalid credentials.");

@@ -1,37 +1,84 @@
 ﻿using System;
 using System.Data;
 using System.Windows.Forms;
+using FlightBookingSystem.Services;
+using FlightBookingSystem.Models;
+using FlightBookingSystem.DAL;
 
 namespace FlightBookingSystem.Controls
 {
     public partial class ActivityLogControl : UserControl
     {
-        public ActivityLogControl()
+        private readonly IUserRepository _userRepository;
+        private readonly UserService _userService;
+
+        public ActivityLogControl(IUserRepository userRepository)
         {
             InitializeComponent();
-            LoadSampleData();
+            _userRepository = userRepository;
+            _userService = new UserService(_userRepository);
+            LoadActivityData();
         }
 
-        private void LoadSampleData()
+        private void LoadActivityData()
         {
-            DataTable dt = new DataTable();
-            dt.Columns.Add("Timestamp");
-            dt.Columns.Add("User");
-            dt.Columns.Add("Activity");
-            dt.Columns.Add("Details");
+            try
+            {
+                // In a real application, you would have an ActivityLogService and Repository
+                // For now, we'll simulate getting activity data
+                DataTable dt = new DataTable();
+                dt.Columns.Add("Timestamp");
+                dt.Columns.Add("User");
+                dt.Columns.Add("Activity");
+                dt.Columns.Add("Details");
 
-            dt.Rows.Add("2023-05-15 14:30:22", "admin", "Login", "Successful login from 192.168.1.1");
-            dt.Rows.Add("2023-05-15 14:35:18", "admin", "User Edit", "Modified user 'user1'");
-            dt.Rows.Add("2023-05-15 15:02:45", "user1", "Flight Search", "Searched for flights to Paris");
-            dt.Rows.Add("2023-05-15 15:30:10", "user2", "Booking", "Booked flight AA123");
+                // Get all users to populate the activity log
+                var users = _userService.GetAllUsers();
 
-            logGrid.DataSource = dt;
+                // Sample activities - in a real app, these would come from a database
+                foreach (var user in users)
+                {
+                    if (user.LastLogin.HasValue)
+                    {
+                        dt.Rows.Add(
+                            user.LastLogin.Value.ToString("yyyy-MM-dd HH:mm:ss"),
+                            user.Username,
+                            "Login",
+                            $"Successful login for {user.Username}"
+                        );
+                    }
+
+                    // Add other activities as needed
+                    dt.Rows.Add(
+                        DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                        user.Username,
+                        "Profile View",
+                        $"Viewed profile of {user.Username}"
+                    );
+                }
+
+                logGrid.DataSource = dt;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading activity data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void datePicker_ValueChanged(object sender, EventArgs e)
         {
-            // In a real application, this would filter the log data
-            MessageBox.Show($"Filtering logs for {datePicker.Value.ToShortDateString()}", "Filter Applied", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            try
+            {
+                // Filter the data based on the selected date
+                if (logGrid.DataSource is DataTable dataTable)
+                {
+                    dataTable.DefaultView.RowFilter = $"Timestamp >= '{datePicker.Value.Date:yyyy-MM-dd}' AND Timestamp < '{datePicker.Value.Date.AddDays(1):yyyy-MM-dd}'";
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error filtering data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }

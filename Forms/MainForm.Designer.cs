@@ -8,7 +8,6 @@
 
         private void InitializeComponent()
         {
-            navbarControl = new Controls.NavbarControl();
             mainContentPanel = new Panel();
             SuspendLayout();
             // 
@@ -16,7 +15,6 @@
             // 
             navbarControl.BackColor = Color.FromArgb(8, 18, 44);
             navbarControl.Dock = DockStyle.Top;
-            navbarControl.IsAdmin = false;
             navbarControl.Location = new Point(0, 0);
             navbarControl.Name = "navbarControl";
             navbarControl.Size = new Size(1200, 80);

@@ -22,7 +22,7 @@ namespace FlightBookingSystem.Services
         public UnsplashService()
         {
             // Load environment variables
-            var envPath = Path.Combine(Directory.GetCurrentDirectory(), ".env");
+            String envPath = Path.Combine(Directory.GetCurrentDirectory(), ".env");
             DotNetEnv.Env.Load();
 
             _accessKey = Environment.GetEnvironmentVariable("UNSPLASH_Access_Key");
@@ -54,7 +54,7 @@ namespace FlightBookingSystem.Services
         public async Task<string> GetCityImageUrl(string cityName, string imageSize = "regular")
         {
             // Create cache key with city name and size
-            var cacheKey = $"{cityName.ToLowerInvariant()}_{imageSize}";
+            String cacheKey = $"{cityName.ToLowerInvariant()}_{imageSize}";
 
             // Check cache first
             if (_cityImageCache.TryGetValue(cacheKey, out var cachedUrl))
@@ -65,7 +65,7 @@ namespace FlightBookingSystem.Services
             try
             {
                 // Clean city name (remove airport code if present)
-                var cleanCity = Uri.EscapeDataString(cityName.Split('(')[0].Trim());
+                String cleanCity = Uri.EscapeDataString(cityName.Split('(')[0].Trim());
 
                 // API request
                 var response = await _httpClient.GetAsync(
@@ -74,11 +74,11 @@ namespace FlightBookingSystem.Services
                 response.EnsureSuccessStatusCode();
 
                 // Parse response
-                var content = await response.Content.ReadAsStringAsync();
+                String content = await response.Content.ReadAsStringAsync();
                 dynamic result = JsonConvert.DeserializeObject(content);
 
                 // Get the requested image size (defaults to 'regular')
-                var imageUrl = result?.results[0]?.urls?[imageSize]?.ToString()
+                String imageUrl = result?.results[0]?.urls?[imageSize]?.ToString()
                              ?? GetDefaultImageUrl();
 
                 // Add to cache
@@ -109,7 +109,7 @@ namespace FlightBookingSystem.Services
             }
 
             // AirHex image URL (assuming you're using the free CDN version)
-            var logoUrl = $"https://content.airhex.com/content/logos/airlines_{iataCode}_80_80_s.png";
+            String logoUrl = $"https://content.airhex.com/content/logos/airlines_{iataCode}_80_80_s.png";
 
             // Optional: Validate the logo exists
             try
@@ -140,7 +140,7 @@ namespace FlightBookingSystem.Services
             {
                 if (File.Exists(_cacheFilePath))
                 {
-                    var json = File.ReadAllText(_cacheFilePath);
+                    String json = File.ReadAllText(_cacheFilePath);
                     var cache = JsonConvert.DeserializeObject<ConcurrentDictionary<string, string>>(json);
                     if (cache != null)
                     {
@@ -161,13 +161,13 @@ namespace FlightBookingSystem.Services
         {
             try
             {
-                var directory = Path.GetDirectoryName(_cacheFilePath);
+                String directory = Path.GetDirectoryName(_cacheFilePath);
                 if (!Directory.Exists(directory))
                 {
                     Directory.CreateDirectory(directory);
                 }
 
-                var json = JsonConvert.SerializeObject(_cityImageCache);
+                String json = JsonConvert.SerializeObject(_cityImageCache);
                 File.WriteAllText(_cacheFilePath, json);
             }
             catch (Exception ex)

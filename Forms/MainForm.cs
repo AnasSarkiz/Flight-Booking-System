@@ -13,15 +13,18 @@ namespace FlightBookingSystem
         private readonly UnsplashService _unsplashService;
         private readonly User _currentUser;
         private readonly IUserRepository _userRepo;
+        private readonly UserService _userService;
         public MainForm(User user, IUserRepository userRepo) : this()
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
             if (userRepo == null) throw new ArgumentNullException(nameof(userRepo));
             {
+                navbarControl = new Controls.NavbarControl(user.UserRole);
                 InitializeComponent();
                 _currentUser = user;
                 _userRepo = userRepo;
                 _unsplashService = new UnsplashService();
+                _userService = new UserService(_userRepo);
                 navbarControl.HomeClicked += (s, e) => ShowHomeView();
                 navbarControl.SearchFlightsClicked += (s, e) => ShowSearchFlightsView();
                 navbarControl.BookingsClicked += (s, e) => ShowBookingsView();
@@ -31,21 +34,21 @@ namespace FlightBookingSystem
                 navbarControl.UserManagementClicked += (s, e) => ShowUserManagement();
                 navbarControl.UserProfileClicked += (s, e) => ShowUserProfile();
                 navbarControl.ActivityLogClicked += (s, e) => ShowActivityLog();
-
                 ShowHomeView();
             }
         }
 
         private void ShowUserProfile()
         {
-            var userProfileControl = new UserProfileControl();
+            UserProfileControl userProfileControl = new UserProfileControl(_userService, _currentUser);
+            userProfileControl.BackRequested += (s, e) => ShowHomeView(); 
             SwitchView(userProfileControl);
         }
         private void ShowUserManagement()
         {
             if (_currentUser.UserRole == User.Role.Admin)
             {
-                var userManagement = new UserManagementControl(_currentUser, _userRepo);
+                UserManagementControl userManagement = new UserManagementControl(_currentUser, _userRepo);
                 SwitchView(userManagement);
             }
             else
@@ -56,17 +59,17 @@ namespace FlightBookingSystem
         }
         private void ShowActivityLog()
         {
-            var activityLogControl = new ActivityLogControl();
+            var activityLogControl = new ActivityLogControl(_userRepo);
             SwitchView(activityLogControl);
         }
 
         private void ShowHomeView()
         {
-            var homeControl = new HomeControl(_unsplashService);
+            HomeControl homeControl = new HomeControl(_unsplashService);
             homeControl.ExploreFlightsClicked += (s, e) => ShowSearchFlightsView();
             homeControl.PromotionClicked += (s, city) =>
             {
-                var searchControl = new SearchFlightsControl();
+                SearchFlightsControl searchControl = new SearchFlightsControl();
                 searchControl.SetSearchDestination(city);
                 ShowSearchFlightsView(searchControl);
             };
@@ -75,7 +78,7 @@ namespace FlightBookingSystem
 
         private void ShowSearchFlightsView(SearchFlightsControl existingControl = null)
         {
-            var searchControl = existingControl ?? new SearchFlightsControl();
+            SearchFlightsControl searchControl = existingControl ?? new SearchFlightsControl();
             searchControl.BackToHomeClicked += (s, e) => ShowHomeView();
             searchControl.FlightSelected += (s, flight) => ShowBookingView(flight);
             SwitchView(searchControl);
@@ -83,7 +86,7 @@ namespace FlightBookingSystem
 
         private void ShowBookingView(Flight flight)
         {
-            var bookingControl = new BookingControl(flight, _currentUser);
+            BookingControl bookingControl = new BookingControl(flight, _currentUser);
             bookingControl.BackRequested += (s, e) => ShowSearchFlightsView();
             bookingControl.BookingConfirmed += (s, booking) =>
             {
@@ -96,25 +99,25 @@ namespace FlightBookingSystem
 
         private void ShowBookingsView()
         {
-            var bookingsControl = new ManageBooking();
+            ManageBooking bookingsControl = new ManageBooking();
             SwitchView(bookingsControl);
         }
 
         private void ShowContactUs()
         {
-            var contactUsControl = new ContactUsControl();
+            ContactUsControl contactUsControl = new ContactUsControl();
             SwitchView(contactUsControl);
         }
 
         private void ShowAboutUs()
         {
-            var aboutUsControl = new AboutUsControl();
+            AboutUsControl aboutUsControl = new AboutUsControl();
             SwitchView(aboutUsControl);
         }
 
         private void Logout()
         {
-            var result = MessageBox.Show("Are you sure you want to logout?",
+            DialogResult result = MessageBox.Show("Are you sure you want to logout?",
                 "Logout",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question);
@@ -124,7 +127,7 @@ namespace FlightBookingSystem
                 Application.Exit();
             }
         }
-
+        
         private void SwitchView(UserControl newView)
         {
             if (currentView != null)

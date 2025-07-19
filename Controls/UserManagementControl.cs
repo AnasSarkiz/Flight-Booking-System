@@ -320,12 +320,12 @@ namespace FlightBookingSystem.Controls
         {
             if (usersGrid.SelectedRows.Count == 0) return;
 
-            var selectedId = (int)usersGrid.SelectedRows[0].Cells["ID"].Value;
-            var currentRole = (User.Role)Enum.Parse(typeof(User.Role),
+            int selectedId = (int)usersGrid.SelectedRows[0].Cells["ID"].Value;
+            User.Role currentRole = (User.Role)Enum.Parse(typeof(User.Role),
                 usersGrid.SelectedRows[0].Cells["Role"].Value.ToString());
 
-            var roleControl = new ChangeRoleControl(currentRole);
-            var form = new Form
+            ChangeRoleControl roleControl = new ChangeRoleControl(currentRole);
+            Form form = new Form
             {
                 Text = "Change User Role",
                 Size = new System.Drawing.Size(350, 200),
