@@ -15,21 +15,20 @@ namespace FlightBookingSystem.DAL
                 OpenConnection();
                 string query = @"
                 INSERT INTO BookingDetails (
-                    FlightNumber, Airline, Origin, Destination,
-                    DepartureTime, ArrivalTime, OriginalPrice,
-                    PassengerId, SeatClass, SeatNumber, PNR,
-                    TotalPrice, BookedByUserId, Status, BookingDate
-                ) VALUES (
-                    @FlightNumber, @Airline, @Origin, @Destination,
-                    @DepartureTime, @ArrivalTime, @OriginalPrice,
-                    @PassengerId, @SeatClass, @SeatNumber, @PNR,
-                    @TotalPrice, @BookedByUserId, @Status, @BookingDate
-                );
-                SELECT SCOPE_IDENTITY();";
+                 FlightNumber, Airline, Origin, Destination,
+                 DestinationImageUrl, DepartureTime, ArrivalTime, 
+                  OriginalPrice, PassengerId, SeatClass, SeatNumber, 
+                  PNR, TotalPrice, BookedByUserId, Status, BookingDate
+                    ) VALUES (
+                   @FlightNumber, @Airline, @Origin, @Destination,
+                      @DestinationImageUrl, @DepartureTime, @ArrivalTime, 
+                      @OriginalPrice, @PassengerId, @SeatClass, @SeatNumber, 
+                       @PNR, @TotalPrice, @BookedByUserId, @Status, @BookingDate
+                    );
+                    SELECT SCOPE_IDENTITY();";
 
                 using (var cmd = new SqlCommand(query, connection))
                 {
-                    // Flight data
                     cmd.Parameters.AddWithValue("@FlightNumber", booking.FlightNumber);
                     cmd.Parameters.AddWithValue("@Airline", booking.Airline);
                     cmd.Parameters.AddWithValue("@Origin", booking.Origin);
@@ -37,11 +36,8 @@ namespace FlightBookingSystem.DAL
                     cmd.Parameters.AddWithValue("@DepartureTime", booking.DepartureTime);
                     cmd.Parameters.AddWithValue("@ArrivalTime", booking.ArrivalTime);
                     cmd.Parameters.AddWithValue("@OriginalPrice", booking.OriginalPrice);
-
-                    // Passenger data
+                    cmd.Parameters.AddWithValue("@DestinationImageUrl", (object)booking.DestinationImageUrl ?? DBNull.Value);
                     cmd.Parameters.AddWithValue("@PassengerId", booking.Passenger.Id);
-
-                    // Booking details
                     cmd.Parameters.AddWithValue("@SeatClass", booking.SeatClass);
                     cmd.Parameters.AddWithValue("@SeatNumber", booking.SeatNumber);
                     cmd.Parameters.AddWithValue("@PNR", booking.PNR);
@@ -49,14 +45,34 @@ namespace FlightBookingSystem.DAL
                     cmd.Parameters.AddWithValue("@BookedByUserId", booking.BookedBuy.Id);
                     cmd.Parameters.AddWithValue("@Status", booking.Status ?? "Confirmed");
                     cmd.Parameters.AddWithValue("@BookingDate", booking.BookingDate);
-
-                    booking.Id = Convert.ToInt32(cmd.ExecuteScalar());
-                    return booking.Id > 0;
+                    try
+                    {
+                        var result = cmd.ExecuteScalar();
+                        if (result != null && result != DBNull.Value)
+                        {
+                            booking.Id = Convert.ToInt32(result);
+                            return booking.Id > 0;
+                        }
+                        return false;
+                    }
+                    catch (SqlException sqlEx)
+                    {
+                        // Log detailed SQL error
+                        Console.WriteLine($"SQL Error: {sqlEx.Message}");
+                        Console.WriteLine($"Procedure: {sqlEx.Procedure}");
+                        Console.WriteLine($"Line Number: {sqlEx.LineNumber}");
+                        throw;
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                // Log general error
+                Console.WriteLine($"Error in Add booking: {ex.Message}");
+                throw;
             }
             finally { CloseConnection(); }
         }
-
         public bool CancelBooking(int bookingId)
         {
             try
@@ -110,6 +126,7 @@ namespace FlightBookingSystem.DAL
                     bd.SeatNumber, 
                     bd.PNR, 
                     bd.TotalPrice,
+                    bd.DestinationImageUrl,
                     bd.BookingDate, 
                     bd.Status,
                     p.Id AS PassengerId, 
@@ -159,6 +176,7 @@ namespace FlightBookingSystem.DAL
                     bd.OriginalPrice AS BookingOriginalPrice,
                     bd.SeatClass AS BookingSeatClass, 
                     bd.SeatNumber, 
+                    bd.DestinationImageUrl,
                     bd.PNR, 
                     bd.TotalPrice,
                     bd.BookingDate, 
@@ -211,6 +229,7 @@ namespace FlightBookingSystem.DAL
                     bd.DepartureTime AS BookingDepartureTime, 
                     bd.ArrivalTime AS BookingArrivalTime, 
                     bd.OriginalPrice AS BookingOriginalPrice,
+                    bd.DestinationImageUrl,
                     bd.SeatClass AS BookingSeatClass, 
                     bd.SeatNumber, 
                     bd.PNR, 
@@ -267,6 +286,7 @@ namespace FlightBookingSystem.DAL
                     bd.ArrivalTime AS BookingArrivalTime, 
                     bd.OriginalPrice AS BookingOriginalPrice,
                     bd.SeatClass AS BookingSeatClass, 
+                    bd.DestinationImageUrl,
                     bd.SeatNumber, 
                     bd.PNR, 
                     bd.TotalPrice,
@@ -321,6 +341,7 @@ namespace FlightBookingSystem.DAL
                     ArrivalTime = @ArrivalTime,
                     OriginalPrice = @OriginalPrice,
                     PassengerId = @PassengerId,
+                    DestinationImageUrl = @DestinationImageUrl
                     SeatClass = @SeatClass,
                     SeatNumber = @SeatNumber,
                     PNR = @PNR,
@@ -368,6 +389,7 @@ namespace FlightBookingSystem.DAL
                 DepartureTime = reader.GetDateTime(reader.GetOrdinal("BookingDepartureTime")),
                 ArrivalTime = reader.GetDateTime(reader.GetOrdinal("BookingArrivalTime")),
                 OriginalPrice = reader.GetDecimal(reader.GetOrdinal("BookingOriginalPrice")),
+                DestinationImageUrl = reader.IsDBNull(reader.GetOrdinal("DestinationImageUrl")) ? null : reader.GetString(reader.GetOrdinal("DestinationImageUrl")),
                 SeatClass = reader.GetString(reader.GetOrdinal("BookingSeatClass")),
                 SeatNumber = reader.GetString(reader.GetOrdinal("SeatNumber")),
                 PNR = reader.GetString(reader.GetOrdinal("PNR")),

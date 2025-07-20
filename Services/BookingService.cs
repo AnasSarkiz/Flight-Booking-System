@@ -8,16 +8,13 @@ namespace FlightBookingSystem.Services
     public class BookingService
     {
         private readonly IBookingDetailsRepository _bookingRepository;
-        private readonly IFlightRepository _flightRepository;
         private readonly IPassengerRepository _passengerRepository;
 
         public BookingService(
             IBookingDetailsRepository bookingRepository,
-            IFlightRepository flightRepository,
             IPassengerRepository passengerRepository)
         {
             _bookingRepository = bookingRepository;
-            _flightRepository = flightRepository;
             _passengerRepository = passengerRepository;
         }
 
@@ -26,14 +23,19 @@ namespace FlightBookingSystem.Services
             if (apiFlight == null) throw new ArgumentNullException(nameof(apiFlight));
             if (passenger == null) throw new ArgumentNullException(nameof(passenger));
             if (user == null) throw new ArgumentNullException(nameof(user));
-
+            if (string.IsNullOrEmpty(apiFlight.FlightNumber))
+                throw new ArgumentException("Flight number is required");
+            if (passenger.Id <= 0 && (string.IsNullOrEmpty(passenger.FirstName) || string.IsNullOrEmpty(passenger.LastName)))
+                throw new ArgumentException("Passenger name is required");
+            if (user.Id <= 0)
+                throw new ArgumentException("Invalid user");
             if (passenger.Id == 0)
             {
                 if (!_passengerRepository.Add(passenger))
                     throw new Exception("Failed to save passenger information");
             }
 
-            BookingDetails booking = new BookingDetails
+            BookingDetails booking = new()
             {
 
                 FlightNumber = apiFlight.FlightNumber,
@@ -44,12 +46,9 @@ namespace FlightBookingSystem.Services
                 ArrivalTime = apiFlight.ArrivalTime,
                 OriginalPrice = apiFlight.Price,
                 SeatClass = seatClass,
-
-                // Passenger and user info
-                Passenger = passenger, // Use the saved passenger ID
+                DestinationImageUrl = apiFlight.DestinationImageUrl,
+                Passenger = passenger,
                 BookedBuy = user,
-
-                // Booking metadata
                 SeatNumber = GenerateRandomSeat(),
                 PNR = GeneratePNR(),
                 TotalPrice = apiFlight.Price,
@@ -86,7 +85,7 @@ namespace FlightBookingSystem.Services
 
         private string GeneratePNR()
         {
-            Random random = new Random();
+            Random random = new();
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             return new string(Enumerable.Repeat(chars, 6).Select(s => s[random.Next(s.Length)]).ToArray());
         }

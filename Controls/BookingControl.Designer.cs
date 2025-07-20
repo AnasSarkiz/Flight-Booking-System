@@ -19,7 +19,6 @@
         {
             btnConfirm = new Button();
             btnBack = new Button();
-            lblSeatInfo = new Label();
             lblFlightInfo = new Label();
             lblBalance = new Label();
             lblTotalPrice = new Label();
@@ -72,25 +71,13 @@
             btnBack.Text = "BACK";
             btnBack.UseVisualStyleBackColor = false;
             // 
-            // lblSeatInfo
-            // 
-            lblSeatInfo.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            lblSeatInfo.AutoSize = true;
-            lblSeatInfo.Font = new Font("Segoe UI", 10F);
-            lblSeatInfo.ForeColor = Color.FromArgb(70, 70, 80);
-            lblSeatInfo.Location = new Point(20, 525);
-            lblSeatInfo.Name = "lblSeatInfo";
-            lblSeatInfo.Size = new Size(126, 19);
-            lblSeatInfo.TabIndex = 10;
-            lblSeatInfo.Text = "Assigned Seat: 12A";
-            // 
             // lblFlightInfo
             // 
             lblFlightInfo.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             lblFlightInfo.BackColor = Color.White;
             lblFlightInfo.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold);
             lblFlightInfo.ForeColor = Color.FromArgb(0, 60, 120);
-            lblFlightInfo.Location = new Point(0, 470);
+            lblFlightInfo.Location = new Point(-1, 397);
             lblFlightInfo.Name = "lblFlightInfo";
             lblFlightInfo.Padding = new Padding(20, 15, 20, 15);
             lblFlightInfo.Size = new Size(1000, 70);
@@ -102,9 +89,9 @@
             lblBalance.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             lblBalance.AutoSize = true;
             lblBalance.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            lblBalance.Location = new Point(650, 525);
+            lblBalance.Location = new Point(481, 525);
             lblBalance.Name = "lblBalance";
-            lblBalance.Size = new Size(130, 19);
+            lblBalance.Size = new Size(132, 19);
             lblBalance.TabIndex = 12;
             lblBalance.Text = "Available Balance:";
             // 
@@ -115,7 +102,7 @@
             lblTotalPrice.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             lblTotalPrice.Location = new Point(800, 525);
             lblTotalPrice.Name = "lblTotalPrice";
-            lblTotalPrice.Size = new Size(83, 19);
+            lblTotalPrice.Size = new Size(84, 19);
             lblTotalPrice.TabIndex = 13;
             lblTotalPrice.Text = "Total Price:";
             // 
@@ -124,6 +111,7 @@
             passengerTab.BackColor = Color.White;
             passengerTab.Controls.Add(dtpDob);
             passengerTab.Controls.Add(txtPhone);
+            passengerTab.Controls.Add(lblFlightInfo);
             passengerTab.Controls.Add(txtEmail);
             passengerTab.Controls.Add(cmbNationality);
             passengerTab.Controls.Add(txtPassport);
@@ -205,70 +193,77 @@
             // label7
             // 
             label7.AutoSize = true;
-            label7.Font = new Font("Segoe UI", 10F);
-            label7.Location = new Point(50, 343);
+            label7.Font = new Font("Verdana", 12F, FontStyle.Bold);
+            label7.ForeColor = Color.Navy;
+            label7.Location = new Point(7, 345);
             label7.Name = "label7";
-            label7.Size = new Size(90, 19);
+            label7.Size = new Size(126, 18);
             label7.TabIndex = 6;
             label7.Text = "Date of Birth:";
             // 
             // label6
             // 
             label6.AutoSize = true;
-            label6.Font = new Font("Segoe UI", 10F);
-            label6.Location = new Point(50, 293);
+            label6.Font = new Font("Verdana", 12F, FontStyle.Bold);
+            label6.ForeColor = Color.Navy;
+            label6.Location = new Point(7, 295);
             label6.Name = "label6";
-            label6.Size = new Size(51, 19);
+            label6.Size = new Size(70, 18);
             label6.TabIndex = 5;
             label6.Text = "Phone:";
             // 
             // label5
             // 
             label5.AutoSize = true;
-            label5.Font = new Font("Segoe UI", 10F);
-            label5.Location = new Point(50, 243);
+            label5.Font = new Font("Verdana", 12F, FontStyle.Bold);
+            label5.ForeColor = Color.Navy;
+            label5.Location = new Point(7, 245);
             label5.Name = "label5";
-            label5.Size = new Size(44, 19);
+            label5.Size = new Size(60, 18);
             label5.TabIndex = 4;
             label5.Text = "Email:";
             // 
             // label4
             // 
             label4.AutoSize = true;
-            label4.Font = new Font("Segoe UI", 10F);
-            label4.Location = new Point(50, 193);
+            label4.Font = new Font("Verdana", 12F, FontStyle.Bold);
+            label4.ForeColor = Color.Navy;
+            label4.Location = new Point(7, 195);
             label4.Name = "label4";
-            label4.Size = new Size(78, 19);
+            label4.Size = new Size(107, 18);
             label4.TabIndex = 3;
             label4.Text = "Nationality:";
             // 
             // label3
             // 
             label3.AutoSize = true;
-            label3.Font = new Font("Segoe UI", 10F);
-            label3.Location = new Point(50, 143);
+            label3.Font = new Font("Verdana", 12F, FontStyle.Bold);
+            label3.ForeColor = Color.Navy;
+            label3.Location = new Point(7, 145);
             label3.Name = "label3";
-            label3.Size = new Size(119, 19);
+            label3.Size = new Size(167, 18);
             label3.TabIndex = 2;
             label3.Text = "Passport Number:";
             // 
             // label2
             // 
             label2.AutoSize = true;
-            label2.Font = new Font("Segoe UI", 10F);
-            label2.Location = new Point(50, 93);
+            label2.Font = new Font("Verdana", 12F, FontStyle.Bold);
+            label2.ForeColor = Color.Navy;
+            label2.Location = new Point(7, 95);
             label2.Name = "label2";
-            label2.Size = new Size(77, 19);
+            label2.Size = new Size(107, 18);
             label2.TabIndex = 1;
             label2.Text = "Last Name:";
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Font = new Font("Segoe UI", 10F);
-            label1.Location = new Point(50, 43);
+            label1.Font = new Font("Verdana", 12F, FontStyle.Bold);
+            label1.ForeColor = Color.Navy;
+            label1.Location = new Point(7, 45);
             label1.Name = "label1";
-            label1.Size = new Size(78, 19);
+            label1.Size = new Size(108, 18);
             label1.TabIndex = 0;
             label1.Text = "First Name:";
             // 
@@ -291,8 +286,6 @@
             BackColor = Color.White;
             Controls.Add(lblTotalPrice);
             Controls.Add(lblBalance);
-            Controls.Add(lblFlightInfo);
-            Controls.Add(lblSeatInfo);
             Controls.Add(btnBack);
             Controls.Add(btnConfirm);
             Controls.Add(tabControl);
@@ -309,7 +302,6 @@
 
         private Button btnConfirm;
         private Button btnBack;
-        private Label lblSeatInfo;
         private Label lblFlightInfo;
         private Label lblBalance;
         private Label lblTotalPrice;

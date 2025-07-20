@@ -13,5 +13,7 @@ namespace FlightBookingSystem.DAL
         bool Delete(int userId);
         bool UsernameExists(string username);
         void UpdateLastLogin(int userId);
+        bool UpdateBalance(int userId, decimal amount);
+        bool IncrementBookingCount(int userId);
     }
 }

@@ -9,6 +9,7 @@ using FlightBookingSystem.DAL;
 using FlightBookingSystem.Services;
 using System.Data;
 using Microsoft.Data.SqlClient;
+using System.Transactions;
 
 
 namespace FlightBookingSystem.Controls
@@ -24,34 +25,35 @@ namespace FlightBookingSystem.Controls
         private BookingDetails _bookingDetails;
         private readonly IPassengerRepository _passengerRepository;
         private readonly IBookingDetailsRepository _bookingRepository;
-        private readonly IFlightRepository _flightRepository;
         private readonly BookingService _bookingService;
+        private readonly UserService _userService;
 
         public BookingControl(Flight flight, User user,
-                      IPassengerRepository passengerRepository,
-                      IBookingDetailsRepository bookingRepository,
-                      IFlightRepository flightRepository)
+                         IPassengerRepository passengerRepository,
+                         IBookingDetailsRepository bookingRepository,
+                         UserService userService)
         {
             if (flight == null) throw new ArgumentNullException(nameof(flight));
             if (user == null) throw new ArgumentNullException(nameof(user));
 
             _selectedFlight = flight;
             _currentUser = user;
+            _userService = userService;
             _passengerRepository = passengerRepository;
             _bookingRepository = bookingRepository;
-            _flightRepository = flightRepository;
-            _bookingService = new BookingService(bookingRepository, flightRepository, passengerRepository);
+            _bookingService = new BookingService(bookingRepository, passengerRepository);
 
             InitializeComponent();
             InitializeBooking();
             WireUpEvents();
             LoadNationalities();
             UpdateBalanceDisplay();
+          
         }
 
         private void UpdateBalanceDisplay()
         {
-            lblBalance.Text = $"Available Balance: {_currentUser.Balance:C}";
+            lblBalance.Text = $"Available Balance: {_currentUser.Balance.ToString():USD}";
             lblBalance.ForeColor = _currentUser.Balance >= _selectedFlight.Price ? Color.Green : Color.Red;
         }
 
@@ -82,10 +84,6 @@ namespace FlightBookingSystem.Controls
             }
             catch (Exception ex)
             {
-                _nationalities = new List<string>
-                {
-                    "American", "British", "Canadian", "French", "German", "Japanese"
-                };
 
                 cmbNationality.DataSource = _nationalities;
                 MessageBox.Show($"Failed to load nationalities: {ex.Message}\nUsing default values instead.",
@@ -104,6 +102,7 @@ namespace FlightBookingSystem.Controls
 
         private void InitializeBooking()
         {
+            
             _bookingDetails = new BookingDetails
             {
                 FlightNumber = _selectedFlight.FlightNumber,
@@ -112,6 +111,7 @@ namespace FlightBookingSystem.Controls
                 Destination = _selectedFlight.Destination,
                 DepartureTime = _selectedFlight.DepartureTime,
                 ArrivalTime = _selectedFlight.ArrivalTime,
+                DestinationImageUrl = _selectedFlight.DestinationImageUrl,
                 OriginalPrice = _selectedFlight.Price,
                 Passenger = new Passenger(),
                 SeatNumber = GenerateRandomSeat(),
@@ -120,7 +120,7 @@ namespace FlightBookingSystem.Controls
                 BookedBuy = _currentUser
             };
 
-            lblSeatInfo.Text = $"Assigned Seat: {_bookingDetails.SeatNumber}";
+
             lblFlightInfo.Text = $"{_selectedFlight.Airline} • {_selectedFlight.FlightNumber}\n" +
                                $"{_selectedFlight.Origin} → {_selectedFlight.Destination}\n" +
                                $"{_selectedFlight.DepartureTime:ddd, MMM dd yyyy hh:mm tt}";
@@ -168,7 +168,6 @@ namespace FlightBookingSystem.Controls
 
             try
             {
-                // First ensure passenger has required data
                 if (string.IsNullOrEmpty(_bookingDetails.Passenger.PassportNumber) ||
                     string.IsNullOrEmpty(_bookingDetails.Passenger.Nationality))
                 {
@@ -177,20 +176,49 @@ namespace FlightBookingSystem.Controls
                     return;
                 }
 
-                // Process the booking
-                var booking = _bookingService.CreateBooking(
-                    _selectedFlight,
-                    _bookingDetails.Passenger,
-                    _currentUser,
-                    _selectedFlight.SeatClass
-                );
+                using (var transaction = new TransactionScope())
+                {
+                    try
+                    {
+                        
+                        // 1. Create the booking
+                        var booking = _bookingService.CreateBooking(
+                            _selectedFlight,
+                            _bookingDetails.Passenger,
+                            _currentUser,
+                            _selectedFlight.SeatClass
+                        );
 
-                // Update user balance
-                _currentUser.Balance -= _selectedFlight.Price;
-                // TODO: Save user balance changes
 
-                BookingConfirmed?.Invoke(this, booking);
-                MessageBox.Show($"Booking confirmed! PNR: {booking.PNR}", "Success");
+                        // 2. Update user balance
+                        if (!_userService.DecreaseUserBalance(_currentUser.Id, _selectedFlight.Price))
+                        {
+                            throw new Exception("Failed to update user balance");
+                        }
+
+                        // 3. Increment booking count
+                        if (!_userService.IncrementUserBookingCount(_currentUser.Id))
+                        {
+                            throw new Exception("Failed to update booking count");
+                        }
+
+                        // Refresh user data from database
+                        var updatedUser = _userService.GetUserById(_currentUser.Id);
+                        _currentUser.Balance = updatedUser.Balance;
+
+                        // Complete the transaction if all operations succeeded
+                        transaction.Complete();
+
+                        UpdateBalanceDisplay();
+                        BookingConfirmed?.Invoke(this, booking);
+                        MessageBox.Show($"Booking confirmed! PNR: {booking.PNR}", "Success");
+                    }
+                    catch
+                    {
+                        // Transaction will automatically roll back if Complete() isn't called
+                        throw;
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -198,7 +226,6 @@ namespace FlightBookingSystem.Controls
                               MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
         private bool ValidateBooking()
         {
             if (string.IsNullOrWhiteSpace(_bookingDetails.Passenger.FirstName))

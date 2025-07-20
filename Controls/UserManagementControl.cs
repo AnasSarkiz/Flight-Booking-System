@@ -290,12 +290,31 @@ namespace FlightBookingSystem.Controls
             {
                 try
                 {
-                    _userService.UpdateUserBalance(selectedId, amount);
-                    form.DialogResult = DialogResult.OK;
-                    form.Close();
-                    LoadUsers();
-                    MessageBox.Show("Balance updated successfully!", "Success",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    // Update the balance
+                    bool success = _userService.UpdateUserBalance(selectedId, amount);
+
+                    if (success)
+                    {
+                        // Refresh the user data
+                        var updatedUser = _userService.GetUserById(selectedId);
+
+                        // Update current user if it's the same user
+                        if (_currentUser.Id == selectedId)
+                        {
+                            _currentUser.Balance = updatedUser.Balance;
+                        }
+
+                        form.DialogResult = DialogResult.OK;
+                        form.Close();
+                        LoadUsers();
+                        MessageBox.Show("Balance updated successfully!", "Success",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Failed to update balance.", "Error",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
                 catch (Exception ex)
                 {

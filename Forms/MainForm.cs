@@ -15,17 +15,16 @@ namespace FlightBookingSystem
         private readonly IUserRepository _userRepo;
         private readonly UserService _userService;
         private readonly IBookingDetailsRepository _bookingRepo;
-        private readonly IFlightRepository _flightRepo;
+
         private readonly IPassengerRepository _passengerRepo;
         private readonly BookingService _bookingService;
 
         public MainForm(User user, IUserRepository userRepo, IBookingDetailsRepository bookingRepo,
-            IFlightRepository flightRepo, IPassengerRepository passengerRepo) : this()
+              IPassengerRepository passengerRepo) : this()
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
             if (userRepo == null) throw new ArgumentNullException(nameof(userRepo));
             if (bookingRepo == null) throw new ArgumentNullException(nameof(bookingRepo));
-            if (flightRepo == null) throw new ArgumentNullException(nameof(flightRepo));
             if (passengerRepo == null) throw new ArgumentNullException(nameof(passengerRepo));
 
             {
@@ -34,11 +33,10 @@ namespace FlightBookingSystem
                 _currentUser = user;
                 _userRepo = userRepo;
                 _bookingRepo = bookingRepo;
-                _flightRepo = flightRepo;
                 _passengerRepo = passengerRepo;
                 _unsplashService = new UnsplashService();
                 _userService = new UserService(_userRepo);
-                _bookingService = new BookingService(_bookingRepo, _flightRepo, _passengerRepo);
+                _bookingService = new BookingService(_bookingRepo, _passengerRepo);
 
                 // Wire up navbar events
                 navbarControl.HomeClicked += (s, e) => ShowHomeView();
@@ -105,7 +103,7 @@ namespace FlightBookingSystem
 
         private void ShowBookingView(Flight flight)
         {
-            BookingControl bookingControl = new BookingControl(flight, _currentUser, _passengerRepo, _bookingRepo, _flightRepo);
+            BookingControl bookingControl = new BookingControl(flight, _currentUser, _passengerRepo, _bookingRepo,_userService);
             bookingControl.BackRequested += (s, e) => ShowSearchFlightsView();
             bookingControl.BookingConfirmed += (s, booking) =>
             {
@@ -118,7 +116,7 @@ namespace FlightBookingSystem
 
         private void ShowMyTripsView()
         {
-            MyTripControl myTripsControl = new MyTripControl(_currentUser, _bookingRepo, _passengerRepo, _flightRepo);
+            MyTripControl myTripsControl = new MyTripControl(_currentUser, _bookingRepo, _passengerRepo);
             myTripsControl.NewBookingClicked += (s, e) => ShowSearchFlightsView();
             myTripsControl.BookingManaged += async (s, bookingId) =>
             {

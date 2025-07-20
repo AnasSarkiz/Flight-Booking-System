@@ -59,7 +59,7 @@ namespace FlightBookingSystem.Controls
                 Airline = airline,
                 Origin = origin,
                 Destination = destination,
-                DepartureTime = DateTime.Now.AddHours(depHours),
+                DepartureTime = DateTime.Now.AddHours(depHours+90),
                 ArrivalTime = DateTime.Now.AddHours(arrHours),
                 Duration = TimeSpan.FromHours(arrHours - depHours),
                 Price = price,
@@ -121,6 +121,8 @@ namespace FlightBookingSystem.Controls
                 var origin = searchBoxControl.OriginAirport?.iata;
                 var destination = searchBoxControl.DestinationAirport?.iata;
                 var cabinClass = searchBoxControl.CabinClass;
+                var destinationCity = searchBoxControl.DestinationAirport.city;
+
                 if (string.IsNullOrEmpty(origin) || string.IsNullOrEmpty(destination))
                 {
                     MessageBox.Show("Please select valid airports");
@@ -134,18 +136,21 @@ namespace FlightBookingSystem.Controls
                     cabinClass
                 );
 
-                if (GetCount(flights) == 0)
+                if (flights.Count == 0)
                 {
                     MessageBox.Show("No flights found for your search criteria");
                     filterPanelControl.UpdateFilters(new List<Flight>());
                     return;
                 }
 
+                // Get the city name from the destination airport
+                var cityName = searchBoxControl.DestinationAirport.city;
+
                 foreach (var flight in flights)
                 {
-                    var cityName = flight.Destination.Split('(')[0].Trim();
-                    flight.DestinationImageUrl = await _unsplashService.GetCityImageUrl(cityName);
-                    flight.AirlineLogoUrl = await _unsplashService.GetAirlineLogoUrl(flight.Airline);
+                    // Use the city name for destination image
+                    flight.DestinationImageUrl = await _unsplashService.GetCityImageUrl(destinationCity);
+                    flight.AirlineLogoUrl = $"https://content.airhex.com/content/logos/airlines_{flight.Airline}_80_80_s.png";
                 }
 
                 LoadFlights(flights);
@@ -157,12 +162,10 @@ namespace FlightBookingSystem.Controls
             }
             finally
             {
-                // Hide loading label and show results
                 loadingLabel.Visible = false;
                 flightCardsPanel.Visible = true;
             }
         }
-
         private static int GetCount(List<Flight> flights)
         {
             return flights.Count;

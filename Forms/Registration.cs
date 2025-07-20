@@ -27,7 +27,6 @@ namespace FlightBooker
                 );
                 this.Hide();
                 UserRepository userRepo = new UserRepository();
-                FlightRepository flightRepo = new FlightRepository();
                 BookingDetailsRepository bookingRepo = new BookingDetailsRepository();
                 PassengerRepository passengerRepo = new PassengerRepository();
             
@@ -35,7 +34,6 @@ namespace FlightBooker
                     user,
                     userRepo,
                     bookingRepo,
-                    flightRepo,
                     passengerRepo
                 ).Show();
 

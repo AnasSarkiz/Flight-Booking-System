@@ -14,18 +14,16 @@ namespace FlightBookingSystem.Controls
         private readonly BookingService _bookingService;
         private readonly User _currentUser;
         private readonly IPassengerRepository _passengerRepo;
-        private readonly IFlightRepository _flightRepo;
         private readonly IBookingDetailsRepository _bookingRepo;
 
         public event EventHandler ManageBookingClicked;
 
-        public ManageBooking(User currentUser, IBookingDetailsRepository bookingRepo, IPassengerRepository passengerRepo, IFlightRepository flightRepo)
+        public ManageBooking(User currentUser, IBookingDetailsRepository bookingRepo, IPassengerRepository passengerRepo)
         {
             _currentUser = currentUser;
             _bookingRepo = bookingRepo;
             _passengerRepo = passengerRepo;
-            _flightRepo = flightRepo;
-            _bookingService = new BookingService(bookingRepo, flightRepo, passengerRepo);
+            _bookingService = new BookingService(bookingRepo, passengerRepo);
             InitializeComponent();
             InitializeBookings();
             WireUpEvents();

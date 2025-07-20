@@ -21,10 +21,11 @@ namespace FlightBookingSystem.Models
         public string SeatClass { get; set; }
         public string SeatNumber { get; set; }
         public string PNR { get; set; }
+        public string DestinationImageUrl { get; set; } 
         public decimal TotalPrice { get; set; }
         public DateTime BookingDate { get; set; }
         public User BookedBuy { get; set; }
-        public string Status { get; set; } // e.g., Confirmed, Cancelled, Pending
+        public string Status { get; set; } 
         public string FormattedTotalPrice => $"${TotalPrice:N0}";
     }
 }

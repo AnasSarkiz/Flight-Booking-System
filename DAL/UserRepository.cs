@@ -21,15 +21,15 @@ namespace FlightBookingSystem.DAL
                     FROM Users 
                     WHERE Username = @Username AND DeletedAt IS NULL";
 
-                using (var cmd = new SqlCommand(query, connection))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@Username", username);
 
-                    using (var reader = cmd.ExecuteReader())
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
                         {
-                            var storedHash = reader.GetString(2);
+                            String storedHash = reader.GetString(2);
 
                             // Verify the password
                             if (!PasswordHelper.VerifyPassword(password, storedHash))
@@ -61,6 +61,47 @@ namespace FlightBookingSystem.DAL
             {
                 // Log error
                 throw new Exception("Authentication failed", ex);
+            }
+            finally
+            {
+                CloseConnection();
+            }
+        }
+        public bool UpdateBalance(int userId, decimal amount)
+        {
+            try
+            {
+                OpenConnection();
+                string query = @"UPDATE Users SET 
+                          Balance = Balance + @Amount
+                          WHERE Id = @Id AND DeletedAt IS NULL";
+
+                using (SqlCommand cmd = new SqlCommand(query, connection))
+                {
+                    cmd.Parameters.AddWithValue("@Id", userId);
+                    cmd.Parameters.AddWithValue("@Amount", amount);
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+            finally
+            {
+                CloseConnection();
+            }
+        }
+        public bool IncrementBookingCount(int userId)
+        {
+            try
+            {
+                OpenConnection();
+                string query = @"UPDATE Users SET 
+                          NumberOfBookings = NumberOfBookings + 1
+                          WHERE Id = @Id AND DeletedAt IS NULL";
+
+                using (SqlCommand cmd = new SqlCommand(query, connection))
+                {
+                    cmd.Parameters.AddWithValue("@Id", userId);
+                    return cmd.ExecuteNonQuery() > 0;
+                }
             }
             finally
             {

@@ -61,10 +61,11 @@ namespace FlightBookingSystem.Services
                 throw new Exception("Failed to create user.");
         }
 
-        public void UpdateUser(User user)
+        public bool UpdateUser(User user)
         {
             if (!_userRepo.Update(user))
                 throw new Exception("Failed to update user.");
+            return true;
         }
 
         public void DeleteUser(int userId)
@@ -84,13 +85,42 @@ namespace FlightBookingSystem.Services
 
         public bool UpdateUserBalance(int userId, decimal amount)
         {
+            try
+            {
+                return _userRepo.UpdateBalance(userId, amount);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to update user balance", ex);
+            }
+        }
+
+
+        public bool DecreaseUserBalance(int userId, decimal amount)
+        {
             var user = _userRepo.GetById(userId);
             if (user == null) return false;
 
-            user.Balance += amount;
-            return _userRepo.Update(user);
-        }
+            // Check if user has sufficient balance
+            if (user.Balance < amount)
+            {
+                throw new Exception("Insufficient balance for this transaction");
+            }
 
+            return UpdateUserBalance(userId, -amount);
+        }
+        public bool IncrementUserBookingCount(int userId)
+        {
+            try
+            {
+                return _userRepo.IncrementBookingCount(userId);
+            }
+            catch (Exception ex)
+            {
+                // Log error
+                throw new Exception("Failed to update booking count", ex);
+            }
+        }
         public bool ChangeUserRole(int userId, User.Role newRole)
         {
             var user = _userRepo.GetById(userId);
