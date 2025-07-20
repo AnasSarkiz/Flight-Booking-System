@@ -14,26 +14,43 @@ namespace FlightBookingSystem
         private readonly User _currentUser;
         private readonly IUserRepository _userRepo;
         private readonly UserService _userService;
-        public MainForm(User user, IUserRepository userRepo) : this()
+        private readonly IBookingDetailsRepository _bookingRepo;
+        private readonly IFlightRepository _flightRepo;
+        private readonly IPassengerRepository _passengerRepo;
+        private readonly BookingService _bookingService;
+
+        public MainForm(User user, IUserRepository userRepo, IBookingDetailsRepository bookingRepo,
+            IFlightRepository flightRepo, IPassengerRepository passengerRepo) : this()
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
             if (userRepo == null) throw new ArgumentNullException(nameof(userRepo));
+            if (bookingRepo == null) throw new ArgumentNullException(nameof(bookingRepo));
+            if (flightRepo == null) throw new ArgumentNullException(nameof(flightRepo));
+            if (passengerRepo == null) throw new ArgumentNullException(nameof(passengerRepo));
+
             {
                 navbarControl = new Controls.NavbarControl(user.UserRole);
                 InitializeComponent();
                 _currentUser = user;
                 _userRepo = userRepo;
+                _bookingRepo = bookingRepo;
+                _flightRepo = flightRepo;
+                _passengerRepo = passengerRepo;
                 _unsplashService = new UnsplashService();
                 _userService = new UserService(_userRepo);
+                _bookingService = new BookingService(_bookingRepo, _flightRepo, _passengerRepo);
+
+                // Wire up navbar events
                 navbarControl.HomeClicked += (s, e) => ShowHomeView();
                 navbarControl.SearchFlightsClicked += (s, e) => ShowSearchFlightsView();
-                navbarControl.BookingsClicked += (s, e) => ShowBookingsView();
+                navbarControl.BookingsClicked += (s, e) => ShowMyTripsView();
                 navbarControl.ContactUsClicked += (s, e) => ShowContactUs();
                 navbarControl.AboutUsClicked += (s, e) => ShowAboutUs();
                 navbarControl.LogoutClicked += (s, e) => Logout();
                 navbarControl.UserManagementClicked += (s, e) => ShowUserManagement();
                 navbarControl.UserProfileClicked += (s, e) => ShowUserProfile();
                 navbarControl.ActivityLogClicked += (s, e) => ShowActivityLog();
+
                 ShowHomeView();
             }
         }
@@ -41,9 +58,10 @@ namespace FlightBookingSystem
         private void ShowUserProfile()
         {
             UserProfileControl userProfileControl = new UserProfileControl(_userService, _currentUser);
-            userProfileControl.BackRequested += (s, e) => ShowHomeView(); 
+            userProfileControl.BackRequested += (s, e) => ShowHomeView();
             SwitchView(userProfileControl);
         }
+
         private void ShowUserManagement()
         {
             if (_currentUser.UserRole == User.Role.Admin)
@@ -57,6 +75,7 @@ namespace FlightBookingSystem
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
+
         private void ShowActivityLog()
         {
             var activityLogControl = new ActivityLogControl(_userRepo);
@@ -86,21 +105,45 @@ namespace FlightBookingSystem
 
         private void ShowBookingView(Flight flight)
         {
-            BookingControl bookingControl = new BookingControl(flight, _currentUser);
+            BookingControl bookingControl = new BookingControl(flight, _currentUser, _passengerRepo, _bookingRepo, _flightRepo);
             bookingControl.BackRequested += (s, e) => ShowSearchFlightsView();
             bookingControl.BookingConfirmed += (s, booking) =>
             {
                 MessageBox.Show($"Booking confirmed! Your PNR is: {booking.PNR}", "Success",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
-                ShowBookingsView();
+                ShowMyTripsView();
             };
             SwitchView(bookingControl);
         }
 
-        private void ShowBookingsView()
+        private void ShowMyTripsView()
         {
-            ManageBooking bookingsControl = new ManageBooking();
-            SwitchView(bookingsControl);
+            MyTripControl myTripsControl = new MyTripControl(_currentUser, _bookingRepo, _passengerRepo, _flightRepo);
+            myTripsControl.NewBookingClicked += (s, e) => ShowSearchFlightsView();
+            myTripsControl.BookingManaged += async (s, bookingId) =>
+            {
+                var booking = _bookingService.GetBookingById(bookingId);
+                if (booking != null)
+                {
+                    var dialog = new ManageBookingDialog(booking);
+                    dialog.BookingCancelled += (ds, bid) =>
+                    {
+                        if (_bookingService.CancelBooking(bid))
+                        {
+                            MessageBox.Show("Booking cancelled successfully", "Success",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            myTripsControl.RefreshBookings();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Failed to cancel booking", "Error",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    };
+                    dialog.ShowDialog();
+                }
+            };
+            SwitchView(myTripsControl);
         }
 
         private void ShowContactUs()
@@ -127,7 +170,7 @@ namespace FlightBookingSystem
                 Application.Exit();
             }
         }
-        
+
         private void SwitchView(UserControl newView)
         {
             if (currentView != null)
@@ -141,7 +184,8 @@ namespace FlightBookingSystem
             mainContentPanel.Controls.Add(currentView);
             currentView.BringToFront();
         }
-        protected void Dispose(bool disposing)
+
+        protected override void Dispose(bool disposing)
         {
             if (disposing)
             {

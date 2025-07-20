@@ -5,6 +5,11 @@ using System.Linq;
 using System.Windows.Forms;
 using FlightBookingSystem.Models;
 using Newtonsoft.Json;
+using FlightBookingSystem.DAL;
+using FlightBookingSystem.Services;
+using System.Data;
+using Microsoft.Data.SqlClient;
+
 
 namespace FlightBookingSystem.Controls
 {
@@ -17,14 +22,25 @@ namespace FlightBookingSystem.Controls
         private readonly Flight _selectedFlight;
         private readonly User _currentUser;
         private BookingDetails _bookingDetails;
+        private readonly IPassengerRepository _passengerRepository;
+        private readonly IBookingDetailsRepository _bookingRepository;
+        private readonly IFlightRepository _flightRepository;
+        private readonly BookingService _bookingService;
 
-        public BookingControl(Flight flight, User user)
+        public BookingControl(Flight flight, User user,
+                      IPassengerRepository passengerRepository,
+                      IBookingDetailsRepository bookingRepository,
+                      IFlightRepository flightRepository)
         {
             if (flight == null) throw new ArgumentNullException(nameof(flight));
             if (user == null) throw new ArgumentNullException(nameof(user));
 
             _selectedFlight = flight;
             _currentUser = user;
+            _passengerRepository = passengerRepository;
+            _bookingRepository = bookingRepository;
+            _flightRepository = flightRepository;
+            _bookingService = new BookingService(bookingRepository, flightRepository, passengerRepository);
 
             InitializeComponent();
             InitializeBooking();
@@ -90,7 +106,13 @@ namespace FlightBookingSystem.Controls
         {
             _bookingDetails = new BookingDetails
             {
-                Flight = _selectedFlight,
+                FlightNumber = _selectedFlight.FlightNumber,
+                Airline = _selectedFlight.Airline,
+                Origin = _selectedFlight.Origin,
+                Destination = _selectedFlight.Destination,
+                DepartureTime = _selectedFlight.DepartureTime,
+                ArrivalTime = _selectedFlight.ArrivalTime,
+                OriginalPrice = _selectedFlight.Price,
                 Passenger = new Passenger(),
                 SeatNumber = GenerateRandomSeat(),
                 PNR = GeneratePNR(),
@@ -140,19 +162,40 @@ namespace FlightBookingSystem.Controls
 
             if (_currentUser.Balance < _selectedFlight.Price)
             {
-                MessageBox.Show($"Insufficient balance. Your balance is {_currentUser.Balance:C} but the flight costs {_selectedFlight.Price:C}.",
-                              "Payment Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Insufficient balance", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            var confirmResult = MessageBox.Show($"Confirm booking for {_selectedFlight.Price:C}? This amount will be deducted from your balance.",
-                                             "Confirm Booking",
-                                             MessageBoxButtons.YesNo,
-                                             MessageBoxIcon.Question);
-
-            if (confirmResult == DialogResult.Yes)
+            try
             {
-                BookingConfirmed?.Invoke(this, _bookingDetails);
+                // First ensure passenger has required data
+                if (string.IsNullOrEmpty(_bookingDetails.Passenger.PassportNumber) ||
+                    string.IsNullOrEmpty(_bookingDetails.Passenger.Nationality))
+                {
+                    MessageBox.Show("Please fill all passenger details", "Validation Error",
+                                  MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Process the booking
+                var booking = _bookingService.CreateBooking(
+                    _selectedFlight,
+                    _bookingDetails.Passenger,
+                    _currentUser,
+                    _selectedFlight.SeatClass
+                );
+
+                // Update user balance
+                _currentUser.Balance -= _selectedFlight.Price;
+                // TODO: Save user balance changes
+
+                BookingConfirmed?.Invoke(this, booking);
+                MessageBox.Show($"Booking confirmed! PNR: {booking.PNR}", "Success");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Booking failed: {ex.Message}", "Error",
+                              MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

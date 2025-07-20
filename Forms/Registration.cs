@@ -10,6 +10,7 @@ namespace FlightBooker
     public partial class Registration : Form
     {
         private readonly UserService _userService;
+
         public Registration()
         {
             InitializeComponent();
@@ -25,8 +26,18 @@ namespace FlightBooker
                     passwordTextBox.Text.Trim()
                 );
                 this.Hide();
-                var userRepo = new UserRepository();
-                new MainForm(user,userRepo).Show();
+                UserRepository userRepo = new UserRepository();
+                FlightRepository flightRepo = new FlightRepository();
+                BookingDetailsRepository bookingRepo = new BookingDetailsRepository();
+                PassengerRepository passengerRepo = new PassengerRepository();
+            
+                 new MainForm(
+                    user,
+                    userRepo,
+                    bookingRepo,
+                    flightRepo,
+                    passengerRepo
+                ).Show();
 
             }
             catch (Exception ex)
