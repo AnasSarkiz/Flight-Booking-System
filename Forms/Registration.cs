@@ -2,19 +2,22 @@ using FlightBookingSystem;
 using FlightBookingSystem.DAL;
 using FlightBookingSystem.Services;
 using System;
+using System.Net.Http;
 using System.Windows.Forms;
 using FlightBookingSystem.Models;
-using FlightBookingSystem.Helpers;
+
 namespace FlightBooker
 {
     public partial class Registration : Form
     {
         private readonly UserService _userService;
+        private readonly HttpClient _httpClient;
 
         public Registration()
         {
             InitializeComponent();
             _userService = new UserService(new UserRepository());
+            _httpClient = new HttpClient(); // Initialize HttpClient
         }
 
         private void LoginButton_Click(object sender, EventArgs e)
@@ -26,17 +29,19 @@ namespace FlightBooker
                     passwordTextBox.Text.Trim()
                 );
                 this.Hide();
+
                 UserRepository userRepo = new UserRepository();
                 BookingDetailsRepository bookingRepo = new BookingDetailsRepository();
                 PassengerRepository passengerRepo = new PassengerRepository();
-            
-                 new MainForm(
+                ApiService apiService = new ApiService(_httpClient);
+
+                new MainForm(
                     user,
                     userRepo,
                     bookingRepo,
-                    passengerRepo
+                    passengerRepo,
+                    apiService
                 ).Show();
-
             }
             catch (Exception ex)
             {
@@ -47,6 +52,15 @@ namespace FlightBooker
         private void showPasswordCheck_CheckedChanged(object sender, EventArgs e)
         {
             passwordTextBox.UseSystemPasswordChar = !showPasswordCheck.Checked;
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _httpClient?.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }

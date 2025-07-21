@@ -14,6 +14,7 @@ namespace FlightBookingSystem.Controls
         public event EventHandler UserManagementClicked;
         public event EventHandler ActivityLogClicked;
         public event EventHandler UserProfileClicked;
+        public event EventHandler MessagesClicked;
         private bool _isAdmin;
 
         public NavbarControl(User.Role userRole)
@@ -75,9 +76,11 @@ namespace FlightBookingSystem.Controls
 
                     ToolStripMenuItem activityLogItem = new ToolStripMenuItem("Activity Log");
                     activityLogItem.Click += (s, e) => ActivityLogClicked?.Invoke(this, e);
-
+                    ToolStripMenuItem messagesItem = new ToolStripMenuItem("Messages");
+                    messagesItem.Click += (s, e) => MessagesClicked?.Invoke(this, e);
                     profileMenu.Items.Add(userManagementItem);
                     profileMenu.Items.Add(activityLogItem);
+                    profileMenu.Items.Add(messagesItem);
                     profileMenu.Items.Add(new ToolStripSeparator());
                 }
 

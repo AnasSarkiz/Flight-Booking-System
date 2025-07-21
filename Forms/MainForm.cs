@@ -1,4 +1,6 @@
 ﻿using System.Windows.Forms;
+using System.Windows.Forms.Design;
+using FlightBooker;
 using FlightBookingSystem.Controls;
 using FlightBookingSystem.DAL;
 using FlightBookingSystem.Models;
@@ -15,25 +17,27 @@ namespace FlightBookingSystem
         private readonly IUserRepository _userRepo;
         private readonly UserService _userService;
         private readonly IBookingDetailsRepository _bookingRepo;
-
+        private readonly IApiService _apiService;
         private readonly IPassengerRepository _passengerRepo;
         private readonly BookingService _bookingService;
 
         public MainForm(User user, IUserRepository userRepo, IBookingDetailsRepository bookingRepo,
-              IPassengerRepository passengerRepo) : this()
+              IPassengerRepository passengerRepo, IApiService apiService) : this()
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
             if (userRepo == null) throw new ArgumentNullException(nameof(userRepo));
             if (bookingRepo == null) throw new ArgumentNullException(nameof(bookingRepo));
             if (passengerRepo == null) throw new ArgumentNullException(nameof(passengerRepo));
-
+            if (apiService == null) throw new ArgumentNullException(nameof(apiService));
             {
                 navbarControl = new Controls.NavbarControl(user.UserRole);
+                this.FormClosing += MainForm_FormClosing;
                 InitializeComponent();
                 _currentUser = user;
                 _userRepo = userRepo;
                 _bookingRepo = bookingRepo;
                 _passengerRepo = passengerRepo;
+                _apiService = apiService;
                 _unsplashService = new UnsplashService();
                 _userService = new UserService(_userRepo);
                 _bookingService = new BookingService(_bookingRepo, _passengerRepo);
@@ -48,7 +52,7 @@ namespace FlightBookingSystem
                 navbarControl.UserManagementClicked += (s, e) => ShowUserManagement();
                 navbarControl.UserProfileClicked += (s, e) => ShowUserProfile();
                 navbarControl.ActivityLogClicked += (s, e) => ShowActivityLog();
-
+                navbarControl.MessagesClicked += (s, e) => ShowMessages();
                 ShowHomeView();
             }
         }
@@ -73,7 +77,11 @@ namespace FlightBookingSystem
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
 
+            Application.ExitThread();
+        }
         private void ShowActivityLog()
         {
             var activityLogControl = new ActivityLogControl(_userRepo);
@@ -103,7 +111,7 @@ namespace FlightBookingSystem
 
         private void ShowBookingView(Flight flight)
         {
-            BookingControl bookingControl = new BookingControl(flight, _currentUser, _passengerRepo, _bookingRepo,_userService);
+            BookingControl bookingControl = new BookingControl(flight, _currentUser, _passengerRepo, _bookingRepo, _userService);
             bookingControl.BackRequested += (s, e) => ShowSearchFlightsView();
             bookingControl.BookingConfirmed += (s, booking) =>
             {
@@ -146,16 +154,25 @@ namespace FlightBookingSystem
 
         private void ShowContactUs()
         {
-            ContactUsControl contactUsControl = new ContactUsControl();
+            var httpClient = new HttpClient();
+            var contactService = new ContactService(httpClient);
+
+            ContactUsControl contactUsControl = new ContactUsControl(contactService, _currentUser);
             SwitchView(contactUsControl);
         }
-
         private void ShowAboutUs()
         {
-            AboutUsControl aboutUsControl = new AboutUsControl();
+            AboutUsControl aboutUsControl = new AboutUsControl(_apiService);
             SwitchView(aboutUsControl);
         }
+        private void ShowMessages()
+        {
+            var httpClient = new HttpClient();
+            var contactService = new ContactService(httpClient);
 
+            MessagesControl messagesControl = new MessagesControl(contactService);
+            SwitchView(messagesControl);
+        }
         private void Logout()
         {
             DialogResult result = MessageBox.Show("Are you sure you want to logout?",
@@ -165,7 +182,9 @@ namespace FlightBookingSystem
 
             if (result == DialogResult.Yes)
             {
-                Application.Exit();
+                this.Hide();
+                Registration loginForm = new Registration();
+                loginForm.Show();
             }
         }
 

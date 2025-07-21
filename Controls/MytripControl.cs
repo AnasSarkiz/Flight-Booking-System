@@ -122,6 +122,70 @@ namespace FlightBookingSystem.Controls
             {
                 imagePanel.BackColor = Color.FromArgb(240, 245, 255);
             }
+            var buttonPanel = new Panel
+            {
+                Dock = DockStyle.Right,
+                Width = 200,
+                Padding = new Padding(10)
+            };
+
+            // Manage button
+            var manageButton = new Button
+            {
+                Text = "MANAGE",
+                Size = new Size(180, 36),
+                Location = new Point(10, 20),
+                ForeColor = Color.White,
+                BackColor = Color.FromArgb(0, 115, 207),
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Arial", 9, FontStyle.Bold),
+                Tag = booking.Id
+            };
+            manageButton.FlatAppearance.BorderSize = 0;
+            manageButton.Click += (s, e) => BookingManaged?.Invoke(this, (int)manageButton.Tag);
+
+            // Airline logo (under manage button)
+            var logoPanel = new Panel
+            {
+                Size = new Size(30, 30),
+                Location = new Point(15, 70), // Below manage button
+                BackgroundImageLayout = ImageLayout.Zoom
+            };
+
+            try
+            {
+                var airlineLogoUrl = $"https://content.airhex.com/content/logos/airlines_{booking.Airline}_80_80_s.png";
+                LoadImageAsync(logoPanel, airlineLogoUrl);
+            }
+            catch
+            {
+                logoPanel.BackColor = Color.FromArgb(240, 245, 255);
+            }
+
+            // Price label (to the right of airline logo)
+            var priceLabel = new Label
+            {
+                Text = booking.FormattedTotalPrice,
+                Font = new Font("Segoe UI", 14, FontStyle.Bold),
+                ForeColor = Color.FromArgb(0, 115, 207),
+                Location = new Point(70, 70), // Right of airline logo
+                AutoSize = true
+            };
+
+            var perPersonLabel = new Label
+            {
+                Text = "total price",
+                Font = new Font("Segoe UI", 8),
+                ForeColor = Color.FromArgb(140, 140, 160),
+                Location = new Point(70, 95), // Right of airline logo
+                AutoSize = true
+            };
+
+
+            buttonPanel.Controls.Add(manageButton);
+            buttonPanel.Controls.Add(logoPanel);
+            buttonPanel.Controls.Add(priceLabel);
+            buttonPanel.Controls.Add(perPersonLabel);
 
             var detailsPanel = new Panel
             {
@@ -137,6 +201,9 @@ namespace FlightBookingSystem.Controls
             contentPanel.Controls.Add(imagePanel);
             contentPanel.Controls.Add(detailsPanel);
             card.Controls.Add(contentPanel);
+            contentPanel.Controls.Add(buttonPanel);
+
+
 
             // Add shadow effect
             card.Paint += (sender, e) => {
@@ -194,7 +261,7 @@ namespace FlightBookingSystem.Controls
                 Font = new Font("Segoe UI", 9, FontStyle.Bold),
                 Location = new Point(0, 100),
                 AutoSize = true,
-                ForeColor = booking.Status == "Confirmed" ? Color.Green : Color.OrangeRed
+                ForeColor = booking.Status == "Confirmed" ? Color.DarkBlue : Color.DarkBlue
             };
 
             detailsPanel.Controls.AddRange(new Control[] {
