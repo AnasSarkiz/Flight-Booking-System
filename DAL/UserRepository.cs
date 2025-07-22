@@ -14,11 +14,16 @@ namespace FlightBookingSystem.DAL
             try
             {
                 OpenConnection();
+
+                // First get all the user data we need in one query
                 string query = @"SELECT Id, Username, PasswordHash, Role, Balance, 
-                    FirstName, LastName, DateCreated, LastLogin, IsLocked, 
-                    NumberOfBookings, CreatedByAdminId
-                    FROM Users 
-                    WHERE Username = @Username AND DeletedAt IS NULL";
+                       FirstName, LastName, DateCreated, LastLogin, IsLocked, 
+                       NumberOfBookings, CreatedByAdminId, FailedLoginAttempts, LockoutEnd
+                       FROM Users 
+                       WHERE Username = @Username AND DeletedAt IS NULL";
+
+                User user = null;
+                int currentAttempts = 0;
 
                 using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
@@ -28,18 +33,11 @@ namespace FlightBookingSystem.DAL
                     {
                         if (reader.Read())
                         {
-                            string storedHash = reader.GetString(2);
-
-                            if (!PasswordHelper.VerifyPassword(password, storedHash))
-                            {
-                                return null;
-                            }
-
-                            return new User
+                            user = new User
                             {
                                 Id = reader.GetInt32(0),
                                 Username = reader.GetString(1),
-                                PasswordHash = storedHash,
+                                PasswordHash = reader.GetString(2),
                                 UserRole = (User.Role)reader.GetInt32(3),
                                 Balance = reader.GetDecimal(4),
                                 FirstName = reader.IsDBNull(5) ? null : reader.GetString(5),
@@ -48,12 +46,45 @@ namespace FlightBookingSystem.DAL
                                 LastLogin = reader.IsDBNull(8) ? null : reader.GetDateTime(8),
                                 IsLocked = reader.GetBoolean(9),
                                 NumberOfBookings = reader.GetInt32(10),
-                                CreatedByAdminId = reader.IsDBNull(11) ? null : (int?)reader.GetInt32(11)
+                                CreatedByAdminId = reader.IsDBNull(11) ? null : (int?)reader.GetInt32(11),
+                                FailedLoginAttempts = reader.GetInt32(12),
+                                LockoutEnd = reader.IsDBNull(13) ? null : (DateTime?)reader.GetDateTime(13)
                             };
+                            currentAttempts = reader.GetInt32(12);
                         }
-                    }
+                    } // Reader is properly closed here
                 }
-                return null;
+
+                if (user == null)
+                {
+                    throw new Exception("Username not found.");
+                }
+
+                // Check if account is locked
+                if (user.IsLocked && user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
+                {
+                    throw new Exception($"Account is temporarily locked. Please try again after {user.LockoutEnd.Value.Subtract(DateTime.UtcNow):mm\\:ss} minutes.");
+                }
+
+                // Verify password
+                if (!PasswordHelper.VerifyPassword(password, user.PasswordHash))
+                {
+                    // Increment failed attempts
+                    currentAttempts++;
+                    UpdateFailedAttempts(user.Id, currentAttempts);
+
+                    int attemptsLeft = 4 - currentAttempts;
+                    if (attemptsLeft <= 0)
+                    {
+                        LockAccount(user.Id);
+                        throw new Exception("Too many failed attempts. Account locked for 1 minute.");
+                    }
+                    throw new Exception($"Invalid password. {attemptsLeft} attempts remaining.");
+                }
+
+                // Successful login - reset attempts
+                ResetFailedAttempts(user.Id);
+                return user;
             }
             finally
             {
@@ -61,6 +92,75 @@ namespace FlightBookingSystem.DAL
             }
         }
 
+        private void UpdateFailedAttempts(int userId, int attempts)
+        {
+            try
+            {
+                OpenConnection();
+                string query = @"UPDATE Users SET 
+                      FailedLoginAttempts = @Attempts
+                      WHERE Id = @Id";
+
+                using (SqlCommand cmd = new SqlCommand(query, connection))
+                {
+                    cmd.Parameters.AddWithValue("@Id", userId);
+                    cmd.Parameters.AddWithValue("@Attempts", attempts);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            finally
+            {
+                CloseConnection();
+            }
+        }
+
+        private void LockAccount(int userId)
+        {
+            try
+            {
+                OpenConnection();
+                string query = @"UPDATE Users SET 
+                      IsLocked = 1,
+                      LockoutEnd = DATEADD(minute, 1, GETUTCDATE())
+                      WHERE Id = @Id";
+
+                using (SqlCommand cmd = new SqlCommand(query, connection))
+                {
+                    cmd.Parameters.AddWithValue("@Id", userId);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            finally
+            {
+                CloseConnection();
+            }
+        }
+     
+
+        private void ResetFailedAttempts(int userId)
+        {
+            try
+            {
+                OpenConnection();
+                string query = @"UPDATE Users SET 
+                      FailedLoginAttempts = 0,
+                      IsLocked = 0,
+                      LockoutEnd = NULL
+                      WHERE Id = @Id AND DeletedAt IS NULL";
+
+                using (SqlCommand cmd = new SqlCommand(query, connection))
+                {
+                    cmd.Parameters.AddWithValue("@Id", userId);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            finally
+            {
+                CloseConnection();
+            }
+        }
+
+     
         public bool UpdateBalance(int userId, decimal amount)
         {
             try

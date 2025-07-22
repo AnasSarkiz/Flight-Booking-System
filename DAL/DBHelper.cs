@@ -6,7 +6,7 @@ namespace FlightBookingSystem.DAL
 {
     public class DbHelper : IDisposable
     {
-        protected string connectionString = "Server=Anas_Dell;Database=Re7la;Trusted_Connection=True;TrustServerCertificate=true;";
+        protected string connectionString = "Server=Anas_Dell;Database=Re7la;Trusted_Connection=True;TrustServerCertificate=true;MultipleActiveResultSets=True;";
         protected SqlConnection connection;
 
         public DbHelper()

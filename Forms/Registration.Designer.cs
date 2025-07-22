@@ -107,12 +107,12 @@ namespace FlightBooker
             // 
             titleLabel.AutoSize = true;
             titleLabel.Font = new Font("Segoe UI", 24F, FontStyle.Bold);
-            titleLabel.ForeColor = Color.FromArgb(8, 18, 44);
+            titleLabel.ForeColor = Color.MidnightBlue;
             titleLabel.Location = new Point(256, 40);
             titleLabel.Name = "titleLabel";
-            titleLabel.Size = new Size(248, 45);
+            titleLabel.Size = new Size(246, 45);
             titleLabel.TabIndex = 8;
-            titleLabel.Text = "Welcome Back!";
+            titleLabel.Text = "It's Re7la Time!";
             // 
             // panel1
             // 

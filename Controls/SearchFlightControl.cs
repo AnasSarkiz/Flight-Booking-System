@@ -38,18 +38,43 @@ namespace FlightBookingSystem.Controls
         private async Task InitializeTestFlightsAsync()
         {
             List<Flight> testFlights = new List<Flight>
-            {
-                await CreateTestFlight(1, "AA123", "AA", "New York (JFK)", "London (LHR)", 2, 8, 499.99m),
-                await CreateTestFlight(2, "DL456", "DL", "Atlanta (ATL)", "Paris (CDG)", 4, 11, 599.99m),
-                await CreateTestFlight(3, "UA789", "UA", "Chicago (ORD)", "Tokyo (NRT)", 6, 18, 1299.99m),
-                await CreateTestFlight(4, "BA321", "BA", "London (LHR)", "New York (JFK)", 8, 14, 549.99m)
-            };
+    {
+        // North America
+        await CreateTestFlight(1, "AA123", "AA", "New York (JFK)", "London (LHR)", 2, 8, 499.99m),
+        await CreateTestFlight(2, "DL456", "DL", "Atlanta (ATL)", "Paris (CDG)", 4, 11, 599.99m),
+        await CreateTestFlight(3, "UA789", "UA", "Chicago (ORD)", "Tokyo (NRT)", 6, 18, 1299.99m),
+        await CreateTestFlight(4, "BA321", "BA", "London (LHR)", "New York (JFK)", 8, 14, 549.99m),
+        
+        // Europe
+        await CreateTestFlight(5, "LH411", "LH", "Frankfurt (FRA)", "Singapore (SIN)", 3, 16, 899.99m),
+        await CreateTestFlight(6, "AF268", "AF", "Paris (CDG)", "New York (JFK)", 4, 10, 659.99m),
+        await CreateTestFlight(7, "KL602", "KL", "Amsterdam (AMS)", "Dubai (DXB)", 5, 12, 749.99m),
+        await CreateTestFlight(8, "AY102", "AY", "Helsinki (HEL)", "Bangkok (BKK)", 6, 15, 799.99m),
+        
+        // Asia
+        await CreateTestFlight(9, "SQ321", "SQ", "Singapore (SIN)", "London (LHR)", 7, 19, 1099.99m),
+        await CreateTestFlight(10, "CX888", "CX", "Hong Kong (HKG)", "Vancouver (YVR)", 8, 16, 1199.99m),
+        await CreateTestFlight(11, "JL45", "JL", "Tokyo (NRT)", "Sydney (SYD)", 9, 14, 999.99m),
+        await CreateTestFlight(12, "EK412", "EK", "Dubai (DXB)", "New York (JFK)", 10, 20, 1399.99m),
+        
+        // Domestic (US)
+        await CreateTestFlight(13, "WN234", "WN", "Las Vegas (LAS)", "Denver (DEN)", 1, 3, 199.99m),
+        await CreateTestFlight(14, "B6123", "B6", "Boston (BOS)", "Los Angeles (LAX)", 2, 8, 349.99m),
+        await CreateTestFlight(15, "AS789", "AS", "Seattle (SEA)", "Honolulu (HNL)", 3, 9, 499.99m),
+        
+        // Business/First Class Examples
+        await CreateTestFlight(16, "QF12", "QF", "Los Angeles (LAX)", "Sydney (SYD)", 4, 18, 2999.99m),
+        await CreateTestFlight(17, "EY101", "EY", "Abu Dhabi (AUH)", "New York (JFK)", 5, 16, 3499.99m),
+        
+        // Budget Airlines
+        await CreateTestFlight(18, "FR123", "FR", "London (STN)", "Barcelona (BCN)", 1, 4, 59.99m),
+         await CreateTestFlight(19, "DY701", "DY", "Oslo (OSL)", "New York (JFK)", 2, 10, 299.99m)
+           };
 
             LoadFlights(testFlights);
         }
-
         private async Task<Flight> CreateTestFlight(int id, string number, string airline,
-     string origin, string destination, int depHours, int arrHours, decimal price)
+       string origin, string destination, int depHours, int arrHours, decimal price)
         {
             string cityName = destination.Split('(')[0].Trim();
             return new Flight
@@ -59,13 +84,14 @@ namespace FlightBookingSystem.Controls
                 Airline = airline,
                 Origin = origin,
                 Destination = destination,
-                DepartureTime = DateTime.Now.AddHours(depHours+90),
-                ArrivalTime = DateTime.Now.AddHours(arrHours),
+                DepartureTime = DateTime.Now.AddHours(depHours + 90),
+                ArrivalTime = DateTime.Now.AddHours(arrHours+ 101),
                 Duration = TimeSpan.FromHours(arrHours - depHours),
                 Price = price,
                 DestinationImageUrl = await _unsplashService.GetCityImageUrl(cityName),
                 AirlineLogoUrl = $"https://content.airhex.com/content/logos/airlines_{airline}_80_80_s.png",
-                Stops = id % 3
+                Stops = id % 3,
+                SeatClass = "Economy" // Add this line to include seat class
             };
         }
 

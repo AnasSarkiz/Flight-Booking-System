@@ -38,7 +38,7 @@
 
             // Header Panel
             this.headerPanel.Dock = System.Windows.Forms.DockStyle.Top;
-            this.headerPanel.Size = new System.Drawing.Size(1200, 100);
+            this.headerPanel.Size = new System.Drawing.Size(1200, 80);
             this.headerPanel.BackColor = System.Drawing.Color.FromArgb(8, 18, 44);
 
             // Destinations Title
@@ -144,6 +144,7 @@
             this.Controls.Add(this.headerPanel);
 
             this.Size = new System.Drawing.Size(1200, 1000);
+            this.AutoScroll = true;
             this.ResumeLayout(false);
             this.PerformLayout();
         }

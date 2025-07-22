@@ -18,6 +18,7 @@ namespace FlightBooker
             InitializeComponent();
             _userService = new UserService(new UserRepository());
             _httpClient = new HttpClient();
+            passwordTextBox.KeyDown += PasswordTextBox_KeyDown;
         }
 
         private void LoginButton_Click(object sender, EventArgs e)
@@ -28,6 +29,7 @@ namespace FlightBooker
                     usernameTextBox.Text.Trim(),
                     passwordTextBox.Text.Trim()
                 );
+
                 this.Hide();
 
                 UserRepository userRepo = new UserRepository();
@@ -46,6 +48,18 @@ namespace FlightBooker
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Login Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                passwordTextBox.Text = "";
+                passwordTextBox.Focus();
+            }
+        }
+
+        private void PasswordTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                e.SuppressKeyPress = true;
+                LoginButton_Click(sender, e);
             }
         }
 
@@ -54,12 +68,17 @@ namespace FlightBooker
             passwordTextBox.UseSystemPasswordChar = !showPasswordCheck.Checked;
         }
 
-        protected void Dispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
+                if (passwordTextBox != null)
+                {
+                    passwordTextBox.KeyDown -= PasswordTextBox_KeyDown;
+                }
                 _httpClient?.Dispose();
-            }
+          }
+            
             base.Dispose(disposing);
         }
     }

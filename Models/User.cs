@@ -20,5 +20,7 @@
         public DateTime? DeletedAt { get; set; }
         public int NumberOfBookings { get; set; } = 0;
         public int? CreatedByAdminId { get; set; }
+        public int FailedLoginAttempts { get; set; } = 0;
+        public DateTime? LockoutEnd { get; set; }
     }
 }
