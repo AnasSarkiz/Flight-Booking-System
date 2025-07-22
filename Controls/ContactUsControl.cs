@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Net.Mail;
 using System.Windows.Forms;
 using FlightBookingSystem.Models;
 using FlightBookingSystem.Services;
@@ -17,7 +18,6 @@ namespace FlightBookingSystem.Controls
             _contactService = contactService;
             _currentUser = currentUser;
 
-            // Auto-fill for logged in users
             if (_currentUser != null)
             {
                 nameTextBox.Text = $"{_currentUser.FirstName} {_currentUser.LastName}";
@@ -77,7 +77,7 @@ namespace FlightBookingSystem.Controls
         {
             try
             {
-                var addr = new System.Net.Mail.MailAddress(email);
+                MailAddress addr = new System.Net.Mail.MailAddress(email);
                 return addr.Address == email;
             }
             catch

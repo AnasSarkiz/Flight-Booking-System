@@ -13,8 +13,8 @@ namespace FlightBookingSystem.Controls
 
         private readonly UserService _userService;
         private User _currentUser;
-        private Button btnEditProfile; // Add this declaration
-        private Button btnTopUp; // Add this declaration
+        private Button btnEditProfile;
+        private Button btnTopUp;
 
         public UserProfileControl(UserService userService, User currentUser)
         {
@@ -22,7 +22,6 @@ namespace FlightBookingSystem.Controls
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _currentUser = currentUser ?? throw new ArgumentNullException(nameof(currentUser));
 
-            // Initialize buttons
             btnEditProfile = new Button
             {
                 Text = "Edit Profile",
@@ -47,7 +46,7 @@ namespace FlightBookingSystem.Controls
         private void BtnTopUp_Click(object sender, EventArgs e)
         {
             var topUpControl = new TopUpControl(_currentUser.Balance);
-            var form = new Form
+            Form form = new Form
             {
                 Text = "Top Up Balance",
                 Size = new Size(350, 250),
@@ -116,7 +115,6 @@ namespace FlightBookingSystem.Controls
                 lblTotalBookings.Text = $"{_currentUser.NumberOfBookings}";
                 lblBalance.Text = $"{_currentUser.Balance:C}";
 
-                // Set user role
                 lblRole.Text = _currentUser.UserRole == User.Role.Admin ? "Administrator" : "Standard User";
             }
             catch (Exception ex)

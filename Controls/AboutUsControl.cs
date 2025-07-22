@@ -23,7 +23,7 @@ namespace FlightBookingSystem.Controls
         {
             try
             {
-                var aboutData = await _apiService.GetAboutUsDataAsync();
+                AboutUsResponse aboutData = await _apiService.GetAboutUsDataAsync();
 
                 if (aboutData?.Success == true)
                 {

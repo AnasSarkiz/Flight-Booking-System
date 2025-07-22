@@ -1,5 +1,4 @@
-﻿// PassengerRepository.cs
-using FlightBookingSystem.Models;
+﻿using FlightBookingSystem.Models;
 using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
@@ -20,7 +19,7 @@ namespace FlightBookingSystem.DAL
                                 (@FirstName, @LastName, @PassportNumber, @Nationality, @Email, @Phone, @DateOfBirth);
                                 SELECT SCOPE_IDENTITY();";
 
-                using (var cmd = new SqlCommand(query, connection))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@FirstName", passenger.FirstName);
                     cmd.Parameters.AddWithValue("@LastName", passenger.LastName);
@@ -44,7 +43,7 @@ namespace FlightBookingSystem.DAL
                 OpenConnection();
                 string query = @"UPDATE Passengers SET DeletedAt = GETUTCDATE() 
                                WHERE Id = @Id";
-                using (var cmd = new SqlCommand(query, connection))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@Id", id);
                     return cmd.ExecuteNonQuery() > 0;
@@ -55,13 +54,13 @@ namespace FlightBookingSystem.DAL
 
         public IEnumerable<Passenger> GetAll()
         {
-            var passengers = new List<Passenger>();
+            List<Passenger> passengers = new List<Passenger>();
             try
             {
                 OpenConnection();
                 string query = @"SELECT * FROM Passengers WHERE DeletedAt IS NULL";
-                using (var cmd = new SqlCommand(query, connection))
-                using (var reader = cmd.ExecuteReader())
+                using (SqlCommand cmd = new SqlCommand(query, connection))
+                using (SqlDataReader reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
                     {
@@ -80,10 +79,10 @@ namespace FlightBookingSystem.DAL
                 OpenConnection();
                 string query = @"SELECT * FROM Passengers 
                                WHERE Id = @Id AND DeletedAt IS NULL";
-                using (var cmd = new SqlCommand(query, connection))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@Id", id);
-                    using (var reader = cmd.ExecuteReader())
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
                         {
@@ -98,17 +97,17 @@ namespace FlightBookingSystem.DAL
 
         public IEnumerable<Passenger> GetPassengersByBooking(int bookingId)
         {
-            var passengers = new List<Passenger>();
+            List<Passenger> passengers = new List<Passenger>();
             try
             {
                 OpenConnection();
                 string query = @"SELECT p.* FROM Passengers p
                                JOIN BookingDetails bd ON p.Id = bd.PassengerId
                                WHERE bd.Id = @BookingId AND p.DeletedAt IS NULL";
-                using (var cmd = new SqlCommand(query, connection))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@BookingId", bookingId);
-                    using (var reader = cmd.ExecuteReader())
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
@@ -136,7 +135,7 @@ namespace FlightBookingSystem.DAL
                                DateOfBirth = @DateOfBirth
                                WHERE Id = @Id AND DeletedAt IS NULL";
 
-                using (var cmd = new SqlCommand(query, connection))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@Id", passenger.Id);
                     cmd.Parameters.AddWithValue("@FirstName", passenger.FirstName);

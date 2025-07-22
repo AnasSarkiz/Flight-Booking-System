@@ -2,6 +2,7 @@
 using FlightBookingSystem.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FlightBookingSystem.Services
 {
@@ -29,15 +30,11 @@ namespace FlightBookingSystem.Services
                 throw new ArgumentException("Passenger name is required");
             if (user.Id <= 0)
                 throw new ArgumentException("Invalid user");
-            if (passenger.Id == 0)
-            {
-                if (!_passengerRepository.Add(passenger))
-                    throw new Exception("Failed to save passenger information");
-            }
+            if (passenger.Id == 0 && !_passengerRepository.Add(passenger))
+                throw new Exception("Failed to save passenger information");
 
-            BookingDetails booking = new()
+            BookingDetails booking = new BookingDetails
             {
-
                 FlightNumber = apiFlight.FlightNumber,
                 Airline = apiFlight.Airline,
                 Origin = apiFlight.Origin,
@@ -61,6 +58,7 @@ namespace FlightBookingSystem.Services
 
             return booking;
         }
+
         public bool CancelBooking(int bookingId)
         {
             BookingDetails booking = _bookingRepository.GetById(bookingId);
@@ -83,20 +81,6 @@ namespace FlightBookingSystem.Services
             return _bookingRepository.GetByUserId(userId);
         }
 
-        private string GeneratePNR()
-        {
-            Random random = new();
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            return new string(Enumerable.Repeat(chars, 6).Select(s => s[random.Next(s.Length)]).ToArray());
-        }
-
-        private string GenerateRandomSeat()
-        {
-            Random random = new Random();
-            int row = random.Next(1, 30);
-            char seat = (char)('A' + random.Next(0, 6));
-            return $"{row}{seat}";
-        }
         public BookingDetails GetBookingById(int bookingId)
         {
             if (bookingId <= 0)
@@ -108,6 +92,21 @@ namespace FlightBookingSystem.Services
                 throw new KeyNotFoundException($"Booking with ID {bookingId} not found");
 
             return booking;
+        }
+
+        private string GeneratePNR()
+        {
+            Random random = new Random();
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            return new string(Enumerable.Repeat(chars, 6).Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+        private string GenerateRandomSeat()
+        {
+            Random random = new Random();
+            int row = random.Next(1, 30);
+            char seat = (char)('A' + random.Next(0, 6));
+            return $"{row}{seat}";
         }
     }
 }

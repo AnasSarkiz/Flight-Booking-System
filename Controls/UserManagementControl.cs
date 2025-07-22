@@ -115,7 +115,7 @@ namespace FlightBookingSystem.Controls
         private void addButton_Click(object sender, EventArgs e)
         {
             var addUserControl = new AddUserControl();
-            var form = new Form
+            Form form = new Form
             {
                 Text = "Add New User",
                 Size = new System.Drawing.Size(450, 450),
@@ -162,7 +162,7 @@ namespace FlightBookingSystem.Controls
         {
             if (usersGrid.SelectedRows.Count == 0) return;
 
-            var selectedId = (int)usersGrid.SelectedRows[0].Cells["ID"].Value;
+            int selectedId = (int)usersGrid.SelectedRows[0].Cells["ID"].Value;
             if (selectedId == _currentUser.Id)
             {
                 MessageBox.Show("You cannot edit your own account here.", "Warning",
@@ -170,11 +170,11 @@ namespace FlightBookingSystem.Controls
                 return;
             }
 
-            var userToEdit = _userService.GetUserById(selectedId);
+            User userToEdit = _userService.GetUserById(selectedId);
             if (userToEdit == null) return;
 
-            var editControl = new EditUserControl(userToEdit);
-            var form = new Form
+            EditUserControl editControl = new EditUserControl(userToEdit);
+            Form form = new Form
             {
                 Text = "Edit User",
                 Size = new System.Drawing.Size(450, 450),
@@ -221,8 +221,8 @@ namespace FlightBookingSystem.Controls
         {
             if (usersGrid.SelectedRows.Count == 0) return;
 
-            var selectedId = (int)usersGrid.SelectedRows[0].Cells["ID"].Value;
-            var username = usersGrid.SelectedRows[0].Cells["Username"].Value.ToString();
+            int selectedId = (int)usersGrid.SelectedRows[0].Cells["ID"].Value;
+            string username = usersGrid.SelectedRows[0].Cells["Username"].Value.ToString();
 
             var result = MessageBox.Show($"Are you sure you want to delete user {username}?",
                 "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
@@ -269,11 +269,11 @@ namespace FlightBookingSystem.Controls
         {
             if (usersGrid.SelectedRows.Count == 0) return;
 
-            var selectedId = (int)usersGrid.SelectedRows[0].Cells["ID"].Value;
-            var currentBalance = (decimal)usersGrid.SelectedRows[0].Cells["Balance"].Value;
+            int selectedId = (int)usersGrid.SelectedRows[0].Cells["ID"].Value;
+            decimal currentBalance = (decimal)usersGrid.SelectedRows[0].Cells["Balance"].Value;
 
-            var topUpControl = new TopUpControl(currentBalance);
-            var form = new Form
+            TopUpControl topUpControl = new TopUpControl(currentBalance);
+            Form form = new Form
             {
                 Text = "Top Up Balance",
                 Size = new System.Drawing.Size(350, 250),
@@ -290,15 +290,12 @@ namespace FlightBookingSystem.Controls
             {
                 try
                 {
-                    // Update the balance
                     bool success = _userService.UpdateUserBalance(selectedId, amount);
 
                     if (success)
                     {
-                        // Refresh the user data
-                        var updatedUser = _userService.GetUserById(selectedId);
+                        User updatedUser = _userService.GetUserById(selectedId);
 
-                        // Update current user if it's the same user
                         if (_currentUser.Id == selectedId)
                         {
                             _currentUser.Balance = updatedUser.Balance;

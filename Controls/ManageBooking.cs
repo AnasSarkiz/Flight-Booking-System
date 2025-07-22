@@ -29,18 +29,17 @@ namespace FlightBookingSystem.Controls
             WireUpEvents();
         }
 
-        // Add new method to load bookings
         private void InitializeBookings()
         {
             try
             {
                 bookingsPanel.Controls.Clear();
 
-                var userBookings = _bookingService.GetUserBookings(_currentUser.Id);
+                IEnumerable<BookingDetails> userBookings = _bookingService.GetUserBookings(_currentUser.Id);
 
                 if (!userBookings.Any())
                 {
-                    var noBookingsLabel = new Label
+                    Label noBookingsLabel = new Label
                     {
                         Text = "You don't have any bookings yet.",
                         Font = new Font("Segoe UI", 12),
@@ -50,7 +49,7 @@ namespace FlightBookingSystem.Controls
                     return;
                 }
 
-                foreach (var booking in userBookings)
+                foreach (BookingDetails booking in userBookings)
                 {
                     var bookingCard = CreateBookingCard(booking);
                     bookingsPanel.Controls.Add(bookingCard);
@@ -62,10 +61,9 @@ namespace FlightBookingSystem.Controls
             }
         }
 
-        // Add method to create booking cards
         private Control CreateBookingCard(BookingDetails booking)
         {
-            var card = new Panel
+            Panel card = new Panel
             {
                 Width = bookingsPanel.Width - 40,
                 Height = 120,
@@ -74,8 +72,7 @@ namespace FlightBookingSystem.Controls
                 BorderStyle = BorderStyle.FixedSingle
             };
 
-            // Add booking details to the card
-            var flightInfo = new Label
+            Label flightInfo = new Label
             {
                 Text = $"{booking.Airline} {booking.FlightNumber}",
                 Location = new Point(20, 20),
@@ -84,7 +81,7 @@ namespace FlightBookingSystem.Controls
             };
             card.Controls.Add(flightInfo);
 
-            var routeInfo = new Label
+            Label routeInfo = new Label
             {
                 Text = $"{booking.Origin} → {booking.Destination}",
                 Location = new Point(20, 50),
@@ -92,7 +89,7 @@ namespace FlightBookingSystem.Controls
             };
             card.Controls.Add(routeInfo);
 
-            var dateInfo = new Label
+            Label dateInfo = new Label
             {
                 Text = booking.DepartureTime.ToString("ddd, MMM dd yyyy"),
                 Location = new Point(20, 80),
@@ -100,7 +97,7 @@ namespace FlightBookingSystem.Controls
             };
             card.Controls.Add(dateInfo);
 
-            var cancelButton = new Button
+            Button cancelButton = new Button
             {
                 Text = "Cancel",
                 Location = new Point(card.Width - 120, 40),
@@ -113,7 +110,6 @@ namespace FlightBookingSystem.Controls
             return card;
         }
 
-        // Add method to handle booking cancellation
         private void CancelBooking(int bookingId)
         {
             try
@@ -128,7 +124,7 @@ namespace FlightBookingSystem.Controls
                     if (_bookingService.CancelBooking(bookingId))
                     {
                         MessageBox.Show("Booking cancelled successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        InitializeBookings(); // Refresh the list
+                        InitializeBookings(); 
                     }
                     else
                     {
@@ -142,7 +138,6 @@ namespace FlightBookingSystem.Controls
             }
         }
 
-        // Update the WireUpEvents method
         private void WireUpEvents()
         {
             newBookingButton.Click += (s, e) => ManageBookingClicked?.Invoke(this, EventArgs.Empty);

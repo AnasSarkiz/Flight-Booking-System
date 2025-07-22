@@ -27,7 +27,7 @@ namespace FlightBookingSystem.DAL
                     );
                     SELECT SCOPE_IDENTITY();";
 
-                using (var cmd = new SqlCommand(query, connection))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@FlightNumber", booking.FlightNumber);
                     cmd.Parameters.AddWithValue("@Airline", booking.Airline);
@@ -45,34 +45,19 @@ namespace FlightBookingSystem.DAL
                     cmd.Parameters.AddWithValue("@BookedByUserId", booking.BookedBuy.Id);
                     cmd.Parameters.AddWithValue("@Status", booking.Status ?? "Confirmed");
                     cmd.Parameters.AddWithValue("@BookingDate", booking.BookingDate);
-                    try
+
+                    object result = cmd.ExecuteScalar();
+                    if (result != null && result != DBNull.Value)
                     {
-                        var result = cmd.ExecuteScalar();
-                        if (result != null && result != DBNull.Value)
-                        {
-                            booking.Id = Convert.ToInt32(result);
-                            return booking.Id > 0;
-                        }
-                        return false;
+                        booking.Id = Convert.ToInt32(result);
+                        return booking.Id > 0;
                     }
-                    catch (SqlException sqlEx)
-                    {
-                        // Log detailed SQL error
-                        Console.WriteLine($"SQL Error: {sqlEx.Message}");
-                        Console.WriteLine($"Procedure: {sqlEx.Procedure}");
-                        Console.WriteLine($"Line Number: {sqlEx.LineNumber}");
-                        throw;
-                    }
+                    return false;
                 }
-            }
-            catch (Exception ex)
-            {
-                // Log general error
-                Console.WriteLine($"Error in Add booking: {ex.Message}");
-                throw;
             }
             finally { CloseConnection(); }
         }
+
         public bool CancelBooking(int bookingId)
         {
             try
@@ -81,7 +66,7 @@ namespace FlightBookingSystem.DAL
                 string query = @"UPDATE BookingDetails 
                                SET Status = 'Cancelled', DeletedAt = GETUTCDATE()
                                WHERE Id = @Id";
-                using (var cmd = new SqlCommand(query, connection))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@Id", bookingId);
                     return cmd.ExecuteNonQuery() > 0;
@@ -97,7 +82,7 @@ namespace FlightBookingSystem.DAL
                 OpenConnection();
                 string query = @"UPDATE BookingDetails SET DeletedAt = GETUTCDATE() 
                                WHERE Id = @Id";
-                using (var cmd = new SqlCommand(query, connection))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@Id", id);
                     return cmd.ExecuteNonQuery() > 0;
@@ -108,7 +93,7 @@ namespace FlightBookingSystem.DAL
 
         public IEnumerable<BookingDetails> GetAll()
         {
-            var bookings = new List<BookingDetails>();
+            List<BookingDetails> bookings = new List<BookingDetails>();
             try
             {
                 OpenConnection();
@@ -146,8 +131,8 @@ namespace FlightBookingSystem.DAL
                 JOIN Users u ON bd.BookedByUserId = u.Id
                 WHERE bd.DeletedAt IS NULL";
 
-                using (var cmd = new SqlCommand(query, connection))
-                using (var reader = cmd.ExecuteReader())
+                using (SqlCommand cmd = new SqlCommand(query, connection))
+                using (SqlDataReader reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
                     {
@@ -198,10 +183,10 @@ namespace FlightBookingSystem.DAL
                 JOIN Users u ON bd.BookedByUserId = u.Id
                 WHERE bd.Id = @Id AND bd.DeletedAt IS NULL";
 
-                using (var cmd = new SqlCommand(query, connection))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@Id", id);
-                    using (var reader = cmd.ExecuteReader())
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
                         {
@@ -253,10 +238,10 @@ namespace FlightBookingSystem.DAL
                 JOIN Users u ON bd.BookedByUserId = u.Id
                 WHERE bd.PNR = @PNR AND bd.DeletedAt IS NULL";
 
-                using (var cmd = new SqlCommand(query, connection))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@PNR", pnr);
-                    using (var reader = cmd.ExecuteReader())
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
                         {
@@ -271,7 +256,7 @@ namespace FlightBookingSystem.DAL
 
         public IEnumerable<BookingDetails> GetByUserId(int userId)
         {
-            var bookings = new List<BookingDetails>();
+            List<BookingDetails> bookings = new List<BookingDetails>();
             try
             {
                 OpenConnection();
@@ -310,10 +295,10 @@ namespace FlightBookingSystem.DAL
                 WHERE bd.BookedByUserId = @UserId AND bd.DeletedAt IS NULL
                 ORDER BY bd.BookingDate DESC";
 
-                using (var cmd = new SqlCommand(query, connection))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@UserId", userId);
-                    using (var reader = cmd.ExecuteReader())
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
@@ -349,9 +334,8 @@ namespace FlightBookingSystem.DAL
                     Status = @Status
                 WHERE Id = @Id AND DeletedAt IS NULL";
 
-                using (var cmd = new SqlCommand(query, connection))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
-                    // Flight data
                     cmd.Parameters.AddWithValue("@FlightNumber", booking.FlightNumber);
                     cmd.Parameters.AddWithValue("@Airline", booking.Airline);
                     cmd.Parameters.AddWithValue("@Origin", booking.Origin);
@@ -359,11 +343,7 @@ namespace FlightBookingSystem.DAL
                     cmd.Parameters.AddWithValue("@DepartureTime", booking.DepartureTime);
                     cmd.Parameters.AddWithValue("@ArrivalTime", booking.ArrivalTime);
                     cmd.Parameters.AddWithValue("@OriginalPrice", booking.OriginalPrice);
-
-                    // Passenger and user
                     cmd.Parameters.AddWithValue("@PassengerId", booking.Passenger.Id);
-
-                    // Booking details
                     cmd.Parameters.AddWithValue("@SeatClass", booking.SeatClass);
                     cmd.Parameters.AddWithValue("@SeatNumber", booking.SeatNumber);
                     cmd.Parameters.AddWithValue("@PNR", booking.PNR);

@@ -9,7 +9,6 @@ namespace FlightBookingSystem.DAL
 {
     public class UserRepository : DbHelper, IUserRepository
     {
-        // Authenticate user (existing)
         public User Authenticate(string username, string password)
         {
             try
@@ -29,9 +28,8 @@ namespace FlightBookingSystem.DAL
                     {
                         if (reader.Read())
                         {
-                            String storedHash = reader.GetString(2);
+                            string storedHash = reader.GetString(2);
 
-                            // Verify the password
                             if (!PasswordHelper.VerifyPassword(password, storedHash))
                             {
                                 return null;
@@ -57,16 +55,12 @@ namespace FlightBookingSystem.DAL
                 }
                 return null;
             }
-            catch (Exception ex)
-            {
-                // Log error
-                throw new Exception("Authentication failed", ex);
-            }
             finally
             {
                 CloseConnection();
             }
         }
+
         public bool UpdateBalance(int userId, decimal amount)
         {
             try
@@ -88,6 +82,7 @@ namespace FlightBookingSystem.DAL
                 CloseConnection();
             }
         }
+
         public bool IncrementBookingCount(int userId)
         {
             try
@@ -108,6 +103,7 @@ namespace FlightBookingSystem.DAL
                 CloseConnection();
             }
         }
+
         public IEnumerable<User> GetAll()
         {
             List<User> users = new List<User>();
@@ -118,8 +114,8 @@ namespace FlightBookingSystem.DAL
                         Balance, DateCreated, LastLogin, IsLocked, NumberOfBookings
                         FROM Users WHERE DeletedAt IS NULL";
 
-                using (var cmd = new SqlCommand(query, connection))
-                using (var reader = cmd.ExecuteReader())
+                using (SqlCommand cmd = new SqlCommand(query, connection))
+                using (SqlDataReader reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
                     {
@@ -146,7 +142,6 @@ namespace FlightBookingSystem.DAL
             return users;
         }
 
-        // Get user by ID
         public User GetById(int id)
         {
             try
@@ -156,10 +151,10 @@ namespace FlightBookingSystem.DAL
                                DateCreated, LastLogin, IsLocked, NumberOfBookings 
                                FROM Users WHERE Id = @Id AND DeletedAt IS NULL";
 
-                using (var cmd = new SqlCommand(query, connection))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@Id", id);
-                    using (var reader = cmd.ExecuteReader())
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
                         {
@@ -184,7 +179,6 @@ namespace FlightBookingSystem.DAL
             finally { CloseConnection(); }
         }
 
-        // Add a new user (for admins)
         public bool Add(User user, int adminId)
         {
             try
@@ -195,7 +189,7 @@ namespace FlightBookingSystem.DAL
                        VALUES 
                        (@Username, @PasswordHash, @Role, @FirstName, @LastName, @AdminId)";
 
-                using (var cmd = new SqlCommand(query, connection))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@Username", user.Username);
                     cmd.Parameters.AddWithValue("@PasswordHash", PasswordHelper.HashPassword(user.PasswordHash));
@@ -212,7 +206,7 @@ namespace FlightBookingSystem.DAL
                 CloseConnection();
             }
         }
-        // Update user (e.g., lock/unlock, update balance)
+
         public bool Update(User user)
         {
             try
@@ -226,7 +220,7 @@ namespace FlightBookingSystem.DAL
                                Balance = @Balance
                                WHERE Id = @Id";
 
-                using (var cmd = new SqlCommand(query, connection))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@Id", user.Id);
                     cmd.Parameters.AddWithValue("@Username", user.Username);
@@ -241,14 +235,13 @@ namespace FlightBookingSystem.DAL
             finally { CloseConnection(); }
         }
 
-        // Soft delete (set DeletedAt timestamp)
         public bool Delete(int userId)
         {
             try
             {
                 OpenConnection();
                 string query = "UPDATE Users SET DeletedAt = GETUTCDATE() WHERE Id = @Id";
-                using (var cmd = new SqlCommand(query, connection))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@Id", userId);
                     return cmd.ExecuteNonQuery() > 0;
@@ -257,14 +250,13 @@ namespace FlightBookingSystem.DAL
             finally { CloseConnection(); }
         }
 
-        // Check if username exists
         public bool UsernameExists(string username)
         {
             try
             {
                 OpenConnection();
                 string query = "SELECT COUNT(1) FROM Users WHERE Username = @Username AND DeletedAt IS NULL";
-                using (var cmd = new SqlCommand(query, connection))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@Username", username);
                     return (int)cmd.ExecuteScalar() > 0;
@@ -273,14 +265,13 @@ namespace FlightBookingSystem.DAL
             finally { CloseConnection(); }
         }
 
-        // Update last login time
         public void UpdateLastLogin(int userId)
         {
             try
             {
                 OpenConnection();
                 string query = "UPDATE Users SET LastLogin = GETUTCDATE() WHERE Id = @Id";
-                using (var cmd = new SqlCommand(query, connection))
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@Id", userId);
                     cmd.ExecuteNonQuery();

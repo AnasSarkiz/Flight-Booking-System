@@ -16,7 +16,6 @@ namespace FlightBookingSystem.Controls
             InitializeComponent();
             UpdatedUser = user;
 
-            // Populate form
             txtUsername.Text = user.Username;
             txtFirstName.Text = user.FirstName;
             txtLastName.Text = user.LastName;

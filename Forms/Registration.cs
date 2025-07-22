@@ -17,7 +17,7 @@ namespace FlightBooker
         {
             InitializeComponent();
             _userService = new UserService(new UserRepository());
-            _httpClient = new HttpClient(); // Initialize HttpClient
+            _httpClient = new HttpClient();
         }
 
         private void LoginButton_Click(object sender, EventArgs e)
@@ -33,7 +33,7 @@ namespace FlightBooker
                 UserRepository userRepo = new UserRepository();
                 BookingDetailsRepository bookingRepo = new BookingDetailsRepository();
                 PassengerRepository passengerRepo = new PassengerRepository();
-                ApiService apiService = new ApiService(_httpClient);
+                AboutUsApiService apiService = new AboutUsApiService(_httpClient);
 
                 new MainForm(
                     user,

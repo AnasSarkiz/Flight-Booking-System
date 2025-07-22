@@ -18,7 +18,6 @@
 
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AboutUsControl));
             titleLabel = new Label();
             contentPanel = new Panel();
             aboutTextLabel = new Label();
@@ -56,9 +55,8 @@
             aboutTextLabel.Location = new Point(40, 40);
             aboutTextLabel.MaximumSize = new Size(700, 0);
             aboutTextLabel.Name = "aboutTextLabel";
-            aboutTextLabel.Size = new Size(674, 105);
+            aboutTextLabel.Size = new Size(0, 21);
             aboutTextLabel.TabIndex = 0;
-            aboutTextLabel.Text = resources.GetString("aboutTextLabel.Text");
             // 
             // AboutUsControl
             // 

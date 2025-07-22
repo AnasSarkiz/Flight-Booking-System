@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 
 namespace FlightBookingSystem.Models
 {
@@ -20,7 +19,5 @@ namespace FlightBookingSystem.Models
         public int Stops { get; set; }
         public string FormattedDuration => $"{Duration.Hours}h {Duration.Minutes}m";
         public string FormattedPrice => $"${Price:N0}";
-
     }
-   
 }

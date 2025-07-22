@@ -110,7 +110,7 @@ namespace FlightBookingSystem.Controls
             // notificationLabel
             // 
             notificationLabel.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            notificationLabel.Location = new Point(150, 400);
+            notificationLabel.Location = new Point(150, 440);
             notificationLabel.Name = "notificationLabel";
             notificationLabel.Size = new Size(500, 40);
             notificationLabel.TabIndex = 8;
@@ -122,24 +122,19 @@ namespace FlightBookingSystem.Controls
             messageTypeComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             messageTypeComboBox.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point, 0);
             messageTypeComboBox.FormattingEnabled = true;
-            messageTypeComboBox.Items.AddRange(new object[] {
-            "General Inquiry",
-            "Booking Assistance",
-            "Technical Support",
-            "Feedback",
-            "Complaint"});
+            messageTypeComboBox.Items.AddRange(new object[] { "General Inquiry", "Booking Assistance", "Technical Support", "Feedback", "Complaint" });
             messageTypeComboBox.Location = new Point(150, 147);
             messageTypeComboBox.Name = "messageTypeComboBox";
-            messageTypeComboBox.Size = new Size(300, 25);
+            messageTypeComboBox.Size = new Size(500, 25);
             messageTypeComboBox.TabIndex = 7;
             // 
             // messageTypeLabel
             // 
             messageTypeLabel.AutoSize = true;
             messageTypeLabel.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            messageTypeLabel.Location = new Point(50, 150);
+            messageTypeLabel.Location = new Point(22, 147);
             messageTypeLabel.Name = "messageTypeLabel";
-            messageTypeLabel.Size = new Size(92, 19);
+            messageTypeLabel.Size = new Size(98, 19);
             messageTypeLabel.TabIndex = 6;
             messageTypeLabel.Text = "Message Type:";
             // 
@@ -155,7 +150,7 @@ namespace FlightBookingSystem.Controls
             submitButton.IconFont = FontAwesome.Sharp.IconFont.Auto;
             submitButton.IconSize = 24;
             submitButton.ImageAlign = ContentAlignment.MiddleLeft;
-            submitButton.Location = new Point(300, 370);
+            submitButton.Location = new Point(290, 378);
             submitButton.Name = "submitButton";
             submitButton.Size = new Size(200, 45);
             submitButton.TabIndex = 6;
@@ -168,7 +163,7 @@ namespace FlightBookingSystem.Controls
             // 
             messageLabel.AutoSize = true;
             messageLabel.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            messageLabel.Location = new Point(50, 200);
+            messageLabel.Location = new Point(22, 197);
             messageLabel.Name = "messageLabel";
             messageLabel.Size = new Size(66, 19);
             messageLabel.TabIndex = 4;
@@ -179,14 +174,14 @@ namespace FlightBookingSystem.Controls
             emailTextBox.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point, 0);
             emailTextBox.Location = new Point(150, 97);
             emailTextBox.Name = "emailTextBox";
-            emailTextBox.Size = new Size(300, 25);
+            emailTextBox.Size = new Size(500, 25);
             emailTextBox.TabIndex = 3;
             // 
             // emailLabel
             // 
             emailLabel.AutoSize = true;
             emailLabel.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            emailLabel.Location = new Point(50, 100);
+            emailLabel.Location = new Point(22, 97);
             emailLabel.Name = "emailLabel";
             emailLabel.Size = new Size(44, 19);
             emailLabel.TabIndex = 2;
@@ -197,14 +192,14 @@ namespace FlightBookingSystem.Controls
             nameTextBox.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point, 0);
             nameTextBox.Location = new Point(150, 47);
             nameTextBox.Name = "nameTextBox";
-            nameTextBox.Size = new Size(300, 25);
+            nameTextBox.Size = new Size(500, 25);
             nameTextBox.TabIndex = 1;
             // 
             // nameLabel
             // 
             nameLabel.AutoSize = true;
             nameLabel.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            nameLabel.Location = new Point(50, 50);
+            nameLabel.Location = new Point(22, 47);
             nameLabel.Name = "nameLabel";
             nameLabel.Size = new Size(48, 19);
             nameLabel.TabIndex = 0;

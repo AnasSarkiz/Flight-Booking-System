@@ -36,13 +36,12 @@ namespace FlightBookingSystem.Controls
 
         public FilterPanelControl()
         {
-            InitializeComponent(); // This must be called first
+            InitializeComponent(); 
             WireUpEvents();
             InitializeAirlines();
         }
         private void WireUpEvents()
         {
-            // Price filter
             priceTrackBar.Scroll += (s, e) =>
             {
                 _maxPrice = priceTrackBar.Value;
@@ -63,12 +62,10 @@ namespace FlightBookingSystem.Controls
                 if (anyStopsRadio.Checked) _selectedStopOption = StopOption.AnyStops;
             };
 
-            // Airlines filter
             airlineCheckBox1.CheckedChanged += UpdateSelectedAirlines;
             airlineCheckBox2.CheckedChanged += UpdateSelectedAirlines;
             airlineCheckBox3.CheckedChanged += UpdateSelectedAirlines;
 
-            // Apply button
             applyFiltersButton.Click += (s, e) => FiltersApplied?.Invoke(this, EventArgs.Empty);
         }
         private void InitializeAirlines()
@@ -79,14 +76,13 @@ namespace FlightBookingSystem.Controls
         }
         public void UpdateFilters(List<Flight> flights)
         {
-            // Update airlines
-            var airlines = flights.Select(f => f.Airline).Distinct().ToList();
+            List<String> airlines = flights.Select(f => f.Airline).Distinct().ToList();
             airlinesGroupBox.Controls.Clear();
 
             int yPos = 40;
-            foreach (var airline in airlines)
+            foreach (String airline in airlines)
             {
-                var checkBox = new CheckBox
+                CheckBox checkBox = new()
                 {
                     Text = airline,
                     Font = new Font("Segoe UI", 9F),
@@ -99,16 +95,14 @@ namespace FlightBookingSystem.Controls
             }
             airlinesGroupBox.Height = yPos + 10;
 
-            // Update stops options based on available flights
-            var hasNonStop = flights.Any(f => f.Stops == 0);
-            var hasOneStop = flights.Any(f => f.Stops == 1);
-            var hasMultiStop = flights.Any(f => f.Stops > 1);
+            bool hasNonStop = flights.Any(f => f.Stops == 0);
+            bool hasOneStop = flights.Any(f => f.Stops == 1);
+            bool hasMultiStop = flights.Any(f => f.Stops > 1);
 
             nonStopRadio.Enabled = hasNonStop;
             oneStopRadio.Enabled = hasOneStop;
             anyStopsRadio.Enabled = hasNonStop || hasOneStop || hasMultiStop;
 
-            // If current selection isn't available, switch to "Any"
             if ((_selectedStopOption == StopOption.NonStop && !hasNonStop) ||
                 (_selectedStopOption == StopOption.OneStop && !hasOneStop))
             {

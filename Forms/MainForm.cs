@@ -42,7 +42,6 @@ namespace FlightBookingSystem
                 _userService = new UserService(_userRepo);
                 _bookingService = new BookingService(_bookingRepo, _passengerRepo);
 
-                // Wire up navbar events
                 navbarControl.HomeClicked += (s, e) => ShowHomeView();
                 navbarControl.SearchFlightsClicked += (s, e) => ShowSearchFlightsView();
                 navbarControl.BookingsClicked += (s, e) => ShowMyTripsView();
@@ -128,10 +127,12 @@ namespace FlightBookingSystem
             myTripsControl.NewBookingClicked += (s, e) => ShowSearchFlightsView();
             myTripsControl.BookingManaged += async (s, bookingId) =>
             {
+                IPassengerRepository passengerRepo = new PassengerRepository();
+                IBookingDetailsRepository bookingRepo = new BookingDetailsRepository();
                 var booking = _bookingService.GetBookingById(bookingId);
                 if (booking != null)
                 {
-                    var dialog = new ManageBookingDialog(booking);
+                    var dialog = new ManageBookingDialog(booking,passengerRepo,bookingRepo);
                     dialog.BookingCancelled += (ds, bid) =>
                     {
                         if (_bookingService.CancelBooking(bid))
@@ -154,8 +155,8 @@ namespace FlightBookingSystem
 
         private void ShowContactUs()
         {
-            var httpClient = new HttpClient();
-            var contactService = new ContactService(httpClient);
+            HttpClient httpClient = new();
+            ContactService contactService = new(httpClient);
 
             ContactUsControl contactUsControl = new ContactUsControl(contactService, _currentUser);
             SwitchView(contactUsControl);
@@ -167,8 +168,8 @@ namespace FlightBookingSystem
         }
         private void ShowMessages()
         {
-            var httpClient = new HttpClient();
-            var contactService = new ContactService(httpClient);
+            HttpClient httpClient = new();
+            ContactService contactService = new(httpClient);
 
             MessagesControl messagesControl = new MessagesControl(contactService);
             SwitchView(messagesControl);

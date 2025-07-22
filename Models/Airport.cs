@@ -17,8 +17,7 @@ public class Airport
 
     public static bool TryParseFromDisplay(string displayText, List<Airport> airports, out Airport result)
     {
-        // Extract IATA code from display text (last 3 characters in parentheses)
-        var match = Regex.Match(displayText, @"\(([A-Z]{3})\)$");
+        Match match = Regex.Match(displayText, @"\(([A-Z]{3})\)$");
         if (match.Success)
         {
             string iata = match.Groups[1].Value;

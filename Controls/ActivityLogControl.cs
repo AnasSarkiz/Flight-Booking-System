@@ -24,19 +24,17 @@ namespace FlightBookingSystem.Controls
         {
             try
             {
-                // In a real application, you would have an ActivityLogService and Repository
-                // For now, we'll simulate getting activity data
+ 
                 DataTable dt = new DataTable();
                 dt.Columns.Add("Timestamp");
                 dt.Columns.Add("User");
                 dt.Columns.Add("Activity");
                 dt.Columns.Add("Details");
 
-                // Get all users to populate the activity log
-                var users = _userService.GetAllUsers();
+                
+                IEnumerable<User> users = _userService.GetAllUsers();
 
-                // Sample activities - in a real app, these would come from a database
-                foreach (var user in users)
+                foreach (User user in users)
                 {
                     if (user.LastLogin.HasValue)
                     {
@@ -48,7 +46,6 @@ namespace FlightBookingSystem.Controls
                         );
                     }
 
-                    // Add other activities as needed
                     dt.Rows.Add(
                         DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                         user.Username,
@@ -69,7 +66,6 @@ namespace FlightBookingSystem.Controls
         {
             try
             {
-                // Filter the data based on the selected date
                 if (logGrid.DataSource is DataTable dataTable)
                 {
                     dataTable.DefaultView.RowFilter = $"Timestamp >= '{datePicker.Value.Date:yyyy-MM-dd}' AND Timestamp < '{datePicker.Value.Date.AddDays(1):yyyy-MM-dd}'";

@@ -10,6 +10,7 @@ using FlightBookingSystem.Services;
 using System.Data;
 using Microsoft.Data.SqlClient;
 using System.Transactions;
+using System.Net.Mail;
 
 
 namespace FlightBookingSystem.Controls
@@ -69,7 +70,7 @@ namespace FlightBookingSystem.Controls
                 }
 
                 string json = File.ReadAllText(jsonPath);
-                var countries = JsonConvert.DeserializeObject<List<CountryData>>(json);
+                List<CountryData> countries = JsonConvert.DeserializeObject<List<CountryData>>(json);
 
                 _nationalities = countries
                     .Select(c => c.nationality)
@@ -129,14 +130,14 @@ namespace FlightBookingSystem.Controls
 
         private string GeneratePNR()
         {
-            var random = new Random();
+            Random random = new Random();
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             return new string(Enumerable.Repeat(chars, 6).Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
         private string GenerateRandomSeat()
         {
-            var random = new Random();
+            Random random = new Random();
             int row = random.Next(1, 30);
             char seat = (char)('A' + random.Next(0, 6));
             return $"{row}{seat}";
@@ -176,13 +177,12 @@ namespace FlightBookingSystem.Controls
                     return;
                 }
 
-                using (var transaction = new TransactionScope())
+                using (TransactionScope transaction = new TransactionScope())
                 {
                     try
                     {
                         
-                        // 1. Create the booking
-                        var booking = _bookingService.CreateBooking(
+                        BookingDetails booking = _bookingService.CreateBooking(
                             _selectedFlight,
                             _bookingDetails.Passenger,
                             _currentUser,
@@ -190,23 +190,20 @@ namespace FlightBookingSystem.Controls
                         );
 
 
-                        // 2. Update user balance
                         if (!_userService.DecreaseUserBalance(_currentUser.Id, _selectedFlight.Price))
                         {
                             throw new Exception("Failed to update user balance");
                         }
 
-                        // 3. Increment booking count
                         if (!_userService.IncrementUserBookingCount(_currentUser.Id))
                         {
                             throw new Exception("Failed to update booking count");
                         }
 
-                        // Refresh user data from database
-                        var updatedUser = _userService.GetUserById(_currentUser.Id);
+                        
+                        User updatedUser = _userService.GetUserById(_currentUser.Id);
                         _currentUser.Balance = updatedUser.Balance;
 
-                        // Complete the transaction if all operations succeeded
                         transaction.Complete();
 
                         UpdateBalanceDisplay();
@@ -215,7 +212,6 @@ namespace FlightBookingSystem.Controls
                     }
                     catch
                     {
-                        // Transaction will automatically roll back if Complete() isn't called
                         throw;
                     }
                 }
@@ -224,6 +220,18 @@ namespace FlightBookingSystem.Controls
             {
                 MessageBox.Show($"Booking failed: {ex.Message}", "Error",
                               MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        private bool IsValidEmail(string email)
+        {
+            try
+            {
+                MailAddress addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
             }
         }
         private bool ValidateBooking()
@@ -239,6 +247,7 @@ namespace FlightBookingSystem.Controls
                 MessageBox.Show("Last name is required", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
+            IsValidEmail(email: _bookingDetails.Passenger.Email);
 
             return true;
         }

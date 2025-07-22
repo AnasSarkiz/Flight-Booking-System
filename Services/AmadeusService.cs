@@ -2,6 +2,7 @@
 using FlightBookingSystem.Models;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -30,24 +31,24 @@ namespace FlightBookingSystem.Services
             if (!string.IsNullOrEmpty(_accessToken) && DateTime.UtcNow < _tokenExpiration)
                 return _accessToken;
 
-            String clientId = Environment.GetEnvironmentVariable("AMADEUS_CLIENT_ID");
-            String clientSecret = Environment.GetEnvironmentVariable("AMADEUS_CLIENT_SECRET");
+            string clientId = Environment.GetEnvironmentVariable("AMADEUS_CLIENT_ID");
+            string clientSecret = Environment.GetEnvironmentVariable("AMADEUS_CLIENT_SECRET");
 
             if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret))
                 throw new Exception("Amadeus credentials not configured");
 
-            var content = new FormUrlEncodedContent(new[]
+            FormUrlEncodedContent content = new FormUrlEncodedContent(new[]
             {
                 new KeyValuePair<string, string>("grant_type", "client_credentials"),
                 new KeyValuePair<string, string>("client_id", clientId),
                 new KeyValuePair<string, string>("client_secret", clientSecret)
             });
 
-            var response = await _httpClient.PostAsync(AuthUrl, content);
+            HttpResponseMessage response = await _httpClient.PostAsync(AuthUrl, content);
             response.EnsureSuccessStatusCode();
 
-            String json = await response.Content.ReadAsStringAsync();
-            using var doc = JsonDocument.Parse(json);
+            string json = await response.Content.ReadAsStringAsync();
+            using JsonDocument doc = JsonDocument.Parse(json);
             _accessToken = doc.RootElement.GetProperty("access_token").GetString();
             int expiresIn = doc.RootElement.GetProperty("expires_in").GetInt32();
             _tokenExpiration = DateTime.UtcNow.AddSeconds(expiresIn - 60);
@@ -55,57 +56,56 @@ namespace FlightBookingSystem.Services
             return _accessToken;
         }
 
-        public async Task<List<Flight>> SearchFlightsAsync(string origin, string destination, DateTime departureDate,string SeatClass )
+        public async Task<List<Flight>> SearchFlightsAsync(string origin, string destination, DateTime departureDate, string seatClass)
         {
-            String token = await GetAccessTokenAsync();
+            if (string.IsNullOrEmpty(origin) || origin.Length != 3)
+                throw new ArgumentException("Invalid origin airport code");
 
-            // Create initial originDestinations list
-            var originDestinations = new List<object>
-    {
-        new
-        {
-            id = "1",
-            originLocationCode = origin,
-            destinationLocationCode = destination,
-            departureDateTimeRange = new
-            {
-                date = departureDate.ToString("yyyy-MM-dd")
-            }
-        }
-    };
+            if (string.IsNullOrEmpty(destination) || destination.Length != 3)
+                throw new ArgumentException("Invalid destination airport code");
 
+            if (departureDate < DateTime.Today)
+                throw new ArgumentException("Departure date cannot be in the past");
 
-            var request = new
+            if (string.IsNullOrEmpty(seatClass))
+                seatClass = "ECONOMY";
+            if (!new[] { "ECONOMY", "PREMIUM_ECONOMY", "BUSINESS", "FIRST" }.Contains(seatClass.ToUpper()))
+                throw new ArgumentException("Invalid seat class. Valid options are: ECONOMY, PREMIUM_ECONOMY, BUSINESS, FIRST");
+
+            try {
+            string token = await GetAccessTokenAsync();
+
+            object request = new
             {
                 currencyCode = "USD",
                 originDestinations = new[]
-      {
-        new
-        {
-            id = "1",
-            originLocationCode = origin,
-            destinationLocationCode = destination,
-            departureDateTimeRange = new
-            {
-                date = departureDate.ToString("yyyy-MM-dd")
-            }
-        }
-    },
+                {
+                    new
+                    {
+                        id = "1",
+                        originLocationCode = origin,
+                        destinationLocationCode = destination,
+                        departureDateTimeRange = new
+                        {
+                            date = departureDate.ToString("yyyy-MM-dd")
+                        }
+                    }
+                },
                 travelers = new[]
-      {
-        new
-        {
-            id = "1",
-            travelerType = "ADULT",
-            fareOptions = new[] { "STANDARD" },
-            cabin = SeatClass  
-        }
-    },
+                {
+                    new
+                    {
+                        id = "1",
+                        travelerType = "ADULT",
+                        fareOptions = new[] { "STANDARD" },
+                        cabin = seatClass
+                    }
+                },
                 sources = new[] { "GDS" },
                 searchCriteria = new { maxFlightOffers = 50 }
             };
 
-            String json = JsonSerializer.Serialize(request);
+            string json = JsonSerializer.Serialize(request);
             StringContent httpContent = new StringContent(json, Encoding.UTF8, "application/json");
 
             HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Post, FlightOffersUrl)
@@ -118,6 +118,19 @@ namespace FlightBookingSystem.Services
             response.EnsureSuccessStatusCode();
 
             return await ParseFlightOffers(await response.Content.ReadAsStringAsync());
+             }
+              catch (HttpRequestException ex) when(ex.StatusCode == HttpStatusCode.TooManyRequests)
+               {
+                throw new Exception("Too many requests - please wait before searching again");
+                }
+              catch (HttpRequestException ex) when(ex.StatusCode == HttpStatusCode.InternalServerError)
+               {
+                throw new Exception("Flight search service is currently unavailable. Please try again later.");
+                  }
+                catch (Exception ex)
+                {
+                throw new Exception("Failed to search flights", ex);
+                }
         }
 
         private async Task<List<Flight>> ParseFlightOffers(string json)
@@ -130,10 +143,10 @@ namespace FlightBookingSystem.Services
             {
                 JsonElement firstItinerary = offer.GetProperty("itineraries")[0];
                 JsonElement firstSegment = firstItinerary.GetProperty("segments")[0];
-                String price = offer.GetProperty("price").GetProperty("total").GetString();
+                string price = offer.GetProperty("price").GetProperty("total").GetString();
 
                 JsonElement travelerPricing = offer.GetProperty("travelerPricings")[0];
-                String cabinClass = travelerPricing.GetProperty("fareOption").GetString();
+                string cabinClass = travelerPricing.GetProperty("fareOption").GetString();
 
                 Flight flight = new Flight
                 {
@@ -153,18 +166,15 @@ namespace FlightBookingSystem.Services
             }
 
             return flights;
-                }
-        
+        }
 
         private TimeSpan ParseDuration(string durationString)
         {
-            // Remove "PT" prefix
             durationString = durationString.Replace("PT", "");
 
             int hours = 0;
             int minutes = 0;
 
-            // Check for hours
             int hourIndex = durationString.IndexOf('H');
             if (hourIndex > 0)
             {
@@ -172,7 +182,6 @@ namespace FlightBookingSystem.Services
                 durationString = durationString.Substring(hourIndex + 1);
             }
 
-            // Check for minutes
             int minuteIndex = durationString.IndexOf('M');
             if (minuteIndex > 0)
             {

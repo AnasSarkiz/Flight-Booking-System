@@ -149,6 +149,7 @@
             cabinClassComboBox.Name = "cabinClassComboBox";
             cabinClassComboBox.Size = new Size(194, 23);
             cabinClassComboBox.TabIndex = 1;
+            cabinClassComboBox.SelectedIndex = 0;
             // 
             // SearchBoxControl
             // 

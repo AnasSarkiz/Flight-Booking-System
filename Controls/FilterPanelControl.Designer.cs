@@ -241,6 +241,7 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
+            AutoScroll = true;
             Controls.Add(applyFiltersButton);
             Controls.Add(stopsGroupBox);
             Controls.Add(priceGroupBox);

@@ -20,7 +20,7 @@ namespace FlightBookingSystem.Controls
         {
             if (ValidateInput())
             {
-                var newUser = new User
+                User newUser = new User
                 {
                     Username = txtUsername.Text,
                     PasswordHash = txtPassword.Text,

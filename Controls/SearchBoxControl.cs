@@ -101,7 +101,6 @@ namespace FlightBookingSystem.Controls
         }
         public void SetDestination(string destination)
         {
-            // Implementation to set the destination in your search box
             destinationTextBox.Text = destination;
         }
         private async void TextBox_LostFocus(object sender, EventArgs e)
@@ -129,7 +128,7 @@ namespace FlightBookingSystem.Controls
                 return;
             }
 
-            var suggestions = _airports
+            List<Airport> suggestions = _airports
                 .Where(a => a.name.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
                            a.city.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
                            a.iata.Contains(searchText, StringComparison.OrdinalIgnoreCase))
@@ -210,7 +209,7 @@ namespace FlightBookingSystem.Controls
                 string selectedText = _suggestionListBox.SelectedItem.ToString();
                 _currentTextBox.Text = selectedText;
 
-                if (Airport.TryParseFromDisplay(selectedText, _airports, out var airport))
+                if (Airport.TryParseFromDisplay(selectedText, _airports, out Airport airport))
                 {
                     if (_currentTextBox == originTextBox)
                     {

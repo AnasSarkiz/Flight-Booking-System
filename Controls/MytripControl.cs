@@ -48,7 +48,7 @@ namespace FlightBookingSystem.Controls
 
                 foreach (var booking in userBookings)
                 {
-                    var bookingCard = await CreateBookingCard(booking);
+                    Panel bookingCard = await CreateBookingCard(booking);
                     bookingsPanel.Controls.Add(bookingCard);
                 }
             }
@@ -65,7 +65,7 @@ namespace FlightBookingSystem.Controls
      
         private void ShowNoBookingsMessage()
         {
-            var noBookingsPanel = new Panel
+            Panel noBookingsPanel = new Panel
             {
                 Width = bookingsPanel.Width - 40,
                 Height = 200,
@@ -74,7 +74,7 @@ namespace FlightBookingSystem.Controls
                 Margin = new Padding(0, 0, 0, 20)
             };
 
-            var noBookingsLabel = new Label
+            Label noBookingsLabel = new Label
             {
                 Text = "✈️ You don't have any bookings yet",
                 Font = new Font("Segoe UI", 12, FontStyle.Bold),
@@ -89,7 +89,7 @@ namespace FlightBookingSystem.Controls
 
         private async Task<Panel> CreateBookingCard(BookingDetails booking)
         {
-            var card = new Panel
+            Panel card = new Panel
             {
                 Width = bookingsPanel.Width - 20,
                 Height = 180,
@@ -98,7 +98,7 @@ namespace FlightBookingSystem.Controls
                 BorderStyle = BorderStyle.None
             };
 
-            var imagePanel = new Panel
+            Panel imagePanel = new Panel
             {
                 Width = 200,
                 Height = 140,
@@ -106,7 +106,7 @@ namespace FlightBookingSystem.Controls
                 BackgroundImageLayout = ImageLayout.Zoom,
 
             };
-            var contentPanel = new Panel
+            Panel contentPanel = new Panel
             {
                 Dock = DockStyle.Fill,
                 Padding = new Padding(20)
@@ -122,15 +122,15 @@ namespace FlightBookingSystem.Controls
             {
                 imagePanel.BackColor = Color.FromArgb(240, 245, 255);
             }
-            var buttonPanel = new Panel
+            Panel buttonPanel = new Panel
             {
                 Dock = DockStyle.Right,
                 Width = 200,
                 Padding = new Padding(10)
             };
 
-            // Manage button
-            var manageButton = new Button
+            
+            Button manageButton = new Button
             {
                 Text = "MANAGE",
                 Size = new Size(180, 36),
@@ -144,17 +144,16 @@ namespace FlightBookingSystem.Controls
             manageButton.FlatAppearance.BorderSize = 0;
             manageButton.Click += (s, e) => BookingManaged?.Invoke(this, (int)manageButton.Tag);
 
-            // Airline logo (under manage button)
-            var logoPanel = new Panel
+            Panel logoPanel = new Panel
             {
                 Size = new Size(30, 30),
-                Location = new Point(15, 70), // Below manage button
+                Location = new Point(15, 70), 
                 BackgroundImageLayout = ImageLayout.Zoom
             };
 
             try
             {
-                var airlineLogoUrl = $"https://content.airhex.com/content/logos/airlines_{booking.Airline}_80_80_s.png";
+                String airlineLogoUrl = $"https://content.airhex.com/content/logos/airlines_{booking.Airline}_80_80_s.png";
                 LoadImageAsync(logoPanel, airlineLogoUrl);
             }
             catch
@@ -162,22 +161,21 @@ namespace FlightBookingSystem.Controls
                 logoPanel.BackColor = Color.FromArgb(240, 245, 255);
             }
 
-            // Price label (to the right of airline logo)
-            var priceLabel = new Label
+            Label priceLabel = new Label
             {
                 Text = booking.FormattedTotalPrice,
                 Font = new Font("Segoe UI", 14, FontStyle.Bold),
                 ForeColor = Color.FromArgb(0, 115, 207),
-                Location = new Point(70, 70), // Right of airline logo
+                Location = new Point(70, 70), 
                 AutoSize = true
             };
 
-            var perPersonLabel = new Label
+            Label perPersonLabel = new Label
             {
                 Text = "total price",
                 Font = new Font("Segoe UI", 8),
                 ForeColor = Color.FromArgb(140, 140, 160),
-                Location = new Point(70, 95), // Right of airline logo
+                Location = new Point(70, 95), 
                 AutoSize = true
             };
 
@@ -187,7 +185,7 @@ namespace FlightBookingSystem.Controls
             buttonPanel.Controls.Add(priceLabel);
             buttonPanel.Controls.Add(perPersonLabel);
 
-            var detailsPanel = new Panel
+            Panel detailsPanel = new Panel
             {
                 Location = new Point(240, 20),
                 Size = new Size(400, 140)
@@ -197,7 +195,6 @@ namespace FlightBookingSystem.Controls
 
        
 
-            // Assemble all components
             contentPanel.Controls.Add(imagePanel);
             contentPanel.Controls.Add(detailsPanel);
             card.Controls.Add(contentPanel);
@@ -205,7 +202,6 @@ namespace FlightBookingSystem.Controls
 
 
 
-            // Add shadow effect
             card.Paint += (sender, e) => {
                 using (var shadowBrush = new SolidBrush(Color.FromArgb(15, 0, 0, 0)))
                 {
@@ -219,7 +215,7 @@ namespace FlightBookingSystem.Controls
 
         private void CreateFlightDetailLabels(BookingDetails booking, Panel detailsPanel)
         {
-            var airlineLabel = new Label
+            Label airlineLabel = new Label
             {
                 Text = $"{booking.Airline} • {booking.FlightNumber}",
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
@@ -228,7 +224,7 @@ namespace FlightBookingSystem.Controls
                 ForeColor = Color.FromArgb(50, 50, 70)
             };
 
-            var routeLabel = new Label
+            Label routeLabel = new Label
             {
                 Text = $"{booking.Origin} → {booking.Destination}",
                 Font = new Font("Segoe UI", 12, FontStyle.Bold),
@@ -237,7 +233,7 @@ namespace FlightBookingSystem.Controls
                 ForeColor = Color.FromArgb(30, 30, 50)
             };
 
-            var dateLabel = new Label
+            Label dateLabel = new Label
             {
                 Text = booking.DepartureTime.ToString("ddd, MMM dd yyyy"),
                 Font = new Font("Segoe UI", 10),
@@ -246,7 +242,7 @@ namespace FlightBookingSystem.Controls
                 ForeColor = Color.FromArgb(80, 80, 100)
             };
 
-            var passengerLabel = new Label
+            Label passengerLabel = new Label
             {
                 Text = $"Passenger: {booking.Passenger.FirstName} {booking.Passenger.LastName}",
                 Font = new Font("Segoe UI", 9),
@@ -255,7 +251,7 @@ namespace FlightBookingSystem.Controls
                 ForeColor = Color.FromArgb(120, 120, 140)
             };
 
-            var statusLabel = new Label
+            Label statusLabel = new Label
             {
                 Text = $"Status: {booking.Status}",
                 Font = new Font("Segoe UI", 9, FontStyle.Bold),

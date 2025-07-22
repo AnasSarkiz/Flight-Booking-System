@@ -117,9 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="aboutTextLabel.Text" xml:space="preserve">
-    <value>RE7LA is a leading flight booking platform that connects travelers with the best flight options worldwide. Our mission is to make travel accessible and enjoyable for everyone.
-
-Founded in 2023, we've helped over 1 million customers find their perfect flights at competitive prices.</value>
-  </data>
 </root>
