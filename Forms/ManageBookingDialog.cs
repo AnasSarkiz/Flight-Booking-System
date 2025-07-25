@@ -1,12 +1,13 @@
-﻿using FlightBookingSystem.DAL;
-using FlightBookingSystem.Models;
-using System;
+﻿using System;
 using System.Drawing;
 using System.IO;
 using System.Diagnostics;
 using System.Windows.Forms;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
+using FlightBookingSystem.Models;
+using FlightBookingSystem.DAL;
+using System.Net;
 
 namespace FlightBookingSystem.Controls
 {
@@ -124,7 +125,7 @@ namespace FlightBookingSystem.Controls
 
                 GenerateFlightDetailsPDF(tempFilePath);
 
-                var result = MessageBox.Show("PDF generated successfully! Would you like to preview it before saving?",
+                DialogResult result = MessageBox.Show("PDF generated successfully! Would you like to preview it before saving?",
                                            "PDF Ready",
                                            MessageBoxButtons.YesNoCancel,
                                            MessageBoxIcon.Question);
@@ -133,7 +134,7 @@ namespace FlightBookingSystem.Controls
                 {
                     PreviewPDF(tempFilePath);
 
-                    var saveResult = MessageBox.Show("Would you like to save this PDF?",
+                    DialogResult saveResult = MessageBox.Show("Would you like to save this PDF?",
                                                    "Save PDF",
                                                    MessageBoxButtons.YesNo,
                                                    MessageBoxIcon.Question);
@@ -153,7 +154,7 @@ namespace FlightBookingSystem.Controls
                     if (File.Exists(tempFilePath))
                         File.Delete(tempFilePath);
                 }
-                catch {}
+                catch { }
             }
             catch (Exception ex)
             {
@@ -185,7 +186,7 @@ namespace FlightBookingSystem.Controls
                 {
                     try
                     {
-                        File.Copy(sourceFilePath, saveFileDialog.FileName, overwrite: true);
+                        File.Copy(sourceFilePath, saveFileDialog.FileName, true);
                         MessageBox.Show($"PDF saved successfully to:\n{saveFileDialog.FileName}",
                                       "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
@@ -201,35 +202,88 @@ namespace FlightBookingSystem.Controls
         {
             using (FileStream stream = new FileStream(filePath, FileMode.Create))
             {
-                var document = new Document(PageSize.A4, 36, 36, 36, 36);
+                Document document = new Document(PageSize.A4, 25, 25, 30, 25);
                 PdfWriter writer = PdfWriter.GetInstance(document, stream);
                 document.Open();
-                string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
-                string logoRelativePath = Path.Combine(baseDirectory, @"..\..\..\resources\img\plane.png");
-                string logoPath = Path.GetFullPath(logoRelativePath);
-                if (File.Exists(logoPath))
+                PdfPTable headerTable = new PdfPTable(3);
+                headerTable.WidthPercentage = 100;
+                headerTable.SetWidths(new float[] { 1, 3, 1 });
+
+                string companyLogoPath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\resources\img\plane.png"));
+                if (File.Exists(companyLogoPath))
                 {
-                    var logo = iTextSharp.text.Image.GetInstance(logoPath);
-                    logo.ScaleToFit(60, 60);
-                    logo.Alignment = Element.ALIGN_LEFT;
-                    document.Add(logo);
+                    iTextSharp.text.Image companyLogo = iTextSharp.text.Image.GetInstance(companyLogoPath);
+                    companyLogo.ScaleToFit(60, 60);
+                    PdfPCell logoCell = new PdfPCell(companyLogo);
+                    logoCell.Border = PdfPCell.NO_BORDER;
+                    logoCell.HorizontalAlignment = Element.ALIGN_LEFT;
+                    headerTable.AddCell(logoCell);
+                }
+                else
+                {
+                    headerTable.AddCell(new PdfPCell(new Phrase("")) { Border = PdfPCell.NO_BORDER });
+                }
+                PdfPTable titleTable = new PdfPTable(1);
+                titleTable.WidthPercentage = 100;
+
+                PdfPCell companyNameCell = new PdfPCell(new Phrase("RE7LA",
+                    FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.BLUE)));
+                companyNameCell.Border = PdfPCell.NO_BORDER;
+                companyNameCell.HorizontalAlignment = Element.ALIGN_CENTER;
+                titleTable.AddCell(companyNameCell);
+
+                PdfPCell titleCell = new PdfPCell(new Phrase("FLIGHT BOOKING RECEIPT",
+                    FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16, BaseColor.DARK_GRAY)));
+                titleCell.Border = PdfPCell.NO_BORDER;
+                titleCell.HorizontalAlignment = Element.ALIGN_CENTER;
+                titleTable.AddCell(titleCell);
+
+                PdfPCell centerCell = new PdfPCell(titleTable);
+                centerCell.Border = PdfPCell.NO_BORDER;
+                headerTable.AddCell(centerCell);
+
+
+              
+
+                string airlineLogoUrl = $"https://content.airhex.com/content/logos/airlines_{_booking.Airline}_80_80_s.png";
+                if (!string.IsNullOrEmpty(airlineLogoUrl))
+                {
+                    try
+                    {
+                        iTextSharp.text.Image airlineLogo = iTextSharp.text.Image.GetInstance(new Uri(airlineLogoUrl));
+                        airlineLogo.ScaleToFit(80, 80);
+                        airlineLogo.Alignment = Element.ALIGN_CENTER;
+
+                        PdfPCell airlineCell = new PdfPCell();
+                        airlineCell.Border = PdfPCell.NO_BORDER;
+                        airlineCell.HorizontalAlignment = Element.ALIGN_CENTER;
+                        airlineCell.AddElement(airlineLogo);
+                        headerTable.AddCell(airlineCell);
+                    }
+                    catch
+                    {
+                        headerTable.AddCell(new PdfPCell(new Phrase(_booking.Airline,
+                            FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12)))
+                        {
+                            Border = PdfPCell.NO_BORDER,
+                            HorizontalAlignment = Element.ALIGN_RIGHT
+                        });
+                    }
+                }
+                else
+                {
+                    headerTable.AddCell(new PdfPCell(new Phrase(_booking.Airline,
+                        FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12)))
+                    {
+                        Border = PdfPCell.NO_BORDER,
+                        HorizontalAlignment = Element.ALIGN_RIGHT
+                    });
                 }
 
-                Paragraph header = new("Re7la - Flight Booking",
-                    FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 20, new BaseColor(0, 0, 139)));
-                header.Alignment = Element.ALIGN_CENTER;
-                document.Add(header);
-
-                Paragraph lineSeparator = new(new Chunk(new iTextSharp.text.pdf.draw.LineSeparator(
-                    0.5f, 100f, new BaseColor(200, 200, 200), Element.ALIGN_CENTER, 1)));
-                document.Add(lineSeparator);
-                document.Add(new Paragraph("\n"));
-
-                Paragraph title = new("FLIGHT BOOKING DETAILS",
-                    FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 18, new BaseColor(0, 0, 139)));
-                title.Alignment = Element.ALIGN_CENTER;
-                document.Add(title);
+                document.Add(headerTable);
+                document.Add(new Paragraph(new Chunk(new iTextSharp.text.pdf.draw.LineSeparator(
+                    0.5f, 100f, BaseColor.LIGHT_GRAY, Element.ALIGN_CENTER, -1))));
                 document.Add(new Paragraph("\n"));
 
                 PdfPTable mainTable = new PdfPTable(2);
@@ -240,84 +294,142 @@ namespace FlightBookingSystem.Controls
                 leftCell.Border = PdfPCell.NO_BORDER;
                 leftCell.PaddingBottom = 10f;
 
-                Paragraph bookingHeader = new("BOOKING INFORMATION",
-                    FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.DARK_GRAY));
-                leftCell.AddElement(bookingHeader);
-                leftCell.AddElement(new Paragraph($"PNR: {_booking.PNR}"));
-                leftCell.AddElement(new Paragraph($"Booking Date: {_booking.BookingDate:MMM dd, yyyy}"));
-                leftCell.AddElement(new Paragraph($"Status: {_booking.Status}",
-                    FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12,
-                    _booking.Status == "Confirmed" ? BaseColor.GREEN : BaseColor.RED)));
+                leftCell.AddElement(new Paragraph("BOOKING INFORMATION",
+                    FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12, BaseColor.DARK_GRAY)));
+                leftCell.AddElement(new Paragraph(new Chunk(new iTextSharp.text.pdf.draw.LineSeparator(
+                    0.25f, 100f, BaseColor.LIGHT_GRAY, Element.ALIGN_LEFT, -1))));
+                leftCell.AddElement(CreateDetailRow("PNR:", _booking.PNR, true));
+                leftCell.AddElement(CreateDetailRow("Booking Date:", _booking.BookingDate.ToString("MMM dd, yyyy HH:mm")));
+                leftCell.AddElement(CreateDetailRow("Status:", _booking.Status,
+                    fontColor: _booking.Status == "Confirmed" ? BaseColor.GREEN : BaseColor.RED));
+                leftCell.AddElement(new Paragraph("\n\n\n"));
+
+                leftCell.AddElement(new Paragraph("FLIGHT INFORMATION",
+                    FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12, BaseColor.DARK_GRAY)));
+                leftCell.AddElement(new Paragraph(new Chunk(new iTextSharp.text.pdf.draw.LineSeparator(
+                    0.25f, 100f, BaseColor.LIGHT_GRAY, Element.ALIGN_LEFT, -1))));
+                leftCell.AddElement(CreateDetailRow("Airline:", $"{_booking.Airline} ({_booking.FlightNumber})"));
+                leftCell.AddElement(CreateDetailRow("Route:", $"{_booking.Origin} → {_booking.Destination}"));
+                leftCell.AddElement(CreateDetailRow("Departure:", _booking.DepartureTime.ToString("ddd, MMM dd yyyy HH:mm")));
+                leftCell.AddElement(CreateDetailRow("Arrival:", _booking.ArrivalTime.ToString("ddd, MMM dd yyyy HH:mm")));
+                leftCell.AddElement(CreateDetailRow("Duration:", FormatDuration(_booking.ArrivalTime - _booking.DepartureTime)));
+                leftCell.AddElement(CreateDetailRow("Seat:", $"{_booking.SeatNumber} ({_booking.SeatClass})"));
                 leftCell.AddElement(new Paragraph("\n"));
 
-                Paragraph flightHeader = new("FLIGHT INFORMATION",
-                    FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.DARK_GRAY));
-                leftCell.AddElement(flightHeader);
-                leftCell.AddElement(new Paragraph($"{_booking.Airline} - Flight {_booking.FlightNumber}"));
-                leftCell.AddElement(new Paragraph($"From: {_booking.Origin}"));
-                leftCell.AddElement(new Paragraph($"To: {_booking.Destination}"));
-                leftCell.AddElement(new Paragraph($"Departure: {_booking.DepartureTime:ddd, MMM dd yyyy HH:mm}"));
-                leftCell.AddElement(new Paragraph($"Arrival: {_booking.ArrivalTime:ddd, MMM dd yyyy HH:mm}"));
-                leftCell.AddElement(new Paragraph($"Duration: {FormatDuration(_booking.ArrivalTime - _booking.DepartureTime)}"));
-                leftCell.AddElement(new Paragraph($"Seat: {_booking.SeatNumber} ({_booking.SeatClass})"));
-                leftCell.AddElement(new Paragraph("\n"));
-
-                Paragraph paymentHeader = new("PAYMENT INFORMATION",
-                    FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.DARK_GRAY));
-                leftCell.AddElement(paymentHeader);
-                leftCell.AddElement(new Paragraph($"Total Paid: {_booking.FormattedTotalPrice}",
-                    FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12, new BaseColor(0, 100, 0))));
+                leftCell.AddElement(new Paragraph("PAYMENT INFORMATION",
+                    FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12, BaseColor.DARK_GRAY)));
+                leftCell.AddElement(new Paragraph(new Chunk(new iTextSharp.text.pdf.draw.LineSeparator(
+                    0.25f, 100f, BaseColor.LIGHT_GRAY, Element.ALIGN_LEFT, -1))));
+                leftCell.AddElement(CreateDetailRow("Base Fare:", $"${_booking.OriginalPrice:0.00}"));
+                leftCell.AddElement(CreateDetailRow("Taxes & Fees:", "$0.00"));
+                leftCell.AddElement(CreateDetailRow("Total Paid:", _booking.FormattedTotalPrice, true,
+                    font: FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12, new BaseColor(0, 100, 0))));
 
                 PdfPCell rightCell = new PdfPCell();
                 rightCell.Border = PdfPCell.NO_BORDER;
                 rightCell.PaddingBottom = 10f;
 
-                Paragraph passengerHeader = new Paragraph("PASSENGER INFORMATION",
-                    FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.DARK_GRAY));
-                rightCell.AddElement(passengerHeader);
-                rightCell.AddElement(new Paragraph($"Name: {_booking.Passenger.FirstName} {_booking.Passenger.LastName}"));
-                rightCell.AddElement(new Paragraph($"Passport: {_booking.Passenger.PassportNumber}"));
-                rightCell.AddElement(new Paragraph($"Nationality: {_booking.Passenger.Nationality}"));
+                rightCell.AddElement(new Paragraph("PASSENGER INFORMATION",
+                    FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12, BaseColor.DARK_GRAY)));
+                rightCell.AddElement(new Paragraph(new Chunk(new iTextSharp.text.pdf.draw.LineSeparator(
+                    0.25f, 100f, BaseColor.LIGHT_GRAY, Element.ALIGN_LEFT, -1))));
+                rightCell.AddElement(CreateDetailRow("Name:", $"{_booking.Passenger.FirstName} {_booking.Passenger.LastName}"));
+                rightCell.AddElement(CreateDetailRow("Passport:", _booking.Passenger.PassportNumber));
+                rightCell.AddElement(CreateDetailRow("Nationality:", _booking.Passenger.Nationality));
+                rightCell.AddElement(CreateDetailRow("Email:", _booking.Passenger.Email ?? "N/A"));
+                rightCell.AddElement(CreateDetailRow("Phone:", _booking.Passenger.Phone ?? "N/A"));
                 rightCell.AddElement(new Paragraph("\n"));
 
-                if (!string.IsNullOrEmpty(_booking.DestinationImageUrl) && Uri.IsWellFormedUriString(_booking.DestinationImageUrl, UriKind.Absolute))
+                rightCell.AddElement(new Paragraph("TERMS & CONDITIONS",
+                    FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12, BaseColor.DARK_GRAY)));
+                rightCell.AddElement(new Paragraph(new Chunk(new iTextSharp.text.pdf.draw.LineSeparator(
+                    0.25f, 100f, BaseColor.LIGHT_GRAY, Element.ALIGN_LEFT, -1))));
+                rightCell.AddElement(new Paragraph("• This is an electronic ticket"));
+                rightCell.AddElement(new Paragraph("• Check-in opens 24 hours before departure"));
+                rightCell.AddElement(new Paragraph("• Boarding closes 30 minutes before departure"));
+                rightCell.AddElement(new Paragraph("• Cancellation policies apply based on fare rules"));
+                rightCell.AddElement(new Paragraph("\n\n"));
+
+                if (!string.IsNullOrEmpty(_booking.DestinationImageUrl) &&
+                      Uri.IsWellFormedUriString(_booking.DestinationImageUrl, UriKind.Absolute))
                 {
                     try
                     {
-                        var destinationImage = iTextSharp.text.Image.GetInstance(new Uri(_booking.DestinationImageUrl));
-                        destinationImage.ScaleToFit(200, 150);
-                        destinationImage.Alignment = Element.ALIGN_CENTER;
-                        rightCell.AddElement(new Paragraph("Destination:",
-                            FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12)));
-                        rightCell.AddElement(destinationImage);
+                        using (WebClient client = new WebClient())
+                        {
+                            byte[] imageData = client.DownloadData(_booking.DestinationImageUrl);
+                            iTextSharp.text.Image destinationImage = iTextSharp.text.Image.GetInstance(imageData);
+                            destinationImage.ScaleToFit(200, 150);
+                            destinationImage.Alignment = Element.ALIGN_CENTER;
+                            rightCell.AddElement(new Paragraph("   Your Destination Image:",
+                                FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12)));
+                            rightCell.AddElement(new Paragraph("\n"));
+                            rightCell.AddElement(destinationImage);
+                        }
                     }
-                    catch
-                    {
-                        // If image loading fails, just continue without it
-                    }
+                    catch { rightCell.AddElement(new Paragraph("Faild to Load Destination Image")) ; }
+                            
                 }
 
                 mainTable.AddCell(leftCell);
                 mainTable.AddCell(rightCell);
                 document.Add(mainTable);
 
-                document.Add(new Paragraph("\n\n\n\n"));
-                Paragraph signatureLine = new Paragraph(new Chunk(new iTextSharp.text.pdf.draw.LineSeparator(
-                    0.5f, 200f, new BaseColor(200, 200, 200), Element.ALIGN_LEFT, 1)));
-                document.Add(signatureLine);
-                Paragraph signatureText = new Paragraph("Authorized Signature",
-                    FontFactory.GetFont(FontFactory.HELVETICA_OBLIQUE, 10, BaseColor.GRAY));
-                signatureText.Alignment = Element.ALIGN_LEFT;
-                document.Add(signatureText);
-
                 document.Add(new Paragraph("\n\n"));
-                Paragraph footer = new Paragraph("Thank you for choosing Re7la for your travel needs!",
+
+                PdfPTable footerTable = new PdfPTable(1);
+                footerTable.WidthPercentage = 50;
+                footerTable.HorizontalAlignment = Element.ALIGN_LEFT;
+
+                PdfPCell signatureCell = new PdfPCell();
+                signatureCell.Border = PdfPCell.NO_BORDER;
+                signatureCell.AddElement(new Paragraph(new Chunk(new iTextSharp.text.pdf.draw.LineSeparator(
+                    0.5f, 150f, BaseColor.LIGHT_GRAY, Element.ALIGN_LEFT, -1))));
+                signatureCell.AddElement(new Paragraph("Authorized Signature",
+                    FontFactory.GetFont(FontFactory.HELVETICA_OBLIQUE, 10, BaseColor.GRAY)));
+
+                footerTable.AddCell(signatureCell);
+                document.Add(footerTable);
+
+                Paragraph thankYou = new Paragraph("\n\nThank you for choosing our airline for your travel needs!\n" +
+                                         "We wish you a pleasant journey.",
                     FontFactory.GetFont(FontFactory.HELVETICA_OBLIQUE, 10, BaseColor.DARK_GRAY));
-                footer.Alignment = Element.ALIGN_CENTER;
-                document.Add(footer);
+                thankYou.Alignment = Element.ALIGN_CENTER;
+                document.Add(thankYou);
+
+                document.Add(new Paragraph("\n"));
+                Paragraph pageNumber = new Paragraph($"Page 1 of 1",
+                    FontFactory.GetFont(FontFactory.HELVETICA, 8, BaseColor.GRAY));
+                pageNumber.Alignment = Element.ALIGN_CENTER;
+                document.Add(pageNumber);
 
                 document.Close();
             }
+        }
+
+        private PdfPTable CreateDetailRow(string label, string value, bool isBold = false,
+            BaseColor fontColor = null, iTextSharp.text.Font font = null)
+        {
+            PdfPTable rowTable = new PdfPTable(2);
+            rowTable.WidthPercentage = 100;
+            rowTable.SetWidths(new float[] { 1, 2 });
+
+            iTextSharp.text.Font labelFont = font ?? FontFactory.GetFont(FontFactory.HELVETICA, 10, BaseColor.DARK_GRAY);
+            iTextSharp.text.Font valueFont = font ?? (isBold ?
+                FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10, fontColor ?? BaseColor.BLACK) :
+                FontFactory.GetFont(FontFactory.HELVETICA, 10, fontColor ?? BaseColor.BLACK));
+
+            PdfPCell labelCell = new PdfPCell(new Phrase(label, labelFont));
+            labelCell.Border = PdfPCell.NO_BORDER;
+            labelCell.HorizontalAlignment = Element.ALIGN_LEFT;
+
+            PdfPCell valueCell = new PdfPCell(new Phrase(value, valueFont));
+            valueCell.Border = PdfPCell.NO_BORDER;
+            valueCell.HorizontalAlignment = Element.ALIGN_LEFT;
+
+            rowTable.AddCell(labelCell);
+            rowTable.AddCell(valueCell);
+            return rowTable;
         }
 
         private string GetCityName(string airportInfo)
@@ -343,7 +455,7 @@ namespace FlightBookingSystem.Controls
 
         private void btnCancelBooking_Click(object sender, EventArgs e)
         {
-            var result = MessageBox.Show("Are you sure you want to cancel this booking?",
+            DialogResult result = MessageBox.Show("Are you sure you want to cancel this booking?",
                                       "Confirm Cancellation",
                                       MessageBoxButtons.YesNo,
                                       MessageBoxIcon.Question);

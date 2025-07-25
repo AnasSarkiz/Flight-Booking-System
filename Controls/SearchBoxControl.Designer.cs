@@ -144,7 +144,7 @@
             // 
             // cabinClassComboBox
             // 
-            cabinClassComboBox.Items.AddRange(new object[] { "Economy", "Business", "First" });
+            cabinClassComboBox.Items.AddRange(new object[] { "ECONOMY", "PREMIUM_ECONOMY", "BUSINESS","FIRST" });
             cabinClassComboBox.Location = new Point(639, 100);
             cabinClassComboBox.Name = "cabinClassComboBox";
             cabinClassComboBox.Size = new Size(194, 23);

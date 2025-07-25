@@ -21,42 +21,51 @@ namespace FlightBookingSystem.Services
 
         public BookingDetails CreateBooking(Flight apiFlight, Passenger passenger, User user, string seatClass)
         {
-            if (apiFlight == null) throw new ArgumentNullException(nameof(apiFlight));
-            if (passenger == null) throw new ArgumentNullException(nameof(passenger));
-            if (user == null) throw new ArgumentNullException(nameof(user));
-            if (string.IsNullOrEmpty(apiFlight.FlightNumber))
-                throw new ArgumentException("Flight number is required");
-            if (passenger.Id <= 0 && (string.IsNullOrEmpty(passenger.FirstName) || string.IsNullOrEmpty(passenger.LastName)))
-                throw new ArgumentException("Passenger name is required");
-            if (user.Id <= 0)
-                throw new ArgumentException("Invalid user");
-            if (passenger.Id == 0 && !_passengerRepository.Add(passenger))
-                throw new Exception("Failed to save passenger information");
-
-            BookingDetails booking = new BookingDetails
+            try
             {
-                FlightNumber = apiFlight.FlightNumber,
-                Airline = apiFlight.Airline,
-                Origin = apiFlight.Origin,
-                Destination = apiFlight.Destination,
-                DepartureTime = apiFlight.DepartureTime,
-                ArrivalTime = apiFlight.ArrivalTime,
-                OriginalPrice = apiFlight.Price,
-                SeatClass = seatClass,
-                DestinationImageUrl = apiFlight.DestinationImageUrl,
-                Passenger = passenger,
-                BookedBuy = user,
-                SeatNumber = GenerateRandomSeat(),
-                PNR = GeneratePNR(),
-                TotalPrice = apiFlight.Price,
-                BookingDate = DateTime.UtcNow,
-                Status = "Confirmed"
-            };
+                if (apiFlight == null) throw new ArgumentNullException(nameof(apiFlight));
+                if (passenger == null) throw new ArgumentNullException(nameof(passenger));
+                if (user == null) throw new ArgumentNullException(nameof(user));
+                if (string.IsNullOrEmpty(apiFlight.FlightNumber))
+                    throw new ArgumentException("Flight number is required");
+                if (passenger.Id <= 0 && (string.IsNullOrEmpty(passenger.FirstName) || string.IsNullOrEmpty(passenger.LastName)))
+                    throw new ArgumentException("Passenger name is required");
+                if (user.Id <= 0)
+                    throw new ArgumentException("Invalid user");
+                if (passenger.Id == 0 && !_passengerRepository.Add(passenger))
+                    throw new Exception("Failed to save passenger information");
 
-            if (!_bookingRepository.Add(booking))
-                throw new Exception("Failed to create booking");
+                BookingDetails booking = new BookingDetails
+                {
+                    FlightNumber = apiFlight.FlightNumber,
+                    Airline = apiFlight.Airline,
+                    Origin = apiFlight.Origin,
+                    Destination = apiFlight.Destination,
+                    DepartureTime = apiFlight.DepartureTime,
+                    ArrivalTime = apiFlight.ArrivalTime,
+                    OriginalPrice = apiFlight.Price,
+                    SeatClass = seatClass,
+                    DestinationImageUrl = apiFlight.DestinationImageUrl,
+                    Passenger = passenger,
+                    BookedBuy = user,
+                    SeatNumber = GenerateRandomSeat(),
+                    PNR = GeneratePNR(),
+                    TotalPrice = apiFlight.Price,
+                    BookingDate = DateTime.UtcNow,
+                    Status = "Confirmed"
+                };
 
-            return booking;
+                if (!_bookingRepository.Add(booking, true))
+                {
+                    throw new Exception($"Failed to create booking in database. PassengerId: {passenger.Id}, UserId: {user.Id}");
+                }
+
+                return booking;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Booking creation failed: {ex.Message}", ex);
+            }
         }
 
         public bool CancelBooking(int bookingId)

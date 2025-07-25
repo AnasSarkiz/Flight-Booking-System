@@ -10,8 +10,8 @@ namespace FlightBookingSystem.Services
 {
     public class AmadeusService : IDisposable
     {
-        private const string AuthUrl = "https://api.amadeus.com/v1/security/oauth2/token";
-        private const string FlightOffersUrl = "https://api.amadeus.com/v2/shopping/flight-offers";
+        private const string AuthUrl = "https://test.api.amadeus.com/v1/security/oauth2/token";
+        private const string FlightOffersUrl = "https://test.api.amadeus.com/v2/shopping/flight-offers";
 
         private readonly HttpClient _httpClient;
         private string _accessToken;

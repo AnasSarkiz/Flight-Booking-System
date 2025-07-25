@@ -101,7 +101,6 @@ namespace FlightBookingSystem.Controls
         }
         public void SetDestination(string destination)
         {
-            // Implementation to set the destination in your search box
             destinationTextBox.Text = destination;
         }
         private async void TextBox_LostFocus(object sender, EventArgs e)

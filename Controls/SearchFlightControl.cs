@@ -32,24 +32,45 @@ namespace FlightBookingSystem.Controls
             InitializeComponent();
             WireUpEvents();
             ConfigureFlightCardsPanel();
-            _ = InitializeTestFlightsAsync(); // Async initialization
+            _ = InitializeTestFlightsAsync(); 
         }
 
         private async Task InitializeTestFlightsAsync()
         {
             var testFlights = new List<Flight>
-            {
-                await CreateTestFlight(1, "AA123", "AA", "New York (JFK)", "London (LHR)", 2, 8, 499.99m),
-                await CreateTestFlight(2, "DL456", "DL", "Atlanta (ATL)", "Paris (CDG)", 4, 11, 599.99m),
-                await CreateTestFlight(3, "UA789", "UA", "Chicago (ORD)", "Tokyo (NRT)", 6, 18, 1299.99m),
-                await CreateTestFlight(4, "BA321", "BA", "London (LHR)", "New York (JFK)", 8, 14, 549.99m)
-            };
+              {
+        await CreateTestFlight(1, "AA123", "AA", "New York (JFK)", "London (LHR)", 2, 8, 499.99m,"ECONOMY",0),
+        await CreateTestFlight(2, "DL456", "DL", "Atlanta (ATL)", "Paris (CDG)", 4, 11, 599.99m,"ECONOMY",0),
+        await CreateTestFlight(3, "UA789", "UA", "Chicago (ORD)", "Tokyo (NRT)", 6, 18, 1299.99m,"ECONOMY",0),
+        await CreateTestFlight(4, "BA321", "BA", "London (LHR)", "New York (JFK)", 8, 14, 549.99m,"ECONOMY",0),
+        
+        await CreateTestFlight(5, "LH411", "LH", "Frankfurt (FRA)", "Singapore (SIN)", 3, 16, 899.99m,"ECONOMY",0),
+        await CreateTestFlight(6, "AF268", "AF", "Paris (CDG)", "New York (JFK)", 4, 10, 659.99m,"ECONOMY",0),
+        await CreateTestFlight(7, "KL602", "KL", "Amsterdam (AMS)", "Dubai (DXB)", 5, 12, 749.99m,"ECONOMY",0),
+        await CreateTestFlight(8, "AY102", "AY", "Helsinki (HEL)", "Bangkok (BKK)", 6, 15, 799.99m,"ECONOMY",0),
+        
+        await CreateTestFlight(9, "SQ321", "SQ", "Singapore (SIN)", "London (LHR)", 7, 19, 1099.99m,"ECONOMY",0),
+        await CreateTestFlight(10, "CX888", "CX", "Hong Kong (HKG)", "Vancouver (YVR)", 8, 16, 1199.99m,"ECONOMY",0),
+        await CreateTestFlight(11, "JL45", "JL", "Tokyo (NRT)", "Sydney (SYD)", 9, 14, 999.99m,"ECONOMY",0),
+        await CreateTestFlight(12, "EK412", "EK", "Dubai (DXB)", "New York (JFK)", 10, 20, 1399.99m,"ECONOMY",0),
+        
+        await CreateTestFlight(13, "WN234", "WN", "Las Vegas (LAS)", "Denver (DEN)", 1, 3, 199.99m,"ECONOMY",0),
+        await CreateTestFlight(14, "B6123", "B6", "Boston (BOS)", "Los Angeles (LAX)", 2, 8, 349.99m,"ECONOMY",0),
+        await CreateTestFlight(15, "AS789", "AS", "Seattle (SEA)", "Honolulu (HNL)", 3, 9, 499.99m,"ECONOMY",0),
+        
+        await CreateTestFlight(16, "QF12", "QF", "Los Angeles (LAX)", "Sydney (SYD)", 4, 18, 2999.99m,"BUSINESS",0),
+        await CreateTestFlight(17, "EY101", "EY", "Abu Dhabi (AUH)", "New York (JFK)", 5, 16, 3499.99m,"FIRST",0),
+        
+        await CreateTestFlight(18, "FR123", "FR", "London (STN)", "Barcelona (BCN)", 1, 4, 59.99m,"STANDARD",0),
+         await CreateTestFlight(19, "DY701", "DY", "Oslo (OSL)", "New York (JFK)", 2, 10, 299.99m,"STANDARD",0)
+           };
+
 
             LoadFlights(testFlights);
         }
 
         private async Task<Flight> CreateTestFlight(int id, string number, string airline,
-     string origin, string destination, int depHours, int arrHours, decimal price)
+     string origin, string destination, int depHours, int arrHours, decimal price,string seatClass,int stopsNo)
         {
             var cityName = destination.Split('(')[0].Trim();
             return new Flight
@@ -59,13 +80,15 @@ namespace FlightBookingSystem.Controls
                 Airline = airline,
                 Origin = origin,
                 Destination = destination,
-                DepartureTime = DateTime.Now.AddHours(depHours+90),
-                ArrivalTime = DateTime.Now.AddHours(arrHours),
+                DepartureTime = DateTime.Now.AddHours(depHours*4),
+                ArrivalTime = DateTime.Now.AddHours(arrHours*4),
                 Duration = TimeSpan.FromHours(arrHours - depHours),
                 Price = price,
                 DestinationImageUrl = await _unsplashService.GetCityImageUrl(cityName),
                 AirlineLogoUrl = $"https://content.airhex.com/content/logos/airlines_{airline}_80_80_s.png",
-                Stops = id % 3
+                Stops = stopsNo,
+                SeatClass = seatClass
+
             };
         }
 
@@ -114,7 +137,6 @@ namespace FlightBookingSystem.Controls
         {
             try
             {
-                // Show loading label
                 loadingLabel.Visible = true;
                 flightCardsPanel.Visible = false;
 
@@ -143,12 +165,10 @@ namespace FlightBookingSystem.Controls
                     return;
                 }
 
-                // Get the city name from the destination airport
                 var cityName = searchBoxControl.DestinationAirport.city;
 
-                foreach (var flight in flights)
+                foreach (Flight flight in flights)
                 {
-                    // Use the city name for destination image
                     flight.DestinationImageUrl = await _unsplashService.GetCityImageUrl(destinationCity);
                     flight.AirlineLogoUrl = $"https://content.airhex.com/content/logos/airlines_{flight.Airline}_80_80_s.png";
                 }
@@ -165,10 +185,6 @@ namespace FlightBookingSystem.Controls
                 loadingLabel.Visible = false;
                 flightCardsPanel.Visible = true;
             }
-        }
-        private static int GetCount(List<Flight> flights)
-        {
-            return flights.Count;
         }
 
         private void OnSortChanged(object sender, EventArgs e)
@@ -243,14 +259,13 @@ namespace FlightBookingSystem.Controls
             };
 
             // Main content panel
-            var contentPanel = new Panel
+            Panel contentPanel = new Panel
             {
                 Dock = DockStyle.Fill,
                 Padding = new Padding(20, 15, 20, 15)
             };
 
-            // Airline info
-            var airlinePanel = new Panel
+            Panel airlinePanel = new Panel
             {
                 Width = 50,
                 Height = 50,
@@ -260,14 +275,13 @@ namespace FlightBookingSystem.Controls
             _ = LoadImageAsync(airlinePanel, flight.AirlineLogoUrl);
             contentPanel.Controls.Add(airlinePanel);
 
-            // Flight details
-            var detailsPanel = new Panel
+            Panel detailsPanel = new Panel
             {
                 Location = new Point(70, 15),
                 Size = new Size(400, 110)
             };
 
-            var flightLabel = new Label
+            Label flightLabel = new Label
             {
                 Text = $"{flight.Airline} • {flight.FlightNumber}",
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
@@ -277,7 +291,7 @@ namespace FlightBookingSystem.Controls
             };
             detailsPanel.Controls.Add(flightLabel);
 
-            var routeLabel = new Label
+            Label routeLabel = new Label
             {
                 Text = $"{flight.Origin} → {flight.Destination}",
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
@@ -287,7 +301,7 @@ namespace FlightBookingSystem.Controls
             };
             detailsPanel.Controls.Add(routeLabel);
 
-            var timeLabel = new Label
+            Label timeLabel = new Label
             {
                 Text = $"{flight.DepartureTime:HH:mm} - {flight.ArrivalTime:HH:mm}",
                 Font = new Font("Segoe UI", 10),
@@ -297,7 +311,7 @@ namespace FlightBookingSystem.Controls
             };
             detailsPanel.Controls.Add(timeLabel);
 
-            var durationLabel = new Label
+            Label durationLabel = new Label
             {
                 Text = $"Duration: {flight.FormattedDuration}",
                 Font = new Font("Segoe UI", 9),
@@ -309,15 +323,14 @@ namespace FlightBookingSystem.Controls
 
             contentPanel.Controls.Add(detailsPanel);
 
-            // Price and select button
-            var pricePanel = new Panel
+            Panel pricePanel = new Panel
             {
                 Dock = DockStyle.Right,
                 Width = 150,
                 Padding = new Padding(10)
             };
 
-            var priceLabel = new Label
+            Label priceLabel = new Label
             {
                 Text = flight.FormattedPrice,
                 Font = new Font("Segoe UI", 16, FontStyle.Bold),
@@ -328,7 +341,7 @@ namespace FlightBookingSystem.Controls
             };
             pricePanel.Controls.Add(priceLabel);
 
-            var perPersonLabel = new Label
+            Label perPersonLabel = new Label
             {
                 Text = "per person",
                 Font = new Font("Segoe UI", 8),
@@ -339,7 +352,7 @@ namespace FlightBookingSystem.Controls
             };
             pricePanel.Controls.Add(perPersonLabel);
 
-            var selectButton = new Button
+            Button selectButton = new Button
             {
                 Text = "SELECT FLIGHT",
                 Size = new Size(130, 36),
@@ -351,28 +364,19 @@ namespace FlightBookingSystem.Controls
             };
      
             selectButton.FlatAppearance.BorderSize = 0;
-            selectButton.MouseEnter += (s, e) => selectButton.BackColor = Color.FromArgb(0, 95, 180);
-            selectButton.MouseLeave += (s, e) => selectButton.BackColor = Color.FromArgb(0, 115, 207);
             selectButton.Click += (s, e) => FlightSelected?.Invoke(this, flight);
             pricePanel.Controls.Add(selectButton);
 
             contentPanel.Controls.Add(pricePanel);
             card.Controls.Add(contentPanel);
 
-            // Add subtle shadow effect
-            card.Paint += (sender, e) => {
-                using (var shadowBrush = new SolidBrush(Color.FromArgb(15, 0, 0, 0)))
-                {
-                    e.Graphics.FillRectangle(shadowBrush,
-                        new Rectangle(3, card.Height - 4, card.Width - 6, 4));
-                }
-            };
+      
 
             return card;
         }
         public void SetSearchDestination(string destination)
         {
-            searchBoxControl.SetDestination(destination); // You'll need to implement this in SearchBoxControl
+            searchBoxControl.SetDestination(destination);
         }
         private async Task LoadImageAsync(Panel panel, string imageUrl)
         {
@@ -405,7 +409,6 @@ namespace FlightBookingSystem.Controls
                 }
                 catch
                 {
-                    // Final fallback if even that fails
                     panel.BackColor = Color.FromArgb(240, 245, 255);
                     panel.BackgroundImage = null;
                 }

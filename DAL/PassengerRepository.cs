@@ -14,10 +14,10 @@ namespace FlightBookingSystem.DAL
             {
                 OpenConnection();
                 string query = @"INSERT INTO Passengers 
-                                (FirstName, LastName, PassportNumber, Nationality, Email, Phone, DateOfBirth)
-                                VALUES 
-                                (@FirstName, @LastName, @PassportNumber, @Nationality, @Email, @Phone, @DateOfBirth);
-                                SELECT SCOPE_IDENTITY();";
+                        (FirstName, LastName, PassportNumber, Nationality, Email, Phone, DateOfBirth)
+                        VALUES 
+                        (@FirstName, @LastName, @PassportNumber, @Nationality, @Email, @Phone, @DateOfBirth);
+                        SELECT SCOPE_IDENTITY();";
 
                 using (SqlCommand cmd = new SqlCommand(query, connection))
                 {

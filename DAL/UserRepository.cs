@@ -9,13 +9,18 @@ namespace FlightBookingSystem.DAL
 {
     public class UserRepository : DbHelper, IUserRepository
     {
+        private readonly IActivityLogRepository _activityLogRepository;
+
+        public UserRepository(IActivityLogRepository activityLogRepository)
+        {
+            _activityLogRepository = activityLogRepository;
+        }
         public User Authenticate(string username, string password)
         {
             try
             {
                 OpenConnection();
 
-                // First get all the user data we need in one query
                 string query = @"SELECT Id, Username, PasswordHash, Role, Balance, 
                        FirstName, LastName, DateCreated, LastLogin, IsLocked, 
                        NumberOfBookings, CreatedByAdminId, FailedLoginAttempts, LockoutEnd
@@ -52,7 +57,7 @@ namespace FlightBookingSystem.DAL
                             };
                             currentAttempts = reader.GetInt32(12);
                         }
-                    } // Reader is properly closed here
+                    } 
                 }
 
                 if (user == null)
@@ -60,16 +65,13 @@ namespace FlightBookingSystem.DAL
                     throw new Exception("Username not found.");
                 }
 
-                // Check if account is locked
                 if (user.IsLocked && user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
                 {
                     throw new Exception($"Account is temporarily locked. Please try again after {user.LockoutEnd.Value.Subtract(DateTime.UtcNow):mm\\:ss} minutes.");
                 }
 
-                // Verify password
                 if (!PasswordHelper.VerifyPassword(password, user.PasswordHash))
                 {
-                    // Increment failed attempts
                     currentAttempts++;
                     UpdateFailedAttempts(user.Id, currentAttempts);
 
@@ -82,8 +84,14 @@ namespace FlightBookingSystem.DAL
                     throw new Exception($"Invalid password. {attemptsLeft} attempts remaining.");
                 }
 
-                // Successful login - reset attempts
                 ResetFailedAttempts(user.Id);
+                _activityLogRepository.Add(new ActivityLog
+                {
+                    UserId = user.Id,
+                    ActivityType = "Login",
+                    Description = "Successful login",
+                    Timestamp = DateTime.UtcNow
+                });
                 return user;
             }
             finally
@@ -298,8 +306,21 @@ namespace FlightBookingSystem.DAL
                     cmd.Parameters.AddWithValue("@LastName", user.LastName ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@AdminId", adminId);
 
-                    return cmd.ExecuteNonQuery() > 0;
-                }
+                    var result= cmd.ExecuteNonQuery() > 0;
+                    if (result)
+                    {
+                       
+                        _activityLogRepository.Add(new ActivityLog
+                        {
+                            UserId = adminId, 
+                            ActivityType = "UserManagement",
+                            Description = $"Created new user: {user.Username}",
+                            Timestamp = DateTime.UtcNow
+                        });
+                    }
+                    return result;
+                
+            }
             }
             finally
             {
@@ -329,8 +350,20 @@ namespace FlightBookingSystem.DAL
                     cmd.Parameters.AddWithValue("@IsLocked", user.IsLocked);
                     cmd.Parameters.AddWithValue("@Balance", user.Balance);
 
-                    return cmd.ExecuteNonQuery() > 0;
+                    var result = cmd.ExecuteNonQuery() > 0;
+                    if (result)
+                    {
+                        _activityLogRepository.Add(new ActivityLog
+                        {
+                            UserId = user.Id,
+                            ActivityType = "ProfileUpdate",
+                            Description = "Updated profile information",
+                            Timestamp = DateTime.UtcNow
+                        });
+                    }
+                    return result;
                 }
+
             }
             finally { CloseConnection(); }
         }

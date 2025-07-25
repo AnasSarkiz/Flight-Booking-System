@@ -8,24 +8,30 @@ namespace FlightBookingSystem.DAL
 {
     public class BookingDetailsRepository : DbHelper, IBookingDetailsRepository
     {
-        public bool Add(BookingDetails booking)
+        private readonly IActivityLogRepository _activityLogRepository;
+
+        public BookingDetailsRepository(IActivityLogRepository activityLogRepository)
+        {
+            _activityLogRepository = activityLogRepository;
+        }
+        public bool Add(BookingDetails booking, bool logActivity = true)
         {
             try
             {
                 OpenConnection();
                 string query = @"
-                INSERT INTO BookingDetails (
-                 FlightNumber, Airline, Origin, Destination,
-                 DestinationImageUrl, DepartureTime, ArrivalTime, 
-                  OriginalPrice, PassengerId, SeatClass, SeatNumber, 
-                  PNR, TotalPrice, BookedByUserId, Status, BookingDate
-                    ) VALUES (
-                   @FlightNumber, @Airline, @Origin, @Destination,
-                      @DestinationImageUrl, @DepartureTime, @ArrivalTime, 
-                      @OriginalPrice, @PassengerId, @SeatClass, @SeatNumber, 
-                       @PNR, @TotalPrice, @BookedByUserId, @Status, @BookingDate
-                    );
-                    SELECT SCOPE_IDENTITY();";
+        INSERT INTO BookingDetails (
+         FlightNumber, Airline, Origin, Destination,
+         DestinationImageUrl, DepartureTime, ArrivalTime, 
+          OriginalPrice, PassengerId, SeatClass, SeatNumber, 
+          PNR, TotalPrice, BookedByUserId, Status, BookingDate
+            ) VALUES (
+           @FlightNumber, @Airline, @Origin, @Destination,
+              @DestinationImageUrl, @DepartureTime, @ArrivalTime, 
+              @OriginalPrice, @PassengerId, @SeatClass, @SeatNumber, 
+               @PNR, @TotalPrice, @BookedByUserId, @Status, @BookingDate
+            );
+            SELECT SCOPE_IDENTITY();";
 
                 using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
@@ -47,13 +53,24 @@ namespace FlightBookingSystem.DAL
                     cmd.Parameters.AddWithValue("@BookingDate", booking.BookingDate);
 
                     object result = cmd.ExecuteScalar();
-                    if (result != null && result != DBNull.Value)
+                    booking.Id = Convert.ToInt32(result);
+
+                    if (logActivity && booking.BookedBuy?.Id > 0)
                     {
-                        booking.Id = Convert.ToInt32(result);
-                        return booking.Id > 0;
+                        _activityLogRepository.Add(new ActivityLog
+                        {
+                            UserId = booking.BookedBuy.Id,
+                            ActivityType = "Booking",
+                            Description = $"Created booking with PNR: {booking.PNR}",
+                            Timestamp = DateTime.UtcNow
+                        });
                     }
-                    return false;
+                    return booking.Id > 0;
                 }
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception($"Database error while creating booking: {sqlEx.Message}", sqlEx);
             }
             finally { CloseConnection(); }
         }
@@ -63,18 +80,36 @@ namespace FlightBookingSystem.DAL
             try
             {
                 OpenConnection();
-                string query = @"UPDATE BookingDetails 
-                               SET Status = 'Cancelled', DeletedAt = GETUTCDATE()
-                               WHERE Id = @Id";
-                using (SqlCommand cmd = new SqlCommand(query, connection))
+                // First get the booking to log who cancelled it
+                var booking = GetById(bookingId);
+
+                if (booking != null)
                 {
-                    cmd.Parameters.AddWithValue("@Id", bookingId);
-                    return cmd.ExecuteNonQuery() > 0;
+                    string query = @"UPDATE BookingDetails 
+                           SET Status = 'Cancelled', DeletedAt = GETUTCDATE()
+                           WHERE Id = @Id";
+                    using (SqlCommand cmd = new SqlCommand(query, connection))
+                    {
+                        cmd.Parameters.AddWithValue("@Id", bookingId);
+                        var result = cmd.ExecuteNonQuery() > 0;
+
+                        if (result)
+                        {
+                            _activityLogRepository.Add(new ActivityLog
+                            {
+                                UserId = booking.BookedBuy.Id,
+                                ActivityType = "BookingCancellation",
+                                Description = $"Cancelled booking with PNR: {booking.PNR}",
+                                Timestamp = DateTime.UtcNow
+                            });
+                        }
+                        return result;
+                    }
                 }
+                return false;
             }
             finally { CloseConnection(); }
         }
-
         public bool Delete(int id)
         {
             try

@@ -9,7 +9,7 @@
         private System.Windows.Forms.Panel filterPanel;
         private System.Windows.Forms.Label dateLabel;
         private System.Windows.Forms.DateTimePicker datePicker;
-
+        private System.Windows.Forms.Button refreshButton;
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -27,6 +27,7 @@
             filterPanel = new Panel();
             datePicker = new DateTimePicker();
             dateLabel = new Label();
+            refreshButton = new Button();
             contentPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)logGrid).BeginInit();
             filterPanel.SuspendLayout();
@@ -101,6 +102,11 @@
             dateLabel.Size = new Size(94, 19);
             dateLabel.TabIndex = 0;
             dateLabel.Text = "Filter by Date:";
+
+            refreshButton.Text = "Refresh";
+            refreshButton.Location = new Point(650, 15);
+            refreshButton.Click += btnRefresh_Click;
+            filterPanel.Controls.Add(refreshButton);
             // 
             // ActivityLogControl
             // 

@@ -1,9 +1,6 @@
 using FlightBookingSystem;
 using FlightBookingSystem.DAL;
 using FlightBookingSystem.Services;
-using System;
-using System.Net.Http;
-using System.Windows.Forms;
 using FlightBookingSystem.Models;
 
 namespace FlightBooker
@@ -12,11 +9,13 @@ namespace FlightBooker
     {
         private readonly UserService _userService;
         private readonly HttpClient _httpClient;
+        private readonly IActivityLogRepository _activityLogRepository;
 
         public Registration()
         {
             InitializeComponent();
-            _userService = new UserService(new UserRepository());
+            _activityLogRepository = new ActivityLogRepository(); 
+            _userService = new UserService(new UserRepository(_activityLogRepository));
             _httpClient = new HttpClient();
             passwordTextBox.KeyDown += PasswordTextBox_KeyDown;
         }
@@ -32,8 +31,8 @@ namespace FlightBooker
 
                 this.Hide();
 
-                UserRepository userRepo = new UserRepository();
-                BookingDetailsRepository bookingRepo = new BookingDetailsRepository();
+                UserRepository userRepo = new UserRepository(_activityLogRepository);
+                BookingDetailsRepository bookingRepo = new BookingDetailsRepository(_activityLogRepository);
                 PassengerRepository passengerRepo = new PassengerRepository();
                 AboutUsApiService apiService = new AboutUsApiService(_httpClient);
 
@@ -42,7 +41,8 @@ namespace FlightBooker
                     userRepo,
                     bookingRepo,
                     passengerRepo,
-                    apiService
+                    apiService,
+                    _activityLogRepository
                 ).Show();
             }
             catch (Exception ex)

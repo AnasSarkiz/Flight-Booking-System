@@ -9,7 +9,7 @@ namespace FlightBookingSystem.DAL
         BookingDetails GetByPNR(string pnr);
         IEnumerable<BookingDetails> GetAll();
         IEnumerable<BookingDetails> GetByUserId(int userId);
-        bool Add(BookingDetails booking);
+        bool Add(BookingDetails booking, bool logActivity = true);
         bool Update(BookingDetails booking);
         bool Delete(int id);
         bool CancelBooking(int bookingId);

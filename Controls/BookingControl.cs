@@ -169,56 +169,44 @@ namespace FlightBookingSystem.Controls
 
             try
             {
-                if (string.IsNullOrEmpty(_bookingDetails.Passenger.PassportNumber) ||
-                    string.IsNullOrEmpty(_bookingDetails.Passenger.Nationality))
+                if (!_passengerRepository.Add(_bookingDetails.Passenger))
                 {
-                    MessageBox.Show("Please fill all passenger details", "Validation Error",
-                                  MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
+                    throw new Exception("Failed to save passenger details");
                 }
 
-                using (TransactionScope transaction = new TransactionScope())
+                BookingDetails booking = _bookingService.CreateBooking(
+                    _selectedFlight,
+                    _bookingDetails.Passenger,
+                    _currentUser,
+                    _selectedFlight.SeatClass
+                );
+
+                if (!_userService.DecreaseUserBalance(_currentUser.Id, _selectedFlight.Price))
                 {
-                    try
-                    {
-                        
-                        BookingDetails booking = _bookingService.CreateBooking(
-                            _selectedFlight,
-                            _bookingDetails.Passenger,
-                            _currentUser,
-                            _selectedFlight.SeatClass
-                        );
-
-
-                        if (!_userService.DecreaseUserBalance(_currentUser.Id, _selectedFlight.Price))
-                        {
-                            throw new Exception("Failed to update user balance");
-                        }
-
-                        if (!_userService.IncrementUserBookingCount(_currentUser.Id))
-                        {
-                            throw new Exception("Failed to update booking count");
-                        }
-
-                        
-                        User updatedUser = _userService.GetUserById(_currentUser.Id);
-                        _currentUser.Balance = updatedUser.Balance;
-
-                        transaction.Complete();
-
-                        UpdateBalanceDisplay();
-                        BookingConfirmed?.Invoke(this, booking);
-                        MessageBox.Show($"Booking confirmed! PNR: {booking.PNR}", "Success");
-                    }
-                    catch
-                    {
-                        throw;
-                    }
+                    throw new Exception("Failed to update user balance");
                 }
+
+                if (!_userService.IncrementUserBookingCount(_currentUser.Id))
+                {
+                    throw new Exception("Failed to update booking count");
+                }
+
+                User updatedUser = _userService.GetUserById(_currentUser.Id);
+                _currentUser.Balance = updatedUser.Balance;
+
+                BookingConfirmed?.Invoke(this, booking);
+                MessageBox.Show($"Booking confirmed! PNR: {booking.PNR}", "Success");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Booking failed: {ex.Message}", "Error",
+                string errorMessage = ex.Message;
+                while (ex.InnerException != null)
+                {
+                    ex = ex.InnerException;
+                    errorMessage += $"\nInner Exception: {ex.Message}";
+                }
+
+                MessageBox.Show($"Booking failed: {errorMessage}", "Error",
                               MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }

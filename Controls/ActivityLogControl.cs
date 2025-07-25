@@ -9,14 +9,12 @@ namespace FlightBookingSystem.Controls
 {
     public partial class ActivityLogControl : UserControl
     {
-        private readonly IUserRepository _userRepository;
-        private readonly UserService _userService;
+        private readonly ActivityLogService _activityLogService;
 
-        public ActivityLogControl(IUserRepository userRepository)
+        public ActivityLogControl(IActivityLogRepository activityLogRepository)
         {
             InitializeComponent();
-            _userRepository = userRepository;
-            _userService = new UserService(_userRepository);
+            _activityLogService = new ActivityLogService(activityLogRepository);
             LoadActivityData();
         }
 
@@ -24,33 +22,21 @@ namespace FlightBookingSystem.Controls
         {
             try
             {
- 
                 DataTable dt = new DataTable();
                 dt.Columns.Add("Timestamp");
                 dt.Columns.Add("User");
                 dt.Columns.Add("Activity");
                 dt.Columns.Add("Details");
 
-                
-                IEnumerable<User> users = _userService.GetAllUsers();
+                var activities = _activityLogService.GetAllActivities();
 
-                foreach (User user in users)
+                foreach (var activity in activities)
                 {
-                    if (user.LastLogin.HasValue)
-                    {
-                        dt.Rows.Add(
-                            user.LastLogin.Value.ToString("yyyy-MM-dd HH:mm:ss"),
-                            user.Username,
-                            "Login",
-                            $"Successful login for {user.Username}"
-                        );
-                    }
-
                     dt.Rows.Add(
-                        DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                        user.Username,
-                        "Profile View",
-                        $"Viewed profile of {user.Username}"
+                        activity.Timestamp.ToString("yyyy-MM-dd HH:mm:ss"),
+                        activity.User.Username,
+                        activity.ActivityType,
+                        activity.Description
                     );
                 }
 
@@ -68,13 +54,21 @@ namespace FlightBookingSystem.Controls
             {
                 if (logGrid.DataSource is DataTable dataTable)
                 {
-                    dataTable.DefaultView.RowFilter = $"Timestamp >= '{datePicker.Value.Date:yyyy-MM-dd}' AND Timestamp < '{datePicker.Value.Date.AddDays(1):yyyy-MM-dd}'";
+                    DateTime selectedDate = datePicker.Value.Date;
+                    DateTime nextDay = selectedDate.AddDays(1);
+
+                    dataTable.DefaultView.RowFilter = $"Timestamp >= '{selectedDate:yyyy-MM-dd}' AND Timestamp < '{nextDay:yyyy-MM-dd}'";
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error filtering data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void btnRefresh_Click(object sender, EventArgs e)
+        {
+            LoadActivityData();
         }
     }
 }
