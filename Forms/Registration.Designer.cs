@@ -13,6 +13,8 @@ namespace FlightBooker
         private Panel panel1;
         private Panel panel2;
         private CheckBox showPasswordCheck;
+        ErrorProvider errorProvider = new ErrorProvider();
+
 
         private void InitializeComponent()
         {
@@ -51,6 +53,7 @@ namespace FlightBooker
             usernameTextBox.Name = "usernameTextBox";
             usernameTextBox.Size = new Size(300, 22);
             usernameTextBox.TabIndex = 1;
+            errorProvider.SetError(usernameTextBox, "Username Required");
             // 
             // passwordLabel
             // 
@@ -74,6 +77,7 @@ namespace FlightBooker
             passwordTextBox.Size = new Size(300, 22);
             passwordTextBox.TabIndex = 3;
             passwordTextBox.UseSystemPasswordChar = true;
+            errorProvider.SetError(passwordTextBox, "Password Requierd");
             // 
             // loginButton
             // 

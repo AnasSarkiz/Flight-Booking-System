@@ -54,6 +54,7 @@ namespace FlightBookingSystem
             navbarControl.UserProfileClicked += (s, e) => ShowUserProfile();
             navbarControl.ActivityLogClicked += (s, e) => ShowActivityLog();
             navbarControl.MessagesClicked += (s, e) => ShowMessages();
+            navbarControl.AllBookingsClicked += (s, e) => ShowAllBookings();
             ShowHomeView();
         }
 
@@ -189,6 +190,19 @@ namespace FlightBookingSystem
                 this.Hide();
                 Registration loginForm = new Registration();
                 loginForm.Show();
+            }
+        }
+        private void ShowAllBookings()
+        {
+            if (_currentUser.UserRole == User.Role.Admin)
+            {
+                AllBookingsControl allBookingsControl = new AllBookingsControl(_bookingRepo);
+                SwitchView(allBookingsControl);
+            }
+            else
+            {
+                MessageBox.Show("Admin access required.", "Access Denied",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 

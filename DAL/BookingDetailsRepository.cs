@@ -85,7 +85,6 @@ namespace FlightBookingSystem.DAL
             {
                 OpenConnection();
 
-                // First get the booking details without closing the connection
                 BookingDetails booking = null;
                 string getQuery = @"SELECT bd.Id, bd.PNR, bd.BookedByUserId, u.Username, 
                           p.Id AS PassengerId, p.FirstName, p.LastName
@@ -174,50 +173,63 @@ namespace FlightBookingSystem.DAL
             {
                 OpenConnection();
                 string query = @"
-                SELECT 
-                    bd.Id, 
-                    bd.FlightNumber AS BookingFlightNumber, 
-                    bd.Airline AS BookingAirline, 
-                    bd.Origin AS BookingOrigin, 
-                    bd.Destination AS BookingDestination,
-                    bd.DepartureTime AS BookingDepartureTime, 
-                    bd.ArrivalTime AS BookingArrivalTime, 
-                    bd.OriginalPrice AS BookingOriginalPrice,
-                    bd.SeatClass AS BookingSeatClass, 
-                    bd.SeatNumber, 
-                    bd.PNR, 
-                    bd.TotalPrice,
-                    bd.DestinationImageUrl,
-                    bd.BookingDate, 
-                    bd.Status,
-                    bd.IsNonStop,
-                    p.Id AS PassengerId, 
-                    p.FirstName, 
-                    p.LastName, 
-                    p.PassportNumber, 
-                    p.Nationality,
-                    p.Email, 
-                    p.Phone, 
-                    p.DateOfBirth,
-                    u.Id AS UserId, 
-                    u.Username, 
-                    u.FirstName AS UserFirstName, 
-                    u.LastName AS UserLastName
-                FROM BookingDetails bd
-                JOIN Passengers p ON bd.PassengerId = p.Id
-                JOIN Users u ON bd.BookedByUserId = u.Id
-                WHERE bd.DeletedAt IS NULL";
+            SELECT 
+                bd.Id, 
+                bd.FlightNumber AS BookingFlightNumber, 
+                bd.Airline AS BookingAirline, 
+                bd.Origin AS BookingOrigin, 
+                bd.Destination AS BookingDestination,
+                bd.DepartureTime AS BookingDepartureTime, 
+                bd.ArrivalTime AS BookingArrivalTime, 
+                bd.OriginalPrice AS BookingOriginalPrice,
+                bd.SeatClass AS BookingSeatClass, 
+                bd.SeatNumber, 
+                bd.PNR, 
+                bd.TotalPrice,
+                bd.DestinationImageUrl,
+                bd.BookingDate, 
+                bd.Status,
+                bd.IsNonStop,
+                p.Id AS PassengerId, 
+                p.FirstName, 
+                p.LastName, 
+                p.PassportNumber, 
+                p.Nationality,
+                p.Email, 
+                p.Phone, 
+                p.DateOfBirth,
+                u.Id AS UserId, 
+                u.Username, 
+                u.FirstName AS UserFirstName, 
+                u.LastName AS UserLastName
+            FROM BookingDetails bd
+            JOIN Passengers p ON bd.PassengerId = p.Id
+            JOIN Users u ON bd.BookedByUserId = u.Id";
 
                 using (SqlCommand cmd = new SqlCommand(query, connection))
                 using (SqlDataReader reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
                     {
-                        bookings.Add(MapBookingFromReader(reader));
+                        var booking = MapBookingFromReader(reader, includeStops: false);
+                        bookings.Add(booking);
+                    }
+                }
+
+                foreach (var booking in bookings)
+                {
+                    if (!booking.IsNonStop)
+                    {
+                        booking.Stops = GetBookingStops(booking.Id);
+                    }
+                    else
+                    {
+                        booking.Stops = new List<FlightStop>();
                     }
                 }
             }
             finally { CloseConnection(); }
+
             return bookings;
         }
 
@@ -390,7 +402,6 @@ namespace FlightBookingSystem.DAL
                     {
                         var booking = MapBookingFromReader(reader);
 
-                        // Load stops for this booking
                         if (!booking.IsNonStop)
                         {
                             booking.Stops = GetBookingStops(booking.Id);
@@ -473,7 +484,7 @@ namespace FlightBookingSystem.DAL
             finally { CloseConnection(); }
         }
 
-        private BookingDetails MapBookingFromReader(SqlDataReader reader)
+        private BookingDetails MapBookingFromReader(SqlDataReader reader, bool includeStops = true)
         {
             BookingDetails booking = new BookingDetails
             {
@@ -513,7 +524,7 @@ namespace FlightBookingSystem.DAL
                     LastName = reader.IsDBNull(reader.GetOrdinal("UserLastName")) ? null : reader.GetString(reader.GetOrdinal("UserLastName"))
                 }
             };
-            if (!booking.IsNonStop)
+            if (includeStops && !booking.IsNonStop)
             {
                 try
                 {
@@ -525,7 +536,8 @@ namespace FlightBookingSystem.DAL
                     booking.Stops = new List<FlightStop>();
                 }
             }
-        return booking;
+
+            return booking;
         }
         private List<FlightStop> GetBookingStops(int bookingId)
         {
@@ -576,7 +588,6 @@ namespace FlightBookingSystem.DAL
             {
                 OpenConnection();
 
-                // First delete existing stops
                 string deleteQuery = "DELETE FROM BookingStops WHERE BookingId = @BookingId";
                 using (SqlCommand cmd = new SqlCommand(deleteQuery, connection))
                 {
@@ -584,7 +595,6 @@ namespace FlightBookingSystem.DAL
                     cmd.ExecuteNonQuery();
                 }
 
-                // Insert new stops if there are any
                 if (stops.Any())
                 {
                     string insertQuery = @"INSERT INTO BookingStops 
