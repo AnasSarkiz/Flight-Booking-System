@@ -11,13 +11,22 @@
             mainContentPanel = new Panel();
             SuspendLayout();
             // 
+            // navbarControl
+            // 
+            navbarControl.BackColor = Color.FromArgb(8, 18, 44);
+            navbarControl.Dock = DockStyle.Top;
+            navbarControl.Location = new Point(0, 0);
+            navbarControl.Name = "navbarControl";
+            navbarControl.Size = new Size(1200, 80);
+            navbarControl.TabIndex = 0;
+            // 
             // mainContentPanel
             // 
             mainContentPanel.BackColor = Color.FromArgb(240, 245, 255);
             mainContentPanel.Dock = DockStyle.Fill;
-            mainContentPanel.Location = new Point(0, 0);
+            mainContentPanel.Location = new Point(0, 80);
             mainContentPanel.Name = "mainContentPanel";
-            mainContentPanel.Size = new Size(1200, 961);
+            mainContentPanel.Size = new Size(1200, 881);
             mainContentPanel.TabIndex = 1;
             // 
             // MainForm
@@ -27,6 +36,7 @@
             BackColor = Color.White;
             ClientSize = new Size(1200, 961);
             Controls.Add(mainContentPanel);
+            Controls.Add(navbarControl);
             Font = new Font("Segoe UI", 9F);
             MinimumSize = new Size(1000, 1000);
             Name = "MainForm";
