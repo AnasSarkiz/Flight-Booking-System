@@ -25,7 +25,7 @@ A professional, desktop-based Flight Booking System built using **C# WinForms**,
 
 * ***Flight Search:***
 
- ![Flight Search](docs/screenshots/searchflights.png)
+ ![Flight Search](docs/screenshots/searchFlights.png)
 
  * ***My Trips:***
 	
