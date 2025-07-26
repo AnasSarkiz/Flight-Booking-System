@@ -215,6 +215,7 @@ namespace FlightBookingSystem.Controls
 
         private void CreateFlightDetailLabels(BookingDetails booking, Panel detailsPanel)
         {
+            string stopsText = booking.IsNonStop ? "Non-stop" : $"{booking.Stops.Count} stop{(booking.StopCount > 1 ? "s" : "")}";
             Label airlineLabel = new Label
             {
                 Text = $"{booking.Airline} • {booking.FlightNumber}",
@@ -257,14 +258,34 @@ namespace FlightBookingSystem.Controls
                 Font = new Font("Segoe UI", 9, FontStyle.Bold),
                 Location = new Point(0, 100),
                 AutoSize = true,
-                ForeColor = booking.Status == "Confirmed" ? Color.DarkBlue : Color.DarkBlue
+                ForeColor = booking.Status == "Confirmed" ? Color.DarkBlue : Color.OrangeRed
             };
+            Label stopsLabel = new Label
+            {
+                Text = $"Stops: {stopsText}",
+                Font = new Font("Segoe UI", 9),
+                Location = new Point(200, 100), 
+                AutoSize = true,
+                ForeColor = booking.IsNonStop ? Color.Green : Color.Orange
+            };
+            if (!booking.IsNonStop && booking.Stops.Any())
+            {
+                var stopDetails = string.Join("\n", booking.Stops.Select(s =>
+                    $"{s.AirportCode} ({FormatDuration(s.LayoverDuration)})"));
+
+                var toolTip = new ToolTip();
+                toolTip.SetToolTip(stopsLabel, $"Flight stops:\n{stopDetails}");
+            }
+            detailsPanel.Controls.Add(stopsLabel);
 
             detailsPanel.Controls.AddRange(new Control[] {
                 airlineLabel, routeLabel, dateLabel, passengerLabel, statusLabel
             });
         }
-
+        private string FormatDuration(TimeSpan duration)
+        {
+            return $"{duration.Hours}h {duration.Minutes}m";
+        }
 
         private async Task LoadImageAsync(Panel panel, string imageUrl)
         {

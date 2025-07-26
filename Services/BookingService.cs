@@ -52,7 +52,9 @@ namespace FlightBookingSystem.Services
                     PNR = GeneratePNR(),
                     TotalPrice = apiFlight.Price,
                     BookingDate = DateTime.UtcNow,
-                    Status = "Confirmed"
+                    Status = "Confirmed",
+                    IsNonStop = apiFlight.IsNonStop,
+                    Stops = apiFlight.Stops?.ToList() ?? new List<FlightStop>()
                 };
 
                 if (!_bookingRepository.Add(booking, true))

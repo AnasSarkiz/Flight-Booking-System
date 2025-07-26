@@ -126,32 +126,56 @@ namespace FlightBookingSystem.Services
             foreach (JsonElement offer in root.GetProperty("data").EnumerateArray())
             {
                 JsonElement firstItinerary = offer.GetProperty("itineraries")[0];
-                JsonElement firstSegment = firstItinerary.GetProperty("segments")[0];
-                String price = offer.GetProperty("price").GetProperty("total").GetString();
-
+                var segments = firstItinerary.GetProperty("segments").EnumerateArray().ToList();
+                string price = offer.GetProperty("price").GetProperty("total").GetString();
                 JsonElement travelerPricing = offer.GetProperty("travelerPricings")[0];
-                String cabinClass = travelerPricing.GetProperty("fareOption").GetString();
+                string cabinClass = travelerPricing.GetProperty("fareOption").GetString();
 
-                Flight flight = new Flight
+                JsonElement firstSegment = segments[0];
+                JsonElement lastSegment = segments[segments.Count - 1];
+
+                var flight = new Flight
                 {
                     FlightNumber = firstSegment.GetProperty("number").GetString(),
                     Airline = firstSegment.GetProperty("carrierCode").GetString(),
                     Origin = firstSegment.GetProperty("departure").GetProperty("iataCode").GetString(),
-                    Destination = firstSegment.GetProperty("arrival").GetProperty("iataCode").GetString(),
+                    // Fixed: Get destination from last segment's arrival
+                    Destination = lastSegment.GetProperty("arrival").GetProperty("iataCode").GetString(),
                     DepartureTime = DateTime.Parse(firstSegment.GetProperty("departure").GetProperty("at").GetString()),
-                    ArrivalTime = DateTime.Parse(firstSegment.GetProperty("arrival").GetProperty("at").GetString()),
+                    ArrivalTime = DateTime.Parse(lastSegment.GetProperty("arrival").GetProperty("at").GetString()),
                     Price = decimal.Parse(price),
                     Duration = ParseDuration(firstItinerary.GetProperty("duration").GetString()),
                     SeatClass = cabinClass ?? "ECONOMY",
-                    Stops = firstItinerary.GetProperty("segments").GetArrayLength() - 1
+                    IsNonStop = segments.Count == 1,
+                    Stops = new List<FlightStop>(),
                 };
+
+                if (!flight.IsNonStop)
+                {
+                    for (int i = 1; i < segments.Count; i++)
+                    {
+                        var currentSegment = segments[i];
+                        var prevSegment = segments[i - 1];
+
+                        var airportCode = currentSegment.GetProperty("departure").GetProperty("iataCode").GetString();
+                        var airportName = airportCode; 
+
+                        var stop = new FlightStop
+                        {
+                            AirportCode = airportCode,
+                            Airport = airportName,
+                            LayoverDuration = DateTime.Parse(currentSegment.GetProperty("departure").GetProperty("at").GetString()) -
+                                             DateTime.Parse(prevSegment.GetProperty("arrival").GetProperty("at").GetString())
+                        };
+                        flight.Stops.Add(stop);
+                    }
+                }
 
                 flights.Add(flight);
             }
 
             return flights;
-                }
-        
+        }
 
         private TimeSpan ParseDuration(string durationString)
         {

@@ -28,7 +28,8 @@ namespace FlightBookingSystem.Controls
         private readonly IBookingDetailsRepository _bookingRepository;
         private readonly BookingService _bookingService;
         private readonly UserService _userService;
-
+        public bool IsNonStop { get; set; }
+        public string StopsInfo { get; set; }
         public BookingControl(Flight flight, User user,
                          IPassengerRepository passengerRepository,
                          IBookingDetailsRepository bookingRepository,
@@ -118,7 +119,9 @@ namespace FlightBookingSystem.Controls
                 SeatNumber = GenerateRandomSeat(),
                 PNR = GeneratePNR(),
                 TotalPrice = _selectedFlight.Price,
-                BookedBuy = _currentUser
+                BookedBuy = _currentUser,
+                IsNonStop = _selectedFlight.IsNonStop,
+                Stops = _selectedFlight.Stops?.ToList() ?? new List<FlightStop>()
             };
 
 
@@ -126,6 +129,13 @@ namespace FlightBookingSystem.Controls
                                $"{_selectedFlight.Origin} → {_selectedFlight.Destination}\n" +
                                $"{_selectedFlight.DepartureTime:ddd, MMM dd yyyy hh:mm tt}";
             lblTotalPrice.Text = $"Total Price: {_selectedFlight.FormattedPrice}";
+            string stopsInfo = _selectedFlight.IsNonStop ? "Non-stop" :
+           $"{_selectedFlight.StopCount} stop{(_selectedFlight.StopCount > 1 ? "s" : "")}";
+
+            lblFlightInfo.Text = $"{_selectedFlight.Airline} • {_selectedFlight.FlightNumber}\n" +
+                               $"{_selectedFlight.Origin} → {_selectedFlight.Destination}\n" +
+                               $"{_selectedFlight.DepartureTime:ddd, MMM dd yyyy hh:mm tt}\n" +
+                               $"({stopsInfo})";
         }
 
         private string GeneratePNR()

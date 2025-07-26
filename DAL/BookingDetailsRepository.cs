@@ -20,19 +20,18 @@ namespace FlightBookingSystem.DAL
             {
                 OpenConnection();
                 string query = @"
-        INSERT INTO BookingDetails (
-         FlightNumber, Airline, Origin, Destination,
-         DestinationImageUrl, DepartureTime, ArrivalTime, 
-          OriginalPrice, PassengerId, SeatClass, SeatNumber, 
-          PNR, TotalPrice, BookedByUserId, Status, BookingDate
+            INSERT INTO BookingDetails (
+            FlightNumber, Airline, Origin, Destination,
+            DestinationImageUrl, DepartureTime, ArrivalTime, 
+            OriginalPrice, PassengerId, SeatClass, SeatNumber, 
+            PNR, TotalPrice, BookedByUserId, Status, BookingDate, IsNonStop
             ) VALUES (
-           @FlightNumber, @Airline, @Origin, @Destination,
-              @DestinationImageUrl, @DepartureTime, @ArrivalTime, 
-              @OriginalPrice, @PassengerId, @SeatClass, @SeatNumber, 
-               @PNR, @TotalPrice, @BookedByUserId, @Status, @BookingDate
+            @FlightNumber, @Airline, @Origin, @Destination,
+            @DestinationImageUrl, @DepartureTime, @ArrivalTime, 
+            @OriginalPrice, @PassengerId, @SeatClass, @SeatNumber, 
+            @PNR, @TotalPrice, @BookedByUserId, @Status, @BookingDate, @IsNonStop
             );
             SELECT SCOPE_IDENTITY();";
-
                 using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@FlightNumber", booking.FlightNumber);
@@ -51,10 +50,15 @@ namespace FlightBookingSystem.DAL
                     cmd.Parameters.AddWithValue("@BookedByUserId", booking.BookedBuy.Id);
                     cmd.Parameters.AddWithValue("@Status", booking.Status ?? "Confirmed");
                     cmd.Parameters.AddWithValue("@BookingDate", booking.BookingDate);
-
+                    bool isNonStop = booking.IsNonStop || (booking.Stops == null || !booking.Stops.Any());
+                    cmd.Parameters.AddWithValue("@IsNonStop", isNonStop);
                     object result = cmd.ExecuteScalar();
                     booking.Id = Convert.ToInt32(result);
 
+                    if (booking.Stops != null && booking.Stops.Any())
+                    {
+                        SaveBookingStops(booking.Id, booking.Stops);
+                    }
                     if (logActivity && booking.BookedBuy?.Id > 0)
                     {
                         _activityLogRepository.Add(new ActivityLog
@@ -80,15 +84,49 @@ namespace FlightBookingSystem.DAL
             try
             {
                 OpenConnection();
-                // First get the booking to log who cancelled it
-                var booking = GetById(bookingId);
+
+                // First get the booking details without closing the connection
+                BookingDetails booking = null;
+                string getQuery = @"SELECT bd.Id, bd.PNR, bd.BookedByUserId, u.Username, 
+                          p.Id AS PassengerId, p.FirstName, p.LastName
+                          FROM BookingDetails bd
+                          JOIN Users u ON bd.BookedByUserId = u.Id
+                          JOIN Passengers p ON bd.PassengerId = p.Id
+                          WHERE bd.Id = @Id AND bd.DeletedAt IS NULL";
+
+                using (SqlCommand getCmd = new SqlCommand(getQuery, connection))
+                {
+                    getCmd.Parameters.AddWithValue("@Id", bookingId);
+                    using (SqlDataReader reader = getCmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            booking = new BookingDetails
+                            {
+                                Id = reader.GetInt32(0),
+                                PNR = reader.GetString(1),
+                                BookedBuy = new User
+                                {
+                                    Id = reader.GetInt32(2),
+                                    Username = reader.GetString(3)
+                                },
+                                Passenger = new Passenger  // Initialize the required Passenger property
+                                {
+                                    Id = reader.GetInt32(4),
+                                    FirstName = reader.GetString(5),
+                                    LastName = reader.GetString(6)
+                                }
+                            };
+                        }
+                    }
+                }
 
                 if (booking != null)
                 {
-                    string query = @"UPDATE BookingDetails 
-                           SET Status = 'Cancelled', DeletedAt = GETUTCDATE()
-                           WHERE Id = @Id";
-                    using (SqlCommand cmd = new SqlCommand(query, connection))
+                    string updateQuery = @"UPDATE BookingDetails 
+                               SET Status = 'Cancelled', DeletedAt = GETUTCDATE()
+                               WHERE Id = @Id";
+                    using (SqlCommand cmd = new SqlCommand(updateQuery, connection))
                     {
                         cmd.Parameters.AddWithValue("@Id", bookingId);
                         var result = cmd.ExecuteNonQuery() > 0;
@@ -108,7 +146,10 @@ namespace FlightBookingSystem.DAL
                 }
                 return false;
             }
-            finally { CloseConnection(); }
+            finally
+            {
+                CloseConnection();
+            }
         }
         public bool Delete(int id)
         {
@@ -149,6 +190,7 @@ namespace FlightBookingSystem.DAL
                     bd.DestinationImageUrl,
                     bd.BookingDate, 
                     bd.Status,
+                    bd.IsNonStop,
                     p.Id AS PassengerId, 
                     p.FirstName, 
                     p.LastName, 
@@ -201,6 +243,7 @@ namespace FlightBookingSystem.DAL
                     bd.TotalPrice,
                     bd.BookingDate, 
                     bd.Status,
+                    bd.IsNonStop,
                     p.Id AS PassengerId, 
                     p.FirstName, 
                     p.LastName, 
@@ -256,6 +299,7 @@ namespace FlightBookingSystem.DAL
                     bd.TotalPrice,
                     bd.BookingDate, 
                     bd.Status,
+                    bd.IsNonStop,
                     p.Id AS PassengerId, 
                     p.FirstName, 
                     p.LastName, 
@@ -292,60 +336,88 @@ namespace FlightBookingSystem.DAL
         public IEnumerable<BookingDetails> GetByUserId(int userId)
         {
             List<BookingDetails> bookings = new List<BookingDetails>();
+            SqlConnection conn = null;
+            SqlDataReader reader = null;
+
             try
             {
-                OpenConnection();
+                conn = new SqlConnection(connection.ConnectionString);
+                conn.Open();
+
                 string query = @"
-                SELECT 
-                    bd.Id, 
-                    bd.FlightNumber AS BookingFlightNumber, 
-                    bd.Airline AS BookingAirline, 
-                    bd.Origin AS BookingOrigin, 
-                    bd.Destination AS BookingDestination,
-                    bd.DepartureTime AS BookingDepartureTime, 
-                    bd.ArrivalTime AS BookingArrivalTime, 
-                    bd.OriginalPrice AS BookingOriginalPrice,
-                    bd.SeatClass AS BookingSeatClass, 
-                    bd.DestinationImageUrl,
-                    bd.SeatNumber, 
-                    bd.PNR, 
-                    bd.TotalPrice,
-                    bd.BookingDate, 
-                    bd.Status,
-                    p.Id AS PassengerId, 
-                    p.FirstName, 
-                    p.LastName, 
-                    p.PassportNumber, 
-                    p.Nationality,
-                    p.Email, 
-                    p.Phone, 
-                    p.DateOfBirth,
-                    u.Id AS UserId, 
-                    u.Username, 
-                    u.FirstName AS UserFirstName, 
-                    u.LastName AS UserLastName
-                FROM BookingDetails bd
-                JOIN Passengers p ON bd.PassengerId = p.Id
-                JOIN Users u ON bd.BookedByUserId = u.Id
-                WHERE bd.BookedByUserId = @UserId AND bd.DeletedAt IS NULL
+        SELECT 
+            bd.Id, 
+            bd.FlightNumber AS BookingFlightNumber, 
+            bd.Airline AS BookingAirline, 
+            bd.Origin AS BookingOrigin, 
+            bd.Destination AS BookingDestination,
+            bd.DepartureTime AS BookingDepartureTime, 
+            bd.ArrivalTime AS BookingArrivalTime, 
+            bd.OriginalPrice AS BookingOriginalPrice,
+            bd.SeatClass AS BookingSeatClass, 
+            bd.SeatNumber, 
+            bd.PNR, 
+            bd.TotalPrice,
+            bd.DestinationImageUrl,
+            bd.BookingDate, 
+            bd.Status,
+            bd.IsNonStop,
+            p.Id AS PassengerId, 
+            p.FirstName, 
+            p.LastName, 
+            p.PassportNumber, 
+            p.Nationality,
+            p.Email, 
+            p.Phone, 
+            p.DateOfBirth,
+            u.Id AS UserId, 
+            u.Username, 
+            u.FirstName AS UserFirstName, 
+            u.LastName AS UserLastName
+        FROM BookingDetails bd
+        JOIN Passengers p ON bd.PassengerId = p.Id
+        JOIN Users u ON bd.BookedByUserId = u.Id
+       WHERE bd.BookedByUserId = @UserId 
+                AND (bd.DeletedAt IS NULL OR bd.Status = 'Cancelled')
                 ORDER BY bd.BookingDate DESC";
 
-                using (SqlCommand cmd = new SqlCommand(query, connection))
+                using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@UserId", userId);
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    reader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+                    while (reader.Read())
                     {
-                        while (reader.Read())
+                        var booking = MapBookingFromReader(reader);
+
+                        // Load stops for this booking
+                        if (!booking.IsNonStop)
                         {
-                            bookings.Add(MapBookingFromReader(reader));
+                            booking.Stops = GetBookingStops(booking.Id);
                         }
+                        else
+                        {
+                            booking.Stops = new List<FlightStop>();
+                        }
+
+                        bookings.Add(booking);
                     }
                 }
             }
-            finally { CloseConnection(); }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                reader?.Close();
+                reader?.Dispose();
+                conn?.Dispose();
+            }
+
             return bookings;
         }
-
+        
         public bool Update(BookingDetails booking)
         {
             try
@@ -353,20 +425,21 @@ namespace FlightBookingSystem.DAL
                 OpenConnection();
                 string query = @"
                 UPDATE BookingDetails SET 
-                    FlightNumber = @FlightNumber,
-                    Airline = @Airline,
-                    Origin = @Origin,
-                    Destination = @Destination,
-                    DepartureTime = @DepartureTime,
-                    ArrivalTime = @ArrivalTime,
-                    OriginalPrice = @OriginalPrice,
-                    PassengerId = @PassengerId,
-                    DestinationImageUrl = @DestinationImageUrl
-                    SeatClass = @SeatClass,
-                    SeatNumber = @SeatNumber,
-                    PNR = @PNR,
-                    TotalPrice = @TotalPrice,
-                    Status = @Status
+                FlightNumber = @FlightNumber,
+                Airline = @Airline,
+                Origin = @Origin,
+                Destination = @Destination,
+                DepartureTime = @DepartureTime,
+                ArrivalTime = @ArrivalTime,
+                OriginalPrice = @OriginalPrice,
+                PassengerId = @PassengerId,
+                DestinationImageUrl = @DestinationImageUrl,
+                SeatClass = @SeatClass,
+                SeatNumber = @SeatNumber,
+                PNR = @PNR,
+                TotalPrice = @TotalPrice,
+                Status = @Status,
+                IsNonStop = @IsNonStop
                 WHERE Id = @Id AND DeletedAt IS NULL";
 
                 using (SqlCommand cmd = new SqlCommand(query, connection))
@@ -385,16 +458,24 @@ namespace FlightBookingSystem.DAL
                     cmd.Parameters.AddWithValue("@TotalPrice", booking.TotalPrice);
                     cmd.Parameters.AddWithValue("@Status", booking.Status ?? "Confirmed");
                     cmd.Parameters.AddWithValue("@Id", booking.Id);
+                    cmd.Parameters.AddWithValue("@DestinationImageUrl", (object)booking.DestinationImageUrl ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@IsNonStop", booking.IsNonStop);
 
+
+                    if (!booking.IsNonStop && booking.Stops.Any())
+                    {
+                        SaveBookingStops(booking.Id, booking.Stops);
+                    }
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }
+
             finally { CloseConnection(); }
         }
 
         private BookingDetails MapBookingFromReader(SqlDataReader reader)
         {
-            return new BookingDetails
+            BookingDetails booking = new BookingDetails
             {
                 Id = reader.GetInt32(reader.GetOrdinal("Id")),
                 FlightNumber = reader.GetString(reader.GetOrdinal("BookingFlightNumber")),
@@ -411,6 +492,8 @@ namespace FlightBookingSystem.DAL
                 TotalPrice = reader.GetDecimal(reader.GetOrdinal("TotalPrice")),
                 BookingDate = reader.GetDateTime(reader.GetOrdinal("BookingDate")),
                 Status = reader.IsDBNull(reader.GetOrdinal("Status")) ? "Confirmed" : reader.GetString(reader.GetOrdinal("Status")),
+                IsNonStop = reader.GetBoolean(reader.GetOrdinal("IsNonStop")),
+                Stops = new List<FlightStop>(),
                 Passenger = new Passenger
                 {
                     Id = reader.GetInt32(reader.GetOrdinal("PassengerId")),
@@ -430,6 +513,101 @@ namespace FlightBookingSystem.DAL
                     LastName = reader.IsDBNull(reader.GetOrdinal("UserLastName")) ? null : reader.GetString(reader.GetOrdinal("UserLastName"))
                 }
             };
+            if (!booking.IsNonStop)
+            {
+                try
+                {
+                    booking.Stops = GetBookingStops(booking.Id);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error loading stops: {ex.Message}");
+                    booking.Stops = new List<FlightStop>();
+                }
+            }
+        return booking;
+        }
+        private List<FlightStop> GetBookingStops(int bookingId)
+        {
+            var stops = new List<FlightStop>();
+            try
+            {
+                OpenConnection();
+                string query = @"SELECT Airport, AirportCode, LayoverDuration 
+                FROM BookingStops WHERE BookingId = @BookingId";
+
+                using (SqlCommand cmd = new SqlCommand(query, connection))
+                {
+                    cmd.Parameters.AddWithValue("@BookingId", bookingId);
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            try
+                            {
+                                stops.Add(new FlightStop
+                                {
+                                    Airport = reader.IsDBNull(0) ? string.Empty : reader.GetString(0),
+                                    AirportCode = reader.IsDBNull(1) ? string.Empty : reader.GetString(1),
+                                    LayoverDuration = reader.IsDBNull(2) ? TimeSpan.Zero : TimeSpan.FromTicks(reader.GetInt64(2))
+                                });
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Error parsing stop: {ex.Message}");
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting stops: {ex.Message}");
+            }
+            finally
+            {
+                CloseConnection();
+            }
+            return stops;
+        }
+        private void SaveBookingStops(int bookingId, List<FlightStop> stops)
+        {
+            try
+            {
+                OpenConnection();
+
+                // First delete existing stops
+                string deleteQuery = "DELETE FROM BookingStops WHERE BookingId = @BookingId";
+                using (SqlCommand cmd = new SqlCommand(deleteQuery, connection))
+                {
+                    cmd.Parameters.AddWithValue("@BookingId", bookingId);
+                    cmd.ExecuteNonQuery();
+                }
+
+                // Insert new stops if there are any
+                if (stops.Any())
+                {
+                    string insertQuery = @"INSERT INTO BookingStops 
+                                 (BookingId, Airport, AirportCode, LayoverDuration)
+                                 VALUES (@BookingId, @Airport, @AirportCode, @LayoverDuration)";
+
+                    foreach (var stop in stops)
+                    {
+                        using (SqlCommand cmd = new SqlCommand(insertQuery, connection))
+                        {
+                            cmd.Parameters.AddWithValue("@BookingId", bookingId);
+                            cmd.Parameters.AddWithValue("@Airport", stop.Airport);
+                            cmd.Parameters.AddWithValue("@AirportCode", stop.AirportCode);
+                            cmd.Parameters.AddWithValue("@LayoverDuration", stop.LayoverDuration.Ticks);
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                CloseConnection();
+            }
         }
     }
-}
+    }

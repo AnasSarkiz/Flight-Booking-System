@@ -19,6 +19,29 @@
         public DateTime BookingDate { get; set; }
         public User BookedBuy { get; set; }
         public string Status { get; set; }
+        public bool IsNonStop { get; set; } = true;
+        public List<FlightStop> Stops { get; set; } = new List<FlightStop>();
+
+        public int StopCount => IsNonStop ? 0 : Stops.Count;
         public string FormattedTotalPrice => $"${TotalPrice:N0}";
+
+        public string RouteSummary
+        {
+            get
+            {
+                if (IsNonStop)
+                    return $"{Origin} → {Destination}";
+
+                var stopCodes = Stops.Select(s => s.AirportCode);
+                return $"{Origin} → {string.Join(" → ", stopCodes)} → {Destination}";
+            }
+        }
+    }
+
+    public class FlightStop
+    {
+        public string Airport { get; set; }
+        public string AirportCode { get; set; }
+        public TimeSpan LayoverDuration { get; set; }
     }
 }

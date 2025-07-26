@@ -16,8 +16,24 @@ namespace FlightBookingSystem.Models
         public string Destination { get; set; }
         public DateTime DepartureTime { get; set; }
         public DateTime ArrivalTime { get; set; }
-        public int Stops { get; set; }
         public string FormattedDuration => $"{Duration.Hours}h {Duration.Minutes}m";
         public string FormattedPrice => $"${Price:N0}";
+        public bool IsNonStop { get; set; }
+        public List<FlightStop> Stops { get; set; } = new List<FlightStop>();
+
+        public int StopCount => IsNonStop ? 0 : Stops.Count;
+
+        public string RouteSummary
+        {
+            get
+            {
+                if (IsNonStop)
+                    return $"{Origin} → {Destination}";
+
+                var stops = Stops.Select(s => s.AirportCode);
+                return $"{Origin} → {string.Join(" → ", stops)} → {Destination}";
+            }
+        }
     }
+
 }

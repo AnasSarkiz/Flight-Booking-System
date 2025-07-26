@@ -48,25 +48,43 @@ namespace FlightBookingSystem.Controls
         {
             priceTrackBar.Scroll += (s, e) =>
             {
-                // Calculate the actual price based on trackbar position and flight price range
-                _maxPrice = _minFlightPrice + (priceTrackBar.Value * (_maxFlightPrice - _minFlightPrice) ) / 100;
+                _maxPrice = _minFlightPrice + (priceTrackBar.Value * (_maxFlightPrice - _minFlightPrice)) / 100;
                 maxPriceLabel.Text = $"${_maxPrice:0}";
             };
 
             nonStopRadio.CheckedChanged += (s, e) =>
             {
-                if (nonStopRadio.Checked) _selectedStopOption = StopOption.NonStop;
+                if (nonStopRadio.Checked)
+                {
+                    _selectedStopOption = StopOption.NonStop;
+                    UpdateFilterButtonState();
+                }
             };
+
             oneStopRadio.CheckedChanged += (s, e) =>
             {
-                if (oneStopRadio.Checked) _selectedStopOption = StopOption.OneStop;
+                if (oneStopRadio.Checked)
+                {
+                    _selectedStopOption = StopOption.OneStop;
+                    UpdateFilterButtonState();
+                }
             };
+
             anyStopsRadio.CheckedChanged += (s, e) =>
             {
-                if (anyStopsRadio.Checked) _selectedStopOption = StopOption.AnyStops;
+                if (anyStopsRadio.Checked)
+                {
+                    _selectedStopOption = StopOption.AnyStops;
+                    UpdateFilterButtonState();
+                }
             };
 
             applyFiltersButton.Click += (s, e) => FiltersApplied?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void UpdateFilterButtonState()
+        {
+            applyFiltersButton.Enabled = nonStopRadio.Enabled || oneStopRadio.Enabled || anyStopsRadio.Enabled;
         }
 
         public void UpdateFilters(List<Flight> flights)
@@ -99,38 +117,32 @@ namespace FlightBookingSystem.Controls
                     AutoSize = true,
                     Tag = airline
                 };
-                checkBox.CheckedChanged += UpdateSelectedAirlines;
+                //checkBox.CheckedChanged += UpdateSelectedAirlines;
                 airlinesGroupBox.Controls.Add(checkBox);
                 yPos += 25;
             }
             airlinesGroupBox.Height = yPos + 10;
 
-            bool hasNonStop = flights.Any(f => f.Stops == 0);
-            bool hasOneStop = flights.Any(f => f.Stops == 1);
-            bool hasMultiStop = flights.Any(f => f.Stops > 1);
+            // Enhanced stop filtering logic
+            bool hasNonStop = flights.Any(f => f.IsNonStop);
+            bool hasOneStop = flights.Any(f => !f.IsNonStop && f.StopCount == 1);
+            bool hasMultiStop = flights.Any(f => !f.IsNonStop && f.StopCount > 1);
 
             nonStopRadio.Enabled = hasNonStop;
             oneStopRadio.Enabled = hasOneStop;
             anyStopsRadio.Enabled = hasNonStop || hasOneStop || hasMultiStop;
+
+            nonStopRadio.Text = hasNonStop ? "Non-stop" : "Non-stop (none available)";
+            oneStopRadio.Text = hasOneStop ? "1 stop" : "1 stop (none available)";
+            anyStopsRadio.Text = "All flights";
 
             if ((_selectedStopOption == StopOption.NonStop && !hasNonStop) ||
                 (_selectedStopOption == StopOption.OneStop && !hasOneStop))
             {
                 anyStopsRadio.Checked = true;
             }
-        }
 
-        private void UpdateSelectedAirlines(object sender, EventArgs e)
-        {
-            _selectedAirlines.Clear();
-
-            foreach (Control control in airlinesGroupBox.Controls)
-            {
-                if (control is CheckBox checkBox && checkBox.Checked)
-                {
-                    _selectedAirlines.Add(checkBox.Tag.ToString());
-                }
-            }
+            UpdateFilterButtonState();
         }
     }
 }

@@ -23,7 +23,7 @@
         private System.Windows.Forms.Button btnGeneratePDF;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
-
+        private System.Windows.Forms.Label lblStops;
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -88,7 +88,7 @@
             // 
             lblSeat.AutoSize = true;
             lblSeat.Font = new Font("Segoe UI", 10F);
-            lblSeat.Location = new Point(30, 215);
+            lblSeat.Location = new Point(30, 210);
             lblSeat.Name = "lblSeat";
             lblSeat.Size = new Size(0, 19);
             lblSeat.TabIndex = 6;
@@ -97,7 +97,7 @@
             // 
             lblStatus.AutoSize = true;
             lblStatus.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            lblStatus.Location = new Point(30, 240);
+            lblStatus.Location = new Point(30, 235);
             lblStatus.Name = "lblStatus";
             lblStatus.Size = new Size(0, 19);
             lblStatus.TabIndex = 7;
@@ -106,7 +106,7 @@
             // 
             lblPNR.AutoSize = true;
             lblPNR.Font = new Font("Segoe UI", 10F);
-            lblPNR.Location = new Point(30, 265);
+            lblPNR.Location = new Point(30, 260);
             lblPNR.Name = "lblPNR";
             lblPNR.Size = new Size(0, 19);
             lblPNR.TabIndex = 8;
@@ -115,7 +115,7 @@
             // 
             lblIssuedAt.AutoSize = true;
             lblIssuedAt.Font = new Font("Segoe UI", 10F);
-            lblIssuedAt.Location = new Point(30, 290);
+            lblIssuedAt.Location = new Point(30, 285);
             lblIssuedAt.Name = "lblIssuedAt";
             lblIssuedAt.Size = new Size(0, 19);
             lblIssuedAt.TabIndex = 12;
@@ -124,7 +124,7 @@
             // 
             lblPrice.AutoSize = true;
             lblPrice.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            lblPrice.Location = new Point(30, 315);
+            lblPrice.Location = new Point(30, 310);
             lblPrice.Name = "lblPrice";
             lblPrice.Size = new Size(0, 19);
             lblPrice.TabIndex = 9;
@@ -136,7 +136,7 @@
             btnCancelBooking.FlatStyle = FlatStyle.Flat;
             btnCancelBooking.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             btnCancelBooking.ForeColor = Color.White;
-            btnCancelBooking.Location = new Point(30, 360);
+            btnCancelBooking.Location = new Point(30, 355);
             btnCancelBooking.Name = "btnCancelBooking";
             btnCancelBooking.Size = new Size(180, 40);
             btnCancelBooking.TabIndex = 10;
@@ -151,7 +151,7 @@
             btnClose.FlatStyle = FlatStyle.Flat;
             btnClose.Font = new Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
             btnClose.ForeColor = Color.Red;
-            btnClose.Location = new Point(273, 418);
+            btnClose.Location = new Point(273, 413);
             btnClose.Name = "btnClose";
             btnClose.Size = new Size(180, 40);
             btnClose.TabIndex = 11;
@@ -211,6 +211,16 @@
             dtpArrival.Size = new Size(200, 23);
             dtpArrival.TabIndex = 15;
             // 
+            // lblStops
+            // 
+            lblStops = new Label();
+            lblStops.AutoSize = true;
+            lblStops.Font = new Font("Segoe UI", 10F);
+            lblStops.Location = new Point(30, 185);
+            lblStops.Name = "lblStops";
+            lblStops.Size = new Size(0, 19);
+            lblStops.TabIndex = 5;
+            // 
             // btnSaveChanges
             // 
             btnSaveChanges.BackColor = Color.FromArgb(0, 115, 207);
@@ -218,7 +228,7 @@
             btnSaveChanges.FlatStyle = FlatStyle.Flat;
             btnSaveChanges.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             btnSaveChanges.ForeColor = Color.White;
-            btnSaveChanges.Location = new Point(273, 360);
+            btnSaveChanges.Location = new Point(273, 355);
             btnSaveChanges.Name = "btnSaveChanges";
             btnSaveChanges.Size = new Size(180, 40);
             btnSaveChanges.TabIndex = 16;
@@ -232,7 +242,7 @@
             btnGeneratePDF.FlatAppearance.BorderSize = 0;
             btnGeneratePDF.FlatStyle = FlatStyle.Flat;
             btnGeneratePDF.Font = new Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            btnGeneratePDF.Location = new Point(30, 418);
+            btnGeneratePDF.Location = new Point(30, 413);
             btnGeneratePDF.Name = "btnGeneratePDF";
             btnGeneratePDF.Size = new Size(180, 40);
             btnGeneratePDF.TabIndex = 17;
@@ -257,6 +267,7 @@
             label4.Name = "label4";
             label4.Size = new Size(0, 15);
             label4.TabIndex = 19;
+           
             // 
             // ManageBookingDialog
             // 
@@ -284,6 +295,7 @@
             Controls.Add(label1);
             Controls.Add(lblRoute);
             Controls.Add(lblFlightInfo);
+            Controls.Add(lblStops);
             Font = new Font("Segoe UI", 9F);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;

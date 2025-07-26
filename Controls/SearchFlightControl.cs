@@ -5,6 +5,7 @@ using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using FlightBookingSystem.Models;
@@ -70,7 +71,7 @@ namespace FlightBookingSystem.Controls
         }
 
         private async Task<Flight> CreateTestFlight(int id, string number, string airline,
-     string origin, string destination, int depHours, int arrHours, decimal price,string seatClass,int stopsNo)
+     string origin, string destination, int depHours, int arrHours, decimal price,string seatClass,int stops )
         {
             var cityName = destination.Split('(')[0].Trim();
             return new Flight
@@ -86,7 +87,7 @@ namespace FlightBookingSystem.Controls
                 Price = price,
                 DestinationImageUrl = await _unsplashService.GetCityImageUrl(cityName),
                 AirlineLogoUrl = $"https://content.airhex.com/content/logos/airlines_{airline}_80_80_s.png",
-                Stops = stopsNo,
+                IsNonStop= stops == 0,
                 SeatClass = seatClass
 
             };
@@ -110,8 +111,8 @@ namespace FlightBookingSystem.Controls
                  filterPanelControl.SelectedAirlines.Contains(f.Airline)) &&
                 f.Price <= filterPanelControl.MaxPrice &&
                 (filterPanelControl.SelectedStopOption == FilterPanelControl.StopOption.AnyStops ||
-                 (filterPanelControl.SelectedStopOption == FilterPanelControl.StopOption.NonStop && f.Stops == 0) ||
-                 (filterPanelControl.SelectedStopOption == FilterPanelControl.StopOption.OneStop && f.Stops == 1))
+                 (filterPanelControl.SelectedStopOption == FilterPanelControl.StopOption.NonStop && f.IsNonStop) ||
+                 (filterPanelControl.SelectedStopOption == FilterPanelControl.StopOption.OneStop && !f.IsNonStop))
             ).ToList();
 
             var sortedFlights = SortFlights(filteredFlights, filterPanelControl.SelectedSortOption);
@@ -171,6 +172,8 @@ namespace FlightBookingSystem.Controls
                 {
                     flight.DestinationImageUrl = await _unsplashService.GetCityImageUrl(destinationCity);
                     flight.AirlineLogoUrl = $"https://content.airhex.com/content/logos/airlines_{flight.Airline}_80_80_s.png";
+
+                    flight.IsNonStop = flight.Stops == null || flight.Stops.Count == 0;
                 }
 
                 LoadFlights(flights);
@@ -258,7 +261,6 @@ namespace FlightBookingSystem.Controls
                 Cursor = Cursors.Hand
             };
 
-            // Main content panel
             Panel contentPanel = new Panel
             {
                 Dock = DockStyle.Fill,
@@ -293,7 +295,7 @@ namespace FlightBookingSystem.Controls
 
             Label routeLabel = new Label
             {
-                Text = $"{flight.Origin} → {flight.Destination}",
+                Text = flight.RouteSummary,
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
                 Location = new Point(0, 25),
                 AutoSize = true,
@@ -301,6 +303,7 @@ namespace FlightBookingSystem.Controls
             };
             detailsPanel.Controls.Add(routeLabel);
 
+            // Flight times
             Label timeLabel = new Label
             {
                 Text = $"{flight.DepartureTime:HH:mm} - {flight.ArrivalTime:HH:mm}",
@@ -311,6 +314,7 @@ namespace FlightBookingSystem.Controls
             };
             detailsPanel.Controls.Add(timeLabel);
 
+            // Duration
             Label durationLabel = new Label
             {
                 Text = $"Duration: {flight.FormattedDuration}",
@@ -321,8 +325,30 @@ namespace FlightBookingSystem.Controls
             };
             detailsPanel.Controls.Add(durationLabel);
 
+            // Stop information - enhanced display
+            Label stopsLabel = new Label
+            {
+                Text = flight.IsNonStop ? "✈️ Non-stop" : $"⏱️ {flight.StopCount} stop{(flight.StopCount > 1 ? "s" : "")}",
+                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                Location = new Point(0, 95),
+                AutoSize = true,
+                ForeColor = flight.IsNonStop ? Color.FromArgb(0, 115, 207) : Color.FromArgb(220, 120, 0)
+            };
+            detailsPanel.Controls.Add(stopsLabel);
+
+            // Add tooltip for stop details if not non-stop
+            if (!flight.IsNonStop && flight.Stops.Any())
+            {
+                var stopDetails = string.Join("\n", flight.Stops.Select(s =>
+                    $"{s.AirportCode} ({s.LayoverDuration.Hours}h {s.LayoverDuration.Minutes}m layover)"));
+
+                var toolTip = new ToolTip();
+                toolTip.SetToolTip(stopsLabel, $"Flight stops:\n{stopDetails}");
+            }
+
             contentPanel.Controls.Add(detailsPanel);
 
+            // Price panel
             Panel pricePanel = new Panel
             {
                 Dock = DockStyle.Right,
@@ -330,6 +356,7 @@ namespace FlightBookingSystem.Controls
                 Padding = new Padding(10)
             };
 
+            // Price label
             Label priceLabel = new Label
             {
                 Text = flight.FormattedPrice,
@@ -362,7 +389,6 @@ namespace FlightBookingSystem.Controls
                 FlatStyle = FlatStyle.Flat,
                 Font = new Font("Arial", 9, FontStyle.Bold),
             };
-     
             selectButton.FlatAppearance.BorderSize = 0;
             selectButton.Click += (s, e) => FlightSelected?.Invoke(this, flight);
             pricePanel.Controls.Add(selectButton);
@@ -370,9 +396,13 @@ namespace FlightBookingSystem.Controls
             contentPanel.Controls.Add(pricePanel);
             card.Controls.Add(contentPanel);
 
-      
-
             return card;
+        }
+
+        private string GetAirportCode(string airportText)
+        {
+            var match = Regex.Match(airportText, @"\(([A-Z]{3})\)");
+            return match.Success ? match.Groups[1].Value : airportText;
         }
         public void SetSearchDestination(string destination)
         {

@@ -42,16 +42,50 @@ namespace FlightBookingSystem.Controls
             string destCity = GetCityName(_booking.Destination);
             string destCode = GetAirportCode(_booking.Destination);
 
-            lblFlightInfo.Text = $"{_booking.Airline} {_booking.FlightNumber}";
-            lblRoute.Text = $"{originCity} ({originCode}) → {destCity} ({destCode})";
+            // Enhanced route display with stops
+            if (!_booking.IsNonStop && _booking.Stops != null && _booking.Stops.Any())
+            {
+                var stopsInfo = new System.Text.StringBuilder();
+                stopsInfo.Append($"Route: {originCode} → ");
+
+                foreach (var stop in _booking.Stops)
+                {
+                    stopsInfo.Append($"{stop.AirportCode} ({FormatDuration(stop.LayoverDuration)}) → ");
+                }
+
+                stopsInfo.Append(destCode);
+                lblRoute.Text = stopsInfo.ToString();
+            }
+            else
+            {
+                lblRoute.Text = $"Route: {originCode} → {destCode} (Non-stop)";
+            }
+
+            lblFlightInfo.Text = $"{originCity} ({originCode}) → {destCity} ({destCode})";
+            lblFlightInfo.Font = new System.Drawing.Font(lblFlightInfo.Font, FontStyle.Bold);
 
             dtpDeparture.Value = _booking.DepartureTime;
             dtpArrival.Value = _booking.ArrivalTime;
 
-            lblDuration.Text = $"Duration: {FormatDuration(_booking.ArrivalTime - _booking.DepartureTime)}";
+            // Enhanced duration and stops display
+            var duration = _booking.ArrivalTime - _booking.DepartureTime;
+            lblDuration.Text = $"Duration: {FormatDuration(duration)}";
+
+            string stopsText = _booking.IsNonStop ? "Non-stop" : $"{_booking.Stops?.Count ?? 0} stop{(_booking.Stops?.Count > 1 ? "s" : "")}";
+            lblStops.Text = $"Stops: {stopsText}";
+            lblStops.ForeColor = _booking.IsNonStop ? Color.Green : Color.Orange;
+
+            if (!_booking.IsNonStop && _booking.Stops != null && _booking.Stops.Any())
+            {
+                var toolTip = new ToolTip();
+                var stopDetails = string.Join("\n", _booking.Stops.Select(s =>
+                    $"{s.AirportCode} - {s.Airport ?? "Unknown Airport"} ({FormatDuration(s.LayoverDuration)})"));
+                toolTip.SetToolTip(lblStops, $"Stop Details:\n{stopDetails}");
+            }
+
             lblSeat.Text = $"Seat: {_booking.SeatNumber} ({_booking.SeatClass})";
             lblStatus.Text = $"Status: {_booking.Status}";
-            lblStatus.ForeColor = _booking.Status == "Confirmed" ? Color.Green : Color.OrangeRed;
+            lblStatus.ForeColor = _booking.Status == "Confirmed" ? Color.DarkGreen : Color.OrangeRed;
             lblPNR.Text = $"PNR: {_booking.PNR}";
             lblIssuedAt.Text = $"Issued at: {_booking.BookingDate:MMM dd, yyyy hh:mm tt}";
             lblPrice.Text = $"Total Paid: {_booking.FormattedTotalPrice}";
@@ -65,7 +99,6 @@ namespace FlightBookingSystem.Controls
             btnCancelBooking.Enabled = canModify;
             btnGeneratePDF.Enabled = true;
         }
-
         private void btnSaveChanges_Click(object sender, EventArgs e)
         {
             if (ValidateInputs())
@@ -309,10 +342,22 @@ namespace FlightBookingSystem.Controls
                 leftCell.AddElement(new Paragraph(new Chunk(new iTextSharp.text.pdf.draw.LineSeparator(
                     0.25f, 100f, BaseColor.LIGHT_GRAY, Element.ALIGN_LEFT, -1))));
                 leftCell.AddElement(CreateDetailRow("Airline:", $"{_booking.Airline} ({_booking.FlightNumber})"));
-                leftCell.AddElement(CreateDetailRow("Route:", $"{_booking.Origin} → {_booking.Destination}"));
+                leftCell.AddElement(CreateDetailRow("Route:", GetFormattedRouteForPDF()));
                 leftCell.AddElement(CreateDetailRow("Departure:", _booking.DepartureTime.ToString("ddd, MMM dd yyyy HH:mm")));
                 leftCell.AddElement(CreateDetailRow("Arrival:", _booking.ArrivalTime.ToString("ddd, MMM dd yyyy HH:mm")));
                 leftCell.AddElement(CreateDetailRow("Duration:", FormatDuration(_booking.ArrivalTime - _booking.DepartureTime)));
+
+                if (!_booking.IsNonStop && _booking.Stops != null && _booking.Stops.Any())
+                {
+                    leftCell.AddElement(CreateDetailRow("Stops:", $"{_booking.Stops.Count} stop{(_booking.Stops.Count > 1 ? "s" : "")}"));
+                    foreach (var stop in _booking.Stops)
+                    {
+                        leftCell.AddElement(CreateDetailRow($"  {stop.AirportCode}:",
+                            $"{FormatDuration(stop.LayoverDuration)} layover",
+                            fontColor: BaseColor.DARK_GRAY));
+                    }
+                }
+
                 leftCell.AddElement(CreateDetailRow("Seat:", $"{_booking.SeatNumber} ({_booking.SeatClass})"));
                 leftCell.AddElement(new Paragraph("\n"));
 
@@ -447,9 +492,30 @@ namespace FlightBookingSystem.Controls
             }
             return airportInfo;
         }
+        private string GetFormattedRouteForPDF()
+        {
+            if (_booking.IsNonStop || _booking.Stops == null || !_booking.Stops.Any())
+            {
+                return $"{_booking.Origin} → {_booking.Destination}";
+            }
 
+            var sb = new System.Text.StringBuilder();
+            sb.Append(_booking.Origin);
+
+            foreach (var stop in _booking.Stops)
+            {
+                sb.Append($" → {stop.AirportCode}");
+            }
+
+            sb.Append($" → {_booking.Destination}");
+            return sb.ToString();
+        }
         private string FormatDuration(TimeSpan duration)
         {
+            if (duration.Days > 0)
+            {
+                return $"{duration.Days} day{(duration.Days > 1 ? "s" : "")} {duration.Hours}h {duration.Minutes}m";
+            }
             return $"{duration.Hours}h {duration.Minutes}m";
         }
 
