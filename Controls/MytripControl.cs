@@ -36,8 +36,6 @@ namespace FlightBookingSystem.Controls
             try
             {
                 bookingsPanel.Controls.Clear();
-                loadingIndicator.Visible = true;
-
                 var userBookings = await Task.Run(() => _bookingService.GetUserBookings(_currentUser.Id));
 
                 if (!userBookings.Any())
@@ -139,7 +137,8 @@ namespace FlightBookingSystem.Controls
                 BackColor = Color.FromArgb(0, 115, 207),
                 FlatStyle = FlatStyle.Flat,
                 Font = new Font("Arial", 9, FontStyle.Bold),
-                Tag = booking.Id
+                Tag = booking.Id,
+                Visible = booking.Status == "Confirmed" 
             };
             manageButton.FlatAppearance.BorderSize = 0;
             manageButton.Click += (s, e) => BookingManaged?.Invoke(this, (int)manageButton.Tag);
