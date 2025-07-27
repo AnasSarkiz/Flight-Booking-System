@@ -24,6 +24,16 @@ namespace FlightBooker
         {
             try
             {
+                if(string.IsNullOrWhiteSpace(usernameTextBox.Text))
+                {
+                    errorProvider.SetError(usernameTextBox, "Username is required.");
+                    return;
+                }
+                if (string.IsNullOrWhiteSpace(passwordTextBox.Text))
+                {
+                   errorProvider.SetError(passwordTextBox, "Password is required.");
+                    return;
+                }
                 User user = _userService.Login(
                     usernameTextBox.Text.Trim(),
                     passwordTextBox.Text.Trim()

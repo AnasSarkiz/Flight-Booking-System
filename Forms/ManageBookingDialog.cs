@@ -334,7 +334,7 @@ namespace FlightBookingSystem.Controls
                 leftCell.AddElement(CreateDetailRow("PNR:", _booking.PNR, true));
                 leftCell.AddElement(CreateDetailRow("Booking Date:", _booking.BookingDate.ToString("MMM dd, yyyy HH:mm")));
                 leftCell.AddElement(CreateDetailRow("Status:", _booking.Status,
-                    fontColor: _booking.Status == "Confirmed" ? BaseColor.GREEN : BaseColor.RED));
+                    fontColor: _booking.Status == "Confirmed" ? new BaseColor(0, 100, 0) : BaseColor.RED));
                 leftCell.AddElement(new Paragraph("\n\n\n"));
 
                 leftCell.AddElement(new Paragraph("FLIGHT INFORMATION",

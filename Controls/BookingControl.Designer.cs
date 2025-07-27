@@ -139,6 +139,7 @@
             dtpDob.Name = "dtpDob";
             dtpDob.Size = new Size(631, 25);
             dtpDob.TabIndex = 13;
+            dtpDob.MaxDate = DateTime.Today; 
             // 
             // txtPhone
             // 
@@ -158,7 +159,6 @@
             // 
             // cmbNationality
             // 
-            cmbNationality.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbNationality.Font = new Font("Segoe UI", 10F);
             cmbNationality.FormattingEnabled = true;
             cmbNationality.Location = new Point(180, 193);
@@ -321,5 +321,7 @@
         private Label label3;
         private Label label2;
         private Label label1;
+        ErrorProvider errorProvider = new ErrorProvider();
+
     }
 }

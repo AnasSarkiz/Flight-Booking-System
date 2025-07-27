@@ -53,7 +53,6 @@ namespace FlightBooker
             usernameTextBox.Name = "usernameTextBox";
             usernameTextBox.Size = new Size(300, 22);
             usernameTextBox.TabIndex = 1;
-            //errorProvider.SetError(usernameTextBox, "Username Required");
             // 
             // passwordLabel
             // 
@@ -77,7 +76,6 @@ namespace FlightBooker
             passwordTextBox.Size = new Size(300, 22);
             passwordTextBox.TabIndex = 3;
             passwordTextBox.UseSystemPasswordChar = true;
-            //errorProvider.SetError(passwordTextBox, "Password Requierd");
             // 
             // loginButton
             // 

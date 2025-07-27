@@ -10,6 +10,7 @@ using FlightBookingSystem.Services;
 using System.Data;
 using Microsoft.Data.SqlClient;
 using System.Transactions;
+using System.Text.RegularExpressions;
 using System.Net.Mail;
 
 
@@ -220,34 +221,121 @@ namespace FlightBookingSystem.Controls
                               MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+        private bool ValidateBooking()
+        {
+            bool isValid = true;
+            errorProvider.Clear(); 
+
+            if (string.IsNullOrWhiteSpace(txtFirstName.Text))
+            {
+                errorProvider.SetError(txtFirstName, "First name is required");
+                isValid = false;
+            }
+            else if (txtFirstName.Text.Length > 50)
+            {
+                errorProvider.SetError(txtFirstName, "First name cannot exceed 50 characters");
+                isValid = false;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtLastName.Text))
+            {
+                errorProvider.SetError(txtLastName, "Last name is required");
+                isValid = false;
+            }
+            else if (txtLastName.Text.Length > 50)
+            {
+                errorProvider.SetError(txtLastName, "Last name cannot exceed 50 characters");
+                isValid = false;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtEmail.Text))
+            {
+                errorProvider.SetError(txtEmail, "Email is required");
+                isValid = false;
+            }
+            else if (!IsValidEmail(txtEmail.Text))
+            {
+                errorProvider.SetError(txtEmail, "Please enter a valid email address");
+                isValid = false;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtPhone.Text))
+            {
+                errorProvider.SetError(txtPhone, "Phone number is required");
+                isValid = false;
+            }
+            else if (!IsValidPhoneNumber(txtPhone.Text))
+            {
+                errorProvider.SetError(txtPhone, "Format: +[country code][number] (e.g., +218123456789)");
+                isValid = false;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtPassport.Text))
+            {
+                errorProvider.SetError(txtPassport, "Passport number is required");
+                isValid = false;
+            }
+            else if (!IsValidPassport(txtPassport.Text))
+            {
+                errorProvider.SetError(txtPassport, "Only letters and numbers allowed");
+                isValid = false;
+            }
+            else if (txtPassport.Text.Length < 6 || txtPassport.Text.Length > 20)
+            {
+                errorProvider.SetError(txtPassport, "Must be between 6-20 characters");
+                isValid = false;
+            }
+
+            if (dtpDob.Value > DateTime.Today)
+            {
+                errorProvider.SetError(dtpDob, "Date cannot be in the future");
+                isValid = false;
+            }
+            else if (CalculateAge(dtpDob.Value) < 1)
+            {
+                errorProvider.SetError(dtpDob, "Passenger must be at least 1 year old");
+                isValid = false;
+            }
+
+            if (cmbNationality.SelectedIndex == -1 || string.IsNullOrWhiteSpace(cmbNationality.Text))
+            {
+                errorProvider.SetError(cmbNationality, "Please select a nationality");
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        // Helper method to calculate age
+        private int CalculateAge(DateTime birthDate)
+        {
+            var today = DateTime.Today;
+            var age = today.Year - birthDate.Year;
+            if (birthDate.Date > today.AddYears(-age)) age--;
+            return age;
+        }
+
+        private bool IsValidPhoneNumber(string phoneNumber) { 
+        
+            return Regex.IsMatch(phoneNumber, @"^\+\d{1,4}\d{7,14}$");
+        }
+
+        private bool IsValidPassport(string passportNumber)
+        {
+            return Regex.IsMatch(passportNumber, @"^[a-zA-Z0-9]+$");
+        }
+
         private bool IsValidEmail(string email)
         {
             try
             {
-                MailAddress addr = new System.Net.Mail.MailAddress(email);
+                var addr = new MailAddress(email);
                 return addr.Address == email;
             }
             catch
             {
                 return false;
             }
-        }
-        private bool ValidateBooking()
-        {
-            if (string.IsNullOrWhiteSpace(_bookingDetails.Passenger.FirstName))
-            {
-                MessageBox.Show("First name is required", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
-            }
-
-            if (string.IsNullOrWhiteSpace(_bookingDetails.Passenger.LastName))
-            {
-                MessageBox.Show("Last name is required", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
-            }
-            IsValidEmail(email: _bookingDetails.Passenger.Email);
-
-            return true;
         }
     }
 }
