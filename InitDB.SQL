@@ -4,6 +4,16 @@ GO
 
 IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'Re7la')
 BEGIN
+Expand
+SQL.sql
+5 KB
+﻿
+-- Create the database
+USE master;
+GO
+
+IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'Re7la')
+BEGIN
     CREATE DATABASE Re7la;
 END
 GO
@@ -30,7 +40,7 @@ CREATE TABLE Users (
     LockoutEnd DATETIME,
     CreatedAt DATETIME NOT NULL DEFAULT GETUTCDATE(),
     UpdatedAt DATETIME NOT NULL DEFAULT GETUTCDATE(),
-    FOREIGN KEY (CreatedByAdminId) REFERENCES dUsers(Id)
+    FOREIGN KEY (CreatedByAdminId) REFERENCES Users(Id)
 );
 GO
 
@@ -98,6 +108,7 @@ CREATE TABLE ActivityLogs (
     Description NVARCHAR(255) NOT NULL,
     Timestamp DATETIME NOT NULL DEFAULT GETUTCDATE(),
     CreatedAt DATETIME NOT NULL DEFAULT GETUTCDATE(),
+    IpAddress NVARCHAR(50) NULL,
     FOREIGN KEY (UserId) REFERENCES Users(Id)
 );
 GO
@@ -128,7 +139,7 @@ INSERT INTO Users (
     UpdatedAt
 ) VALUES (
     'admin', 
-    '$2a$11$2nRZ7rE6QOYkzZq.3YVQJ.DRfz7wW7cXoJk9ZJt8Nv1dLm1Yf9QO2', 
+    '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 
     0, 
     'System', 
     'Admin', 
